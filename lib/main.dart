@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'app_shell.dart';
+import 'login_screen.dart';
 import 'theme.dart';
 
 void main() {
@@ -57,7 +57,7 @@ class _SplashScreenState extends State<SplashScreen>
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
-        pageBuilder: (_, __, ___) => const AppShell(),
+        pageBuilder: (_, __, ___) => const LoginScreen(),
         transitionsBuilder: (_, animation, __, child) =>
             FadeTransition(opacity: animation, child: child),
         transitionDuration: const Duration(milliseconds: 600),
