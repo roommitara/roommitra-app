@@ -9,17 +9,16 @@ class RoomItem {
   final int rooms;
   final String bath;
   final String tag;
-  const RoomItem(
-      this.title, this.area, this.price, this.rooms, this.bath, this.tag);
+  final String image;
+  const RoomItem(this.title, this.area, this.price, this.rooms, this.bath,
+      this.tag, this.image);
 }
 
 const List<RoomItem> featuredRooms = [
-  RoomItem('1 RK Room for Rent', 'Kothrud, Pune', 7500, 1, 'साझा बाथरूम',
-      'छात्रों के लिए बेहतर'),
-  RoomItem('PG Room (Boys)', 'Hadapsar, Pune', 5500, 1, 'साझा बाथरूम',
-      'Food Included'),
-  RoomItem('Single Room (With AC)', 'Viman Nagar, Pune', 7000, 1,
-      'अटैच बाथरूम', 'AC Room'),
+  RoomItem('1 RK Room for Rent', 'Nahan, Sirmour', 4500, 1, 'साझा बाथरूम',
+      'छात्रों के लिए बेहतर', 'assets/room1.jpg'),
+  RoomItem('PG Room (Boys)', 'Nahan, Sirmour', 3500, 1, 'साझा बाथरूम',
+      'Food Included', 'assets/room2.jpg'),
 ];
 
 String formatPrice(int p) {
@@ -38,21 +37,16 @@ class RoomMitraLogo extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        const SizedBox(
-          width: 48,
-          height: 48,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              Icon(Icons.home_outlined, color: Colors.white, size: 48),
-              Positioned(
-                bottom: 4,
-                child: Icon(Icons.eco, color: AppColors.accent, size: 20),
-              ),
-            ],
+        ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Image.asset(
+            'assets/logo.png',
+            width: 52,
+            height: 52,
+            fit: BoxFit.contain,
           ),
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: 10),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
@@ -107,7 +101,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _cat = 0;
-  String _city = 'Pune';
+  String _city = 'Nahan';
   final Set<String> _fav = {};
 
   static const List<_Cat> _cats = [
@@ -118,13 +112,15 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
 
   static const List<_City> _cities = [
-    _City('Pune', Icons.fort, Color(0xFF8FB7D9), Color(0xFFC9A57C)),
-    _City('Mumbai', Icons.account_balance, Color(0xFF9DBFD8), Color(0xFFB9A58C)),
-    _City('Bangalore', Icons.location_city, Color(0xFF7FB0DC), Color(0xFF9CC6A0)),
-    _City('Delhi', Icons.museum, Color(0xFFF2B27A), Color(0xFFE08E5A)),
+    _City('Nahan', Icons.location_city, Color(0xFF7FB0DC), Color(0xFF9CC6A0)),
+    _City('Paonta Sahib', Icons.account_balance, Color(0xFFC9A57C),
+        Color(0xFF8FB7D9)),
+    _City('Rajgarh', Icons.landscape, Color(0xFF9CC6A0), Color(0xFF5E9B78)),
+    _City('Kala Amb', Icons.factory, Color(0xFFF2B27A), Color(0xFFE08E5A)),
   ];
 
   Widget _header(double top) {
+    final w = MediaQuery.of(context).size.width;
     return Container(
       width: double.infinity,
       clipBehavior: Clip.hardEdge,
@@ -135,30 +131,43 @@ class _HomeScreenState extends State<HomeScreen> {
           end: Alignment.bottomRight,
         ),
       ),
-      padding: EdgeInsets.fromLTRB(20, top + 14, 20, 30),
       child: Stack(
         children: [
-          const Positioned(
-            right: 40,
+          Positioned(
+            right: 0,
             top: 0,
-            child: Icon(Icons.cottage, size: 90, color: Color(0x1AFFFFFF)),
+            bottom: 0,
+            width: w * 0.62,
+            child: ShaderMask(
+              blendMode: BlendMode.dstIn,
+              shaderCallback: (rect) => const LinearGradient(
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+                colors: [Color(0x00FFFFFF), Color(0xFFFFFFFF)],
+              ).createShader(rect),
+              child: Image.asset('assets/header_bg.jpg', fit: BoxFit.cover),
+            ),
           ),
-          Row(
-            children: [
-              const RoomMitraLogo(),
-              const Spacer(),
-              GestureDetector(
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('नोटिफिकेशन स्क्रीन अगले चरणों में जुड़ेगी'),
-                    ),
-                  );
-                },
-                child: const Icon(Icons.notifications_none,
-                    color: Colors.white, size: 30),
-              ),
-            ],
+          Padding(
+            padding: EdgeInsets.fromLTRB(20, top + 14, 20, 30),
+            child: Row(
+              children: [
+                const RoomMitraLogo(),
+                const Spacer(),
+                GestureDetector(
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content:
+                            Text('नोटिफिकेशन स्क्रीन अगले चरणों में जुड़ेगी'),
+                      ),
+                    );
+                  },
+                  child: const Icon(Icons.notifications_none,
+                      color: Colors.white, size: 30),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -408,18 +417,11 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Stack(
             children: [
-              Container(
+              Image.asset(
+                r.image,
                 height: 112,
                 width: double.infinity,
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Color(0xFFE9D9BE), Color(0xFFCFE3D6)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                ),
-                child: const Icon(Icons.bed_rounded,
-                    size: 54, color: Color(0xFF8FB39C)),
+                fit: BoxFit.cover,
               ),
               Positioned(
                 left: 8,
@@ -588,12 +590,16 @@ class _HomeScreenState extends State<HomeScreen> {
                       const Icon(Icons.location_on_outlined,
                           size: 16, color: AppColors.primary),
                       const SizedBox(width: 2),
-                      Text(
-                        c.name,
-                        style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.text),
+                      Expanded(
+                        child: Text(
+                          c.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.text),
+                        ),
                       ),
                     ],
                   ),
