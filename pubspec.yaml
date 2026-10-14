@@ -14,3 +14,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/splash.png
+    - assets/room1.jpg
+    - assets/room2.jpg
+    - assets/header_bg.jpg
+    - assets/logo.png
