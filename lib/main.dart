@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'app_shell.dart';
+import 'theme.dart';
 
 void main() {
   runApp(const RoomMitraApp());
@@ -12,10 +14,7 @@ class RoomMitraApp extends StatelessWidget {
     return MaterialApp(
       title: 'RoomMitra',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF0B5D3B)),
-      ),
+      theme: buildAppTheme(),
       home: const SplashScreen(),
     );
   }
@@ -58,7 +57,7 @@ class _SplashScreenState extends State<SplashScreen>
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
-        pageBuilder: (_, __, ___) => const HomePlaceholder(),
+        pageBuilder: (_, __, ___) => const AppShell(),
         transitionsBuilder: (_, animation, __, child) =>
             FadeTransition(opacity: animation, child: child),
         transitionDuration: const Duration(milliseconds: 600),
@@ -80,27 +79,6 @@ class _SplashScreenState extends State<SplashScreen>
         opacity: _opacity,
         child: SizedBox.expand(
           child: Image.asset('assets/splash.png', fit: BoxFit.cover),
-        ),
-      ),
-    );
-  }
-}
-
-class HomePlaceholder extends StatelessWidget {
-  const HomePlaceholder({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF0B5D3B),
-        foregroundColor: Colors.white,
-        title: const Text('RoomMitra'),
-      ),
-      body: const Center(
-        child: Text(
-          'होम स्क्रीन जल्द आ रही है',
-          style: TextStyle(fontSize: 18),
         ),
       ),
     );
