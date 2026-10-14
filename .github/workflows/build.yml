@@ -15,10 +15,21 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
-      - run: flutter create --platforms=android --project-name roommitra_app --org com.roommitra .
-      - run: flutter pub get
-      - run: flutter build apk --release
+      - name: Create Android project
+        run: flutter create --platforms=android --project-name roommitra_app --org com.roommitra out
+      - name: Copy app files
+        run: |
+          rm -rf out/lib
+          cp -r lib out/lib
+          cp pubspec.yaml out/pubspec.yaml
+          mkdir -p out/assets
+          cp file_00000000b18c8208822c12bae77db15e.png out/assets/splash.png
+      - name: Build
+        working-directory: out
+        run: |
+          flutter pub get
+          flutter build apk --release
       - uses: actions/upload-artifact@v4
         with:
           name: RoomMitra-APK
-          path: build/app/outputs/flutter-apk/app-release.apk
+          path: out/build/app/outputs/flutter-apk/app-release.apk
