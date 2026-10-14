@@ -24,6 +24,10 @@ jobs:
           cp pubspec.yaml out/pubspec.yaml
           mkdir -p out/assets
           cp file_00000000b18c8208822c12bae77db15e.png out/assets/splash.png
+          cp room1.jpg out/assets/room1.jpg
+          cp room2.jpg out/assets/room2.jpg
+          cp header_bg.jpg out/assets/header_bg.jpg
+          cp app_logo_green.png out/assets/logo.png
       - name: Build
         working-directory: out
         run: |
