@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
+import 'search_screen.dart';
 import 'theme.dart';
 
 class AppShell extends StatefulWidget {
@@ -111,7 +112,7 @@ class _AppShellState extends State<AppShell> {
   Widget build(BuildContext context) {
     final pages = <Widget>[
       HomeScreen(onListTap: () => _go(2), onSearchTap: () => _go(1)),
-      const PlaceholderScreen(icon: Icons.search, title: 'खोजें'),
+      const SearchScreen(),
       const PlaceholderScreen(
           icon: Icons.add_circle_outline, title: 'लिस्ट करें'),
       const PlaceholderScreen(icon: Icons.favorite_border, title: 'पसंदीदा'),
