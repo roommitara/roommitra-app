@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'data.dart';
 import 'home_screen.dart' show RoomMitraLogo;
+import 'booking_screen.dart';
 import 'theme.dart';
 
 /// किसी कमरे की सभी फोटो (डेमो में असली फोटो + नाहन की नमूना फोटो)
@@ -683,8 +684,11 @@ class _DetailScreenState extends State<DetailScreen> {
             width: double.infinity,
             height: 44,
             child: OutlinedButton.icon(
-              onPressed: () =>
-                  showMsg(context, 'विज़िट बुकिंग वाली स्क्रीन बाद में जुड़ेगी'),
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => BookingScreen(listing: l),
+                ),
+              ),
               icon: const Icon(Icons.calendar_month, size: 20),
               label: const Text('विज़िट का समय चुनें'),
               style: OutlinedButton.styleFrom(
