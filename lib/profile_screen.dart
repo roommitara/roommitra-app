@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'data.dart';
 import 'home_screen.dart' show RoomMitraLogo;
+import 'messages_screen.dart';
 import 'my_listings_screen.dart';
 import 'theme.dart';
 
@@ -249,6 +250,18 @@ class ProfileScreen extends StatelessWidget {
           Navigator.of(context).push(
             MaterialPageRoute<void>(
               builder: (_) => MyListingsScreen(onAdd: onAdd),
+            ),
+          );
+        },
+      ),
+      _MenuItem(
+        Icons.chat_bubble,
+        'मेरे संदेश',
+        'मकान मालिकों और किरायेदारों से चैट',
+        () {
+          Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => const MessagesScreen(),
             ),
           );
         },
