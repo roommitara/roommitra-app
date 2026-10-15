@@ -1,0 +1,381 @@
+import 'package:flutter/material.dart';
+import 'data.dart';
+import 'detail_screen.dart';
+import 'home_screen.dart' show RoomMitraLogo;
+import 'theme.dart';
+
+class FavoritesScreen extends StatelessWidget {
+  /// खाली स्क्रीन पर "कमरे खोजें" दबाने पर चलेगा
+  final VoidCallback onSearchTap;
+  const FavoritesScreen({super.key, required this.onSearchTap});
+
+  Widget _topBar(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [AppColors.primaryDark, AppColors.primary],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      padding: EdgeInsets.fromLTRB(
+          16, MediaQuery.of(context).padding.top + 10, 16, 12),
+      child: const Row(
+        children: [
+          RoomMitraLogo(),
+          Spacer(),
+          Icon(Icons.favorite, color: Colors.white, size: 26),
+        ],
+      ),
+    );
+  }
+
+  Widget _headerCard(int count) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.tint,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 52,
+            height: 52,
+            decoration: const BoxDecoration(
+              color: AppColors.primary,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.favorite, color: Colors.white, size: 28),
+          ),
+          const SizedBox(width: 12),
+          const Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'मेरे पसंदीदा कमरे',
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.text),
+                ),
+                SizedBox(height: 2),
+                Text(
+                  'आपके द्वारा सेव किए गए सभी कमरे यहाँ दिखाई देंगे।',
+                  style: TextStyle(
+                      fontSize: 12, height: 1.3, color: AppColors.text),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.primary),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.bookmark,
+                    size: 18, color: AppColors.primary),
+                const SizedBox(width: 4),
+                Text(
+                  'कुल $count',
+                  style: const TextStyle(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.primary),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _stat(IconData icon, String text) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 14, color: AppColors.primary),
+        const SizedBox(width: 4),
+        Text(text,
+            style: const TextStyle(fontSize: 11.5, color: AppColors.muted)),
+      ],
+    );
+  }
+
+  List<String> _tags(Listing l) {
+    final t = <String>[l.kind];
+    if (l.verified) t.add('सत्यापित');
+    if (l.immediate) t.add('तुरंत उपलब्ध');
+    if (l.directOwner) t.add('मालिक से सीधे');
+    if (l.safeWomen) t.add('सुरक्षित महिला');
+    return t.take(3).toList();
+  }
+
+  String _amenityLine(Listing l) {
+    return allAmenities
+        .where((a) => l.amenities.contains(a.id))
+        .map((a) => a.label)
+        .take(5)
+        .join(', ');
+  }
+
+  Widget _card(BuildContext context, Listing l) {
+    final amen = _amenityLine(l);
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute<void>(
+            builder: (_) => DetailScreen(listing: l),
+          ),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.border),
+          boxShadow: const [
+            BoxShadow(
+                color: Color(0x12000000), blurRadius: 8, offset: Offset(0, 2)),
+          ],
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: 112,
+              height: 130,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Image.asset(l.image, fit: BoxFit.cover),
+                    Positioned(
+                      left: 6,
+                      bottom: 6,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 7, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: const Color(0x99000000),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.photo_camera,
+                                size: 13, color: Colors.white),
+                            const SizedBox(width: 4),
+                            Text(
+                              '1/${l.photos}',
+                              style: const TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          l.title,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.text),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () => appState.toggleFavorite(l.id),
+                        child: const Padding(
+                          padding: EdgeInsets.only(left: 6),
+                          child: Icon(Icons.favorite,
+                              size: 24, color: Color(0xFFE53935)),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      const Icon(Icons.location_on,
+                          size: 15, color: AppColors.primary),
+                      const SizedBox(width: 3),
+                      Expanded(
+                        child: Text(
+                          l.area,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                              fontSize: 12.5, color: AppColors.primary),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppColors.tint,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      '₹${inr(l.price)}/माह',
+                      style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.primary),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Wrap(
+                    spacing: 10,
+                    runSpacing: 4,
+                    children: [
+                      _stat(Icons.home_outlined, l.typeLabel),
+                      _stat(Icons.square_foot, '${l.sqft} sq ft'),
+                      _stat(Icons.apartment, l.floor),
+                    ],
+                  ),
+                  if (amen.isNotEmpty) ...[
+                    const SizedBox(height: 6),
+                    Text(
+                      amen,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                          fontSize: 12, color: AppColors.muted),
+                    ),
+                  ],
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    children: _tags(l)
+                        .map((t) => Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 9, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: AppColors.tint,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                t,
+                                style: const TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.primary),
+                              ),
+                            ))
+                        .toList(),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _empty() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 48, 24, 24),
+      child: Column(
+        children: [
+          const Icon(Icons.favorite_border, size: 72, color: AppColors.muted),
+          const SizedBox(height: 14),
+          const Text(
+            'अभी कोई पसंदीदा कमरा नहीं है',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: AppColors.text),
+          ),
+          const SizedBox(height: 6),
+          const Text(
+            'कमरे पर दिल का निशान दबाकर उसे यहाँ सेव करें।',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 14, color: AppColors.muted),
+          ),
+          const SizedBox(height: 18),
+          ElevatedButton.icon(
+            onPressed: onSearchTap,
+            icon: const Icon(Icons.search, size: 20),
+            label: const Text('कमरे खोजें'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
+              textStyle:
+                  const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: appState,
+      builder: (context, _) {
+        final favs =
+            sampleListings.where((l) => appState.isFav(l.id)).toList();
+        return Scaffold(
+          backgroundColor: const Color(0xFFF7FCF9),
+          body: Column(
+            children: [
+              _topBar(context),
+              Expanded(
+                child: ListView(
+                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+                  children: [
+                    _headerCard(favs.length),
+                    const SizedBox(height: 12),
+                    if (favs.isEmpty)
+                      _empty()
+                    else
+                      ...favs.map((l) => _card(context, l)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
