@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'data.dart';
 import 'home_screen.dart' show RoomMitraLogo;
 import 'booking_screen.dart';
+import 'report_screen.dart';
 import 'theme.dart';
 
 /// किसी कमरे की सभी फोटो (डेमो में असली फोटो + नाहन की नमूना फोटो)
@@ -137,7 +138,11 @@ class _DetailScreenState extends State<DetailScreen> {
           icon: const Icon(Icons.more_vert, color: Colors.white),
           onSelected: (v) {
             if (v == 'report') {
-              showMsg(context, 'रिपोर्ट वाली स्क्रीन बाद में जुड़ेगी');
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => ReportScreen(listing: l),
+                ),
+              );
             }
           },
           itemBuilder: (_) => const [
