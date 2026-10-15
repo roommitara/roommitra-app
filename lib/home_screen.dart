@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'data.dart';
 import 'theme.dart';
 
 class RoomItem {
@@ -101,8 +102,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _cat = 0;
-  String _city = 'Nahan';
-  final Set<String> _fav = {};
 
   static const List<_Cat> _cats = [
     _Cat(Icons.home_rounded, 'सभी प्रकार'),
@@ -156,12 +155,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 const Spacer(),
                 GestureDetector(
                   onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content:
-                            Text('नोटिफिकेशन स्क्रीन अगले चरणों में जुड़ेगी'),
-                      ),
-                    );
+                    showMsg(context,
+                        'नोटिफिकेशन स्क्रीन अगले चरणों में जुड़ेगी');
                   },
                   child: const Icon(Icons.notifications_none,
                       color: Colors.white, size: 30),
@@ -176,7 +171,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _cityChip() {
     return PopupMenuButton<String>(
-      onSelected: (c) => setState(() => _city = c),
+      onSelected: appState.setCity,
       itemBuilder: (_) => _cities
           .map((c) => PopupMenuItem(value: c.name, child: Text(c.name)))
           .toList(),
@@ -192,7 +187,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const Icon(Icons.location_on, size: 20, color: AppColors.primary),
             const SizedBox(width: 8),
             Text(
-              _city,
+              appState.city,
               style: const TextStyle(
                   color: AppColors.primary,
                   fontSize: 16,
@@ -398,154 +393,183 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _roomCard(RoomItem r, double w) {
-    final key = r.title + r.area;
-    final fav = _fav.contains(key);
-    return Container(
-      width: w,
-      clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: const [
-          BoxShadow(
-              color: Color(0x1A000000), blurRadius: 10, offset: Offset(0, 3)),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Stack(
-            children: [
-              Image.asset(
-                r.image,
-                height: 112,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
-              Positioned(
-                left: 8,
-                top: 8,
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    '₹${formatPrice(r.price)}/माह',
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700),
-                  ),
-                ),
-              ),
-              Positioned(
-                right: 8,
-                top: 8,
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      if (fav) {
-                        _fav.remove(key);
-                      } else {
-                        _fav.add(key);
-                      }
-                    });
-                  },
-                  child: Container(
-                    width: 34,
-                    height: 34,
-                    decoration: const BoxDecoration(
-                      color: Color(0x66FFFFFF),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      fav ? Icons.favorite : Icons.favorite_border,
-                      size: 20,
-                      color: fav ? AppColors.danger : Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+  String _tagFor(Listing l) {
+    if (l.verified) return 'सत्यापित';
+    if (l.immediate) return 'तुरंत उपलब्ध';
+    if (l.directOwner) return 'मालिक से सीधे';
+    return l.kind;
+  }
+
+  Widget _roomCard(Listing l, double w) {
+    final fav = appState.isFav(l.id);
+    return GestureDetector(
+      onTap: () => showMsg(context, 'कमरे की डिटेल स्क्रीन अगले चरण में जुड़ेगी'),
+      child: Container(
+        width: w,
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: const [
+            BoxShadow(
+                color: Color(0x1A000000), blurRadius: 10, offset: Offset(0, 3)),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Stack(
               children: [
-                Text(
-                  r.title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.text),
+                Image.asset(
+                  l.image,
+                  height: 112,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
                 ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    const Icon(Icons.location_on_outlined,
-                        size: 16, color: AppColors.muted),
-                    const SizedBox(width: 3),
-                    Expanded(
-                      child: Text(
-                        r.area,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                            fontSize: 13, color: AppColors.muted),
+                Positioned(
+                  left: 8,
+                  top: 8,
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      '₹${inr(l.price)}/माह',
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  right: 8,
+                  top: 8,
+                  child: GestureDetector(
+                    onTap: () => appState.toggleFavorite(l.id),
+                    child: Container(
+                      width: 34,
+                      height: 34,
+                      decoration: const BoxDecoration(
+                        color: Color(0x66000000),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        fav ? Icons.favorite : Icons.favorite_border,
+                        size: 20,
+                        color: fav ? const Color(0xFFFF6B6B) : Colors.white,
                       ),
                     ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 12,
-                  runSpacing: 4,
-                  children: [
-                    _stat(Icons.bed_outlined, '${r.rooms} Room'),
-                    _stat(Icons.bathtub_outlined, r.bath),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: AppColors.tint,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    r.tag,
-                    style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.primary),
                   ),
                 ),
               ],
             ),
-          ),
-        ],
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.text),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      const Icon(Icons.location_on_outlined,
+                          size: 16, color: AppColors.muted),
+                      const SizedBox(width: 3),
+                      Expanded(
+                        child: Text(
+                          l.area,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                              fontSize: 13, color: AppColors.muted),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 4,
+                    children: [
+                      _stat(Icons.bed_outlined, '${l.rooms} Room'),
+                      _stat(Icons.bathtub_outlined, l.bathLabel),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: AppColors.tint,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      _tagFor(l),
+                      style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primary),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _roomRow(double w) {
+    final rooms =
+        sampleListings.where((l) => l.city == appState.city).take(4).toList();
+    if (rooms.isEmpty) {
+      return Container(
+        width: double.infinity,
+        margin: const EdgeInsets.symmetric(vertical: 6),
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: AppColors.tintLight,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: const Column(
+          children: [
+            Icon(Icons.search_off, size: 40, color: AppColors.muted),
+            SizedBox(height: 8),
+            Text(
+              'इस शहर में अभी कोई कमरा नहीं है',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.muted),
+            ),
+          ],
+        ),
+      );
+    }
     return SizedBox(
       height: 272,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(vertical: 6),
         clipBehavior: Clip.none,
-        itemCount: featuredRooms.length,
+        itemCount: rooms.length,
         separatorBuilder: (_, __) => const SizedBox(width: 12),
-        itemBuilder: (context, i) => _roomCard(featuredRooms[i], w),
+        itemBuilder: (context, i) => _roomCard(rooms[i], w),
       ),
     );
   }
@@ -559,9 +583,9 @@ class _HomeScreenState extends State<HomeScreen> {
         separatorBuilder: (_, __) => const SizedBox(width: 12),
         itemBuilder: (context, i) {
           final c = _cities[i];
-          final sel = c.name == _city;
+          final sel = c.name == appState.city;
           return GestureDetector(
-            onTap: () => setState(() => _city = c.name),
+            onTap: () => appState.setCity(c.name),
             child: SizedBox(
               width: 112,
               child: Column(
@@ -616,62 +640,67 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final top = MediaQuery.of(context).padding.top;
     final cardW = (MediaQuery.of(context).size.width - 32 - 12) / 2;
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light.copyWith(
-        statusBarColor: Colors.transparent,
-      ),
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        body: SingleChildScrollView(
-          child: Container(
-            color: AppColors.primaryDark,
-            child: Column(
-              children: [
-                _header(top),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(26)),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
+    return ListenableBuilder(
+      listenable: appState,
+      builder: (context, _) {
+        return AnnotatedRegion<SystemUiOverlayStyle>(
+          value: SystemUiOverlayStyle.light.copyWith(
+            statusBarColor: Colors.transparent,
+          ),
+          child: Scaffold(
+            backgroundColor: Colors.white,
+            body: SingleChildScrollView(
+              child: Container(
+                color: AppColors.primaryDark,
+                child: Column(
+                  children: [
+                    _header(top),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(26)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _cityChip(),
-                          const Spacer(),
-                          GestureDetector(
-                            onTap: widget.onSearchTap,
-                            child: const Icon(Icons.tune,
-                                size: 30, color: AppColors.primary),
+                          Row(
+                            children: [
+                              _cityChip(),
+                              const Spacer(),
+                              GestureDetector(
+                                onTap: widget.onSearchTap,
+                                child: const Icon(Icons.tune,
+                                    size: 30, color: AppColors.primary),
+                              ),
+                            ],
                           ),
+                          const SizedBox(height: 16),
+                          _searchBar(),
+                          const SizedBox(height: 20),
+                          _categories(),
+                          const SizedBox(height: 20),
+                          _banner(),
+                          const SizedBox(height: 22),
+                          _sectionHeader('Featured Rooms'),
+                          const SizedBox(height: 8),
+                          _roomRow(cardW),
+                          const SizedBox(height: 14),
+                          _sectionHeader('लोकप्रिय शहर'),
+                          const SizedBox(height: 12),
+                          _cityRow(),
                         ],
                       ),
-                      const SizedBox(height: 16),
-                      _searchBar(),
-                      const SizedBox(height: 20),
-                      _categories(),
-                      const SizedBox(height: 20),
-                      _banner(),
-                      const SizedBox(height: 22),
-                      _sectionHeader('Featured Rooms'),
-                      const SizedBox(height: 8),
-                      _roomRow(cardW),
-                      const SizedBox(height: 14),
-                      _sectionHeader('लोकप्रिय शहर'),
-                      const SizedBox(height: 12),
-                      _cityRow(),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
