@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'add_listing_screen.dart';
+import 'favorites_screen.dart';
 import 'home_screen.dart';
 import 'profile_screen.dart';
 import 'search_screen.dart';
@@ -116,42 +117,12 @@ class _AppShellState extends State<AppShell> {
       HomeScreen(onListTap: () => _go(2), onSearchTap: () => _go(1)),
       const SearchScreen(),
       AddListingScreen(onDone: () => _go(0)),
-      const PlaceholderScreen(icon: Icons.favorite_border, title: 'पसंदीदा'),
+      FavoritesScreen(onSearchTap: () => _go(1)),
       ProfileScreen(onAdd: () => _go(2)),
     ];
     return Scaffold(
       body: IndexedStack(index: _index, children: pages),
       bottomNavigationBar: _bottomBar(context),
-    );
-  }
-}
-
-class PlaceholderScreen extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  const PlaceholderScreen({super.key, required this.icon, required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        title: Text(title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 56, color: AppColors.primary),
-            const SizedBox(height: 12),
-            Text(
-              '$title की स्क्रीन अगले चरण में बनेगी',
-              style: const TextStyle(fontSize: 16, color: AppColors.muted),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
