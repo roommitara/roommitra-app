@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'data.dart';
+import 'detail_screen.dart';
 import 'theme.dart';
 
 class RoomItem {
@@ -400,10 +401,18 @@ class _HomeScreenState extends State<HomeScreen> {
     return l.kind;
   }
 
+  void _openDetail(Listing l) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => DetailScreen(listing: l),
+      ),
+    );
+  }
+
   Widget _roomCard(Listing l, double w) {
     final fav = appState.isFav(l.id);
     return GestureDetector(
-      onTap: () => showMsg(context, 'कमरे की डिटेल स्क्रीन अगले चरण में जुड़ेगी'),
+      onTap: () => _openDetail(l),
       child: Container(
         width: w,
         clipBehavior: Clip.antiAlias,
