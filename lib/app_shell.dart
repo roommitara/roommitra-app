@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'add_listing_screen.dart';
 import 'home_screen.dart';
+import 'profile_screen.dart';
 import 'search_screen.dart';
 import 'theme.dart';
 
@@ -116,7 +117,7 @@ class _AppShellState extends State<AppShell> {
       const SearchScreen(),
       AddListingScreen(onDone: () => _go(0)),
       const PlaceholderScreen(icon: Icons.favorite_border, title: 'पसंदीदा'),
-      const PlaceholderScreen(icon: Icons.person_outline, title: 'प्रोफाइल'),
+      ProfileScreen(onAdd: () => _go(2)),
     ];
     return Scaffold(
       body: IndexedStack(index: _index, children: pages),
