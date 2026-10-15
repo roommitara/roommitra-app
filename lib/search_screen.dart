@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'data.dart';
+import 'detail_screen.dart';
 import 'home_screen.dart' show RoomMitraLogo;
 import 'theme.dart';
 
@@ -81,7 +82,11 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   void _openDetail(Listing l) {
-    showMsg(context, 'कमरे की डिटेल स्क्रीन अगले चरण में जुड़ेगी');
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => DetailScreen(listing: l),
+      ),
+    );
   }
 
   BoxDecoration _cardDeco() {
