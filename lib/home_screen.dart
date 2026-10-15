@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'data.dart';
 import 'detail_screen.dart';
+import 'notifications_screen.dart';
 import 'theme.dart';
 
 class RoomItem {
@@ -155,12 +156,40 @@ class _HomeScreenState extends State<HomeScreen> {
                 const RoomMitraLogo(),
                 const Spacer(),
                 GestureDetector(
-                  onTap: () {
-                    showMsg(context,
-                        'नोटिफिकेशन स्क्रीन अगले चरणों में जुड़ेगी');
+                  onTap: () async {
+                    await Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => const NotificationsScreen(),
+                      ),
+                    );
+                    if (mounted) setState(() {});
                   },
-                  child: const Icon(Icons.notifications_none,
-                      color: Colors.white, size: 30),
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      const Icon(Icons.notifications_none,
+                          color: Colors.white, size: 30),
+                      if (demoNotifications.any((n) => n.unread))
+                        Positioned(
+                          right: -4,
+                          top: -4,
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFE53935),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Text(
+                              '${demoNotifications.where((n) => n.unread).length}',
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
               ],
             ),
