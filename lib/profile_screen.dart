@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'admin_screen.dart';
 import 'data.dart';
 import 'home_screen.dart' show RoomMitraLogo;
 import 'messages_screen.dart';
@@ -262,6 +263,18 @@ class ProfileScreen extends StatelessWidget {
           Navigator.of(context).push(
             MaterialPageRoute<void>(
               builder: (_) => const MessagesScreen(),
+            ),
+          );
+        },
+      ),
+      _MenuItem(
+        Icons.admin_panel_settings,
+        'एडमिन पैनल',
+        'डेमो: असली ऐप में सिर्फ एडमिन को दिखेगा',
+        () {
+          Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => const AdminScreen(),
             ),
           );
         },
