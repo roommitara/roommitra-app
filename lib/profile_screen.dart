@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'admin_screen.dart';
 import 'data.dart';
+import 'help_screen.dart';
 import 'home_screen.dart' show RoomMitraLogo;
 import 'messages_screen.dart';
 import 'my_listings_screen.dart';
+import 'terms_screen.dart';
 import 'theme.dart';
 
 class _MenuItem {
@@ -13,6 +15,15 @@ class _MenuItem {
   final VoidCallback onTap;
   const _MenuItem(this.icon, this.title, this.sub, this.onTap);
 }
+
+/// नोटिफिकेशन के स्विच (अभी सिर्फ ऐप चलने तक याद रहते हैं)
+final Map<String, bool> notifPrefs = <String, bool>{
+  'messages': true,
+  'rooms': true,
+  'bookings': true,
+  'safety': true,
+  'offers': false,
+};
 
 class ProfileScreen extends StatelessWidget {
   /// मेरी लिस्टिंग से "नई लिस्टिंग जोड़ें" दबाने पर चलेगा
@@ -289,25 +300,43 @@ class ProfileScreen extends StatelessWidget {
         Icons.shield,
         'सुरक्षा और गोपनीयता',
         'लॉगिन और डेटा सुरक्षा सेटिंग्स',
-        () => showMsg(context, 'यह हिस्सा बाद में जुड़ेगा'),
+        () => showMsg(context, 'यह हिस्सा Supabase जुड़ने पर आएगा'),
       ),
       _MenuItem(
         Icons.notifications,
         'नोटिफिकेशन सेटिंग',
         'मैसेज, नए कमरे के नोटिफिकेशन',
-        () => showMsg(context, 'यह हिस्सा बाद में जुड़ेगा'),
+        () {
+          Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => const NotificationSettingsScreen(),
+            ),
+          );
+        },
       ),
       _MenuItem(
         Icons.help,
         'सहायता और सपोर्ट',
         'FAQ, हेल्प सेंटर और संपर्क करें',
-        () => showMsg(context, 'यह हिस्सा बाद में जुड़ेगा'),
+        () {
+          Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => const HelpScreen(),
+            ),
+          );
+        },
       ),
       _MenuItem(
         Icons.description,
         'नियम और शर्तें',
         'ऐप की शर्तें और गोपनीयता नीति',
-        () => showMsg(context, 'यह हिस्सा बाद में जुड़ेगा'),
+        () {
+          Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => const TermsScreen(),
+            ),
+          );
+        },
       ),
       _MenuItem(
         Icons.logout,
@@ -367,6 +396,221 @@ class ProfileScreen extends StatelessWidget {
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
                               color: AppColors.primary)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// नोटिफिकेशन सेटिंग
+// ---------------------------------------------------------------------------
+
+class _PrefItem {
+  final String key;
+  final IconData icon;
+  final String title;
+  final String sub;
+  const _PrefItem(this.key, this.icon, this.title, this.sub);
+}
+
+class NotificationSettingsScreen extends StatefulWidget {
+  const NotificationSettingsScreen({super.key});
+
+  @override
+  State<NotificationSettingsScreen> createState() =>
+      _NotificationSettingsScreenState();
+}
+
+class _NotificationSettingsScreenState
+    extends State<NotificationSettingsScreen> {
+  static const List<_PrefItem> _items = [
+    _PrefItem('messages', Icons.chat_bubble, 'मैसेज',
+        'किसी का नया संदेश आने पर'),
+    _PrefItem('rooms', Icons.home, 'नए कमरे',
+        'आपके शहर में नया कमरा जुड़ने पर'),
+    _PrefItem('bookings', Icons.calendar_month, 'बुकिंग',
+        'विज़िट अनुरोध और उसके जवाब पर'),
+    _PrefItem('safety', Icons.shield, 'सुरक्षा अलर्ट',
+        'रिपोर्ट और सुरक्षा की ज़रूरी सूचना'),
+    _PrefItem('offers', Icons.campaign, 'ऑफर और ऐप अपडेट',
+        'नई सुविधाओं और खबरों की जानकारी'),
+  ];
+
+  Widget _topBar() {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [AppColors.primaryDark, AppColors.primary],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      padding:
+          EdgeInsets.fromLTRB(4, MediaQuery.of(context).padding.top + 6, 12, 10),
+      child: Row(
+        children: [
+          IconButton(
+            onPressed: () => Navigator.of(context).pop(),
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+          ),
+          Expanded(
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: RoomMitraLogo(),
+              ),
+            ),
+          ),
+          const Icon(Icons.notifications, color: Colors.white, size: 26),
+        ],
+      ),
+    );
+  }
+
+  Widget _row(_PrefItem p, {bool last = false}) {
+    final on = notifPrefs[p.key] ?? false;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        border: last
+            ? null
+            : const Border(bottom: BorderSide(color: AppColors.border)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: const BoxDecoration(
+              color: AppColors.tint,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(p.icon, color: AppColors.primary, size: 22),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  p.title,
+                  style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.text),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  p.sub,
+                  style:
+                      const TextStyle(fontSize: 12, color: AppColors.muted),
+                ),
+              ],
+            ),
+          ),
+          Switch(
+            value: on,
+            onChanged: (v) => setState(() => notifPrefs[p.key] = v),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF7FCF9),
+      body: Column(
+        children: [
+          _topBar(),
+          Expanded(
+            child: ListView(
+              padding: EdgeInsets.fromLTRB(
+                  16, 14, 16, 16 + MediaQuery.of(context).padding.bottom),
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: AppColors.tint,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: const Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 24,
+                        backgroundColor: AppColors.primary,
+                        child: Icon(Icons.tune, color: Colors.white, size: 26),
+                      ),
+                      SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'नोटिफिकेशन सेटिंग',
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w800,
+                                  color: AppColors.text),
+                            ),
+                            SizedBox(height: 2),
+                            Text(
+                              'चुनें कि आपको किस बारे में सूचना चाहिए।',
+                              style: TextStyle(
+                                  fontSize: 12.5, color: AppColors.text),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: AppColors.border),
+                  ),
+                  child: Column(
+                    children: [
+                      for (var i = 0; i < _items.length; i++)
+                        _row(_items[i], last: i == _items.length - 1),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppColors.tintLight,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: AppColors.border),
+                  ),
+                  child: const Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.info_outline,
+                          color: AppColors.primary, size: 20),
+                      SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          'यह अभी डेमो है। असली नोटिफिकेशन Supabase जुड़ने के बाद आपके फोन पर आएँगे और ये स्विच तभी असर करेंगे।',
+                          style: TextStyle(
+                              fontSize: 12.5,
+                              height: 1.4,
+                              color: AppColors.text),
+                        ),
+                      ),
                     ],
                   ),
                 ),
