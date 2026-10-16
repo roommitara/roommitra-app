@@ -89,6 +89,14 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
+  void _resetAll() {
+    setState(() {
+      _filters = Filters();
+      _type = 'सभी';
+      _queryCtrl.clear();
+    });
+  }
+
   BoxDecoration _cardDeco() {
     return BoxDecoration(
       color: Colors.white,
@@ -631,40 +639,109 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
+  Widget _suggestRow(String text, VoidCallback onTap) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 7),
+        child: Row(
+          children: [
+            const Icon(Icons.check_circle,
+                size: 22, color: AppColors.primary),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                text,
+                style: const TextStyle(
+                    fontSize: 14.5, height: 1.3, color: AppColors.text),
+              ),
+            ),
+            const Icon(Icons.chevron_right,
+                size: 20, color: AppColors.muted),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _empty() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 40, 24, 40),
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
       child: Column(
         children: [
-          const Icon(Icons.search_off, size: 64, color: AppColors.muted),
-          const SizedBox(height: 12),
+          Image.asset(
+            'assets/empty_art.png',
+            width: 270,
+            fit: BoxFit.contain,
+          ),
+          const SizedBox(height: 8),
           const Text(
             'कोई कमरा नहीं मिला',
-            style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w800,
-                color: AppColors.text),
-          ),
-          const SizedBox(height: 6),
-          const Text(
-            'दूसरा शहर, बजट या फ़िल्टर आज़माएँ।',
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 14, color: AppColors.muted),
+            style: TextStyle(
+                fontSize: 27,
+                fontWeight: FontWeight.w800,
+                color: AppColors.primary),
           ),
-          const SizedBox(height: 16),
-          OutlinedButton(
-            onPressed: () {
-              setState(() {
-                _filters = Filters();
-                _type = 'सभी';
-                _queryCtrl.clear();
-              });
-            },
-            style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.primary,
-              side: const BorderSide(color: AppColors.primary),
+          const SizedBox(height: 8),
+          const Text(
+            'आपके द्वारा चुनी गई जानकारी के अनुसार,\nकोई भी कमरा उपलब्ध नहीं है।',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                fontSize: 15, height: 1.5, color: AppColors.text),
+          ),
+          const SizedBox(height: 18),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.fromLTRB(16, 14, 12, 8),
+            decoration: BoxDecoration(
+              color: AppColors.tintLight,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.border),
             ),
-            child: const Text('सब हटाएँ'),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Row(
+                  children: [
+                    Icon(Icons.lightbulb_outline,
+                        size: 24, color: AppColors.primary),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'आप ये भी कोशिश कर सकते हैं:',
+                        style: TextStyle(
+                            fontSize: 15.5,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.primary),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                _suggestRow('किराया रेंज थोड़ा बदलें', _openFilter),
+                _suggestRow('किसी दूसरे इलाके को चुनें', _openFilter),
+                _suggestRow('फिल्टर कम करके फिर से खोजें', _resetAll),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          SizedBox(
+            width: 260,
+            height: 54,
+            child: ElevatedButton.icon(
+              onPressed: _resetAll,
+              icon: const Icon(Icons.search, size: 24),
+              label: const Text('फिर से खोजें'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                shape: const StadiumBorder(),
+                textStyle: const TextStyle(
+                    fontSize: 17, fontWeight: FontWeight.w700),
+              ),
+            ),
           ),
         ],
       ),
