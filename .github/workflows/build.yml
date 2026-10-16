@@ -17,6 +17,10 @@ jobs:
           channel: stable
       - name: Create Android project
         run: flutter create --platforms=android --project-name roommitra_app --org com.roommitra out
+      - name: Add Android permissions
+        run: |
+          sed -i 's#<application#<uses-permission android:name="android.permission.INTERNET"/>\n    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>\n    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>\n    <application#' out/android/app/src/main/AndroidManifest.xml
+          grep -n "uses-permission" out/android/app/src/main/AndroidManifest.xml
       - name: Copy app files
         run: |
           rm -rf out/lib
