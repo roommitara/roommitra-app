@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'data.dart';
 import 'detail_screen.dart';
+import 'messages_screen.dart';
 import 'notifications_screen.dart';
 import 'theme.dart';
 
@@ -120,6 +121,53 @@ class _HomeScreenState extends State<HomeScreen> {
     _City('Kala Amb', Icons.factory, Color(0xFFF2B27A), Color(0xFFE08E5A)),
   ];
 
+  Widget _messageIcon() {
+    return ListenableBuilder(
+      listenable: conversations,
+      builder: (context, _) {
+        final unread = conversations.value
+            .where((c) => c.status == 'inbox')
+            .fold<int>(0, (s, c) => s + c.unread);
+        return GestureDetector(
+          onTap: () async {
+            await Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => const MessagesScreen(),
+              ),
+            );
+            if (mounted) setState(() {});
+          },
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              const Icon(Icons.chat_bubble_outline,
+                  color: Colors.white, size: 28),
+              if (unread > 0)
+                Positioned(
+                  right: -6,
+                  top: -6,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFE53935),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Text(
+                      '$unread',
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Widget _header(double top) {
     final w = MediaQuery.of(context).size.width;
     return Container(
@@ -155,6 +203,8 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 const RoomMitraLogo(),
                 const Spacer(),
+                _messageIcon(),
+                const SizedBox(width: 16),
                 GestureDetector(
                   onTap: () async {
                     await Navigator.of(context).push(
