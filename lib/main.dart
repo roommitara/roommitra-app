@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'login_screen.dart';
+import 'onboarding_screen.dart';
 import 'theme.dart';
 
 void main() {
@@ -57,7 +58,18 @@ class _SplashScreenState extends State<SplashScreen>
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
-        pageBuilder: (_, __, ___) => LoginScreen(),
+        pageBuilder: (ctx, __, ___) => OnboardingScreen(
+          onFinish: () {
+            Navigator.of(ctx).pushReplacement(
+              PageRouteBuilder(
+                pageBuilder: (_, __, ___) => LoginScreen(),
+                transitionsBuilder: (_, animation, __, child) =>
+                    FadeTransition(opacity: animation, child: child),
+                transitionDuration: const Duration(milliseconds: 400),
+              ),
+            );
+          },
+        ),
         transitionsBuilder: (_, animation, __, child) =>
             FadeTransition(opacity: animation, child: child),
         transitionDuration: const Duration(milliseconds: 600),
