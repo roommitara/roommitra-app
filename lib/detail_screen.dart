@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'data.dart';
 import 'home_screen.dart' show RoomMitraLogo;
 import 'booking_screen.dart';
+import 'owner_profile_screen.dart';
 import 'report_screen.dart';
 import 'theme.dart';
 
@@ -18,13 +19,6 @@ List<String> galleryOf(Listing l) {
   final seen = <String>{};
   return all.where((p) => seen.add(p)).toList();
 }
-
-const Map<String, String> _ownerNames = {
-  'n1': 'राजेश तिवारी',
-  'n2': 'सुनील ठाकुर',
-  'n3': 'मोहन शर्मा',
-  'p1': 'रोहित शर्मा',
-};
 
 class _Cell {
   final IconData icon;
@@ -98,6 +92,14 @@ class _DetailScreenState extends State<DetailScreen> {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => PhotoGalleryScreen(listing: l, images: _images),
+      ),
+    );
+  }
+
+  void _openOwner() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => OwnerProfileScreen(listing: l),
       ),
     );
   }
@@ -490,89 +492,97 @@ class _DetailScreenState extends State<DetailScreen> {
   }
 
   Widget _ownerBlock() {
-    final name = _ownerNames[l.id] ?? 'मकान मालिक';
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 56,
-            height: 56,
-            decoration: const BoxDecoration(
-              color: AppColors.tint,
-              shape: BoxShape.circle,
+    final o = ownerOf(l);
+    return GestureDetector(
+      onTap: _openOwner,
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 56,
+              height: 56,
+              decoration: const BoxDecoration(
+                color: AppColors.tint,
+                shape: BoxShape.circle,
+              ),
+              child:
+                  const Icon(Icons.person, size: 32, color: AppColors.primary),
             ),
-            child: const Icon(Icons.person, size: 32, color: AppColors.primary),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('मकान मालिक',
+                      style: TextStyle(fontSize: 12, color: AppColors.muted)),
+                  Text(
+                    o.name,
+                    style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.text),
+                  ),
+                  if (l.verified) ...[
+                    const SizedBox(height: 4),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: AppColors.tint,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.verified,
+                              size: 14, color: AppColors.primary),
+                          SizedBox(width: 4),
+                          Text('Verified Owner',
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primary)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('मकान मालिक',
-                    style: TextStyle(fontSize: 12, color: AppColors.muted)),
-                Text(
-                  name,
-                  style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.text),
+                Row(
+                  children: [
+                    const Icon(Icons.star, size: 16, color: AppColors.primary),
+                    const SizedBox(width: 4),
+                    Text('${o.rating} (डेमो)',
+                        style: const TextStyle(
+                            fontSize: 12.5, color: AppColors.text)),
+                  ],
                 ),
-                if (l.verified) ...[
-                  const SizedBox(height: 4),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: AppColors.tint,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.verified,
-                            size: 14, color: AppColors.primary),
-                        SizedBox(width: 4),
-                        Text('Verified Owner',
-                            style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.primary)),
-                      ],
-                    ),
-                  ),
-                ],
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    const Icon(Icons.calendar_month,
+                        size: 16, color: AppColors.primary),
+                    const SizedBox(width: 4),
+                    Text('${o.years}+ साल',
+                        style: const TextStyle(
+                            fontSize: 12.5, color: AppColors.text)),
+                  ],
+                ),
               ],
             ),
-          ),
-          const Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(Icons.star, size: 16, color: AppColors.primary),
-                  SizedBox(width: 4),
-                  Text('4.5 (डेमो)',
-                      style: TextStyle(fontSize: 12.5, color: AppColors.text)),
-                ],
-              ),
-              SizedBox(height: 6),
-              Row(
-                children: [
-                  Icon(Icons.calendar_month,
-                      size: 16, color: AppColors.primary),
-                  SizedBox(width: 4),
-                  Text('3+ साल',
-                      style: TextStyle(fontSize: 12.5, color: AppColors.text)),
-                ],
-              ),
-            ],
-          ),
-        ],
+            const SizedBox(width: 4),
+            const Icon(Icons.chevron_right, color: AppColors.text),
+          ],
+        ),
       ),
     );
   }
