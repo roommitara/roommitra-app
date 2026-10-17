@@ -5,7 +5,7 @@ on:
     branches: [main]
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -33,6 +33,21 @@ jobs:
           -keep class io.flutter.plugins.sharedpreferences.** { *; }
           EOF
           cat out/android/app/proguard-rules.pro
+      - name: Set app icon
+        run: |
+          RES=out/android/app/src/main/res
+          rm -rf $RES/mipmap-anydpi-v26
+          for pair in mdpi:48 hdpi:72 xhdpi:96 xxhdpi:144 xxxhdpi:192; do
+            d=${pair%%:*}
+            s=${pair##*:}
+            mkdir -p $RES/mipmap-$d
+            if command -v magick >/dev/null 2>&1; then
+              magick app_icon.png -resize ${s}x${s} $RES/mipmap-$d/ic_launcher.png
+            else
+              convert app_icon.png -resize ${s}x${s} $RES/mipmap-$d/ic_launcher.png
+            fi
+          done
+          ls -l $RES/mipmap-*/ic_launcher.png
       - name: Copy app files
         run: |
           rm -rf out/lib
