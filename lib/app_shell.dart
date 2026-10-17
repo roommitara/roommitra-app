@@ -4,6 +4,7 @@ import 'favorites_screen.dart';
 import 'home_screen.dart';
 import 'profile_screen.dart';
 import 'search_screen.dart';
+import 'strings.dart';
 import 'theme.dart';
 
 class AppShell extends StatefulWidget {
@@ -72,7 +73,7 @@ class _AppShellState extends State<AppShell> {
             ),
             const SizedBox(height: 2),
             Text(
-              'लिस्ट करें',
+              t('लिस्ट करें', 'List'),
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: _index == 2 ? FontWeight.w800 : FontWeight.w600,
@@ -99,12 +100,14 @@ class _AppShellState extends State<AppShell> {
         height: 70,
         child: Row(
           children: [
-            _navItem(0, Icons.home_outlined, Icons.home_rounded, 'होम'),
-            _navItem(1, Icons.search, Icons.search, 'खोजें'),
-            _centerItem(),
             _navItem(
-                3, Icons.favorite_border, Icons.favorite, 'पसंदीदा'),
-            _navItem(4, Icons.person_outline, Icons.person, 'प्रोफाइल'),
+                0, Icons.home_outlined, Icons.home_rounded, t('होम', 'Home')),
+            _navItem(1, Icons.search, Icons.search, t('खोजें', 'Search')),
+            _centerItem(),
+            _navItem(3, Icons.favorite_border, Icons.favorite,
+                t('पसंदीदा', 'Favorites')),
+            _navItem(4, Icons.person_outline, Icons.person,
+                t('प्रोफाइल', 'Profile')),
           ],
         ),
       ),
@@ -113,16 +116,21 @@ class _AppShellState extends State<AppShell> {
 
   @override
   Widget build(BuildContext context) {
-    final pages = <Widget>[
-      HomeScreen(onListTap: () => _go(2), onSearchTap: () => _go(1)),
-      const SearchScreen(),
-      AddListingScreen(onDone: () => _go(0)),
-      FavoritesScreen(onSearchTap: () => _go(1)),
-      ProfileScreen(onAdd: () => _go(2)),
-    ];
-    return Scaffold(
-      body: IndexedStack(index: _index, children: pages),
-      bottomNavigationBar: _bottomBar(context),
+    return ValueListenableBuilder<String>(
+      valueListenable: AppLang.notifier,
+      builder: (context, lang, _) {
+        final pages = <Widget>[
+          HomeScreen(onListTap: () => _go(2), onSearchTap: () => _go(1)),
+          const SearchScreen(),
+          AddListingScreen(onDone: () => _go(0)),
+          FavoritesScreen(onSearchTap: () => _go(1)),
+          ProfileScreen(onAdd: () => _go(2)),
+        ];
+        return Scaffold(
+          body: IndexedStack(index: _index, children: pages),
+          bottomNavigationBar: _bottomBar(context),
+        );
+      },
     );
   }
 }
