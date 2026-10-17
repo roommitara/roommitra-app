@@ -76,6 +76,14 @@ class Listing {
   final String phone;
   final int order;
 
+  /// मालिक ने मैप पर जो जगह चुनी (खाली हो तो लोकेशन सेट नहीं है)
+  final double? lat;
+  final double? lng;
+
+  /// इलाके का नाम (जैसे Rani Tal) और पूरा पता
+  final String locality;
+  final String address;
+
   const Listing({
     required this.id,
     required this.title,
@@ -101,10 +109,18 @@ class Listing {
     this.commercial = false,
     this.phone = '',
     this.order = 0,
+    this.lat,
+    this.lng,
+    this.locality = '',
+    this.address = '',
   });
+
+  /// क्या इस कमरे की असली मैप लोकेशन सेव है?
+  bool get hasLocation => lat != null && lng != null;
 }
 
 /// नमूना (डेमो) कमरे। इलाकों के नाम सिर्फ उदाहरण हैं।
+/// इनमें जानबूझकर lat/lng नहीं डाले गए, क्योंकि नकली लोकेशन नहीं दिखानी।
 /// असली लिस्टिंग Supabase जुड़ने के बाद मकान मालिक खुद डालेंगे।
 const List<Listing> sampleListings = [
   Listing(
@@ -128,6 +144,7 @@ const List<Listing> sampleListings = [
     directOwner: true,
     immediate: true,
     order: 4,
+    locality: 'Rani Tal',
   ),
   Listing(
     id: 'n2',
@@ -149,6 +166,7 @@ const List<Listing> sampleListings = [
     verified: true,
     immediate: true,
     order: 3,
+    locality: 'Jamta Road',
   ),
   Listing(
     id: 'n3',
@@ -169,6 +187,7 @@ const List<Listing> sampleListings = [
     photos: 5,
     directOwner: true,
     order: 2,
+    locality: 'Sabzi Mandi',
   ),
   Listing(
     id: 'p1',
@@ -201,6 +220,7 @@ const List<Listing> sampleListings = [
     safeWomen: true,
     immediate: true,
     order: 1,
+    locality: 'Paonta Chowk',
   ),
 ];
 
@@ -276,7 +296,12 @@ class Filters {
     if (l.price < minPrice) return false;
     if (maxPrice < 25000 && l.price > maxPrice) return false;
     final loc = locality.trim().toLowerCase();
-    if (loc.isNotEmpty && !l.area.toLowerCase().contains(loc)) return false;
+    if (loc.isNotEmpty &&
+        !l.area.toLowerCase().contains(loc) &&
+        !l.locality.toLowerCase().contains(loc) &&
+        !l.address.toLowerCase().contains(loc)) {
+      return false;
+    }
     if (rooms != 0) {
       if (rooms >= 4) {
         if (l.rooms < 4) return false;
@@ -346,5 +371,31 @@ Future<void> contactOwner(BuildContext context, Listing l,
   final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
   if (!ok && context.mounted) {
     showMsg(context, whatsapp ? 'WhatsApp नहीं खुल सका' : 'फोन ऐप नहीं खुल सका');
+  }
+}
+
+/// Google Maps का रास्ता-लिंक। शुरुआत की जगह Google Maps खुद किरायेदार की
+/// मौजूदा लोकेशन से लेता है, हम उसे कहीं सेव या शेयर नहीं करते।
+Uri mapsDirectionsUrl(double lat, double lng) {
+  return Uri.parse(
+      'https://www.google.com/maps/dir/?api=1&destination=$lat,$lng&travelmode=driving');
+}
+
+/// किसी कमरे तक का रास्ता Google Maps में खोलना
+Future<void> openDirections(BuildContext context, Listing l) async {
+  if (!l.hasLocation) {
+    showMsg(context, 'इस कमरे की मैप लोकेशन अभी सेव नहीं है');
+    return;
+  }
+  try {
+    final ok = await launchUrl(
+      mapsDirectionsUrl(l.lat!, l.lng!),
+      mode: LaunchMode.externalApplication,
+    );
+    if (!ok && context.mounted) {
+      showMsg(context, 'Google Maps नहीं खुल सका');
+    }
+  } catch (_) {
+    if (context.mounted) showMsg(context, 'Google Maps नहीं खुल सका');
   }
 }
