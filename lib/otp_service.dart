@@ -1,72 +1,64 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+const String supabaseUrl = 'https://ckaycemogddeyfpfeqes.supabase.co';
+// यह पब्लिक key है, ऐप में रखना सुरक्षित है।
+const String supabaseAnonKey =
+    'sb_publishable_xZWpXsR0WJHxK-3LOFO9Wg_66EXeEeq';
 
 class OtpService {
-  static const String _baseUrl =
-      'https://ckaycemogddeyfpfeqes.supabase.co/functions/v1/roommitara-otp';
+  static SupabaseClient get _client => Supabase.instance.client;
 
-  /// Supabase की पब्लिक (anon) key। यह सीक्रेट नहीं है और ऐप में रखना सुरक्षित है।
-  /// StartMessaging की API key यहाँ कभी मत डालना, वह सिर्फ Supabase के अंदर रहती है।
-  static const String _anonKey =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNrYXljZW1vZ2RkZXlmcGZlcWVzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4Njc3ODYsImV4cCI6MjEwNzQ0Mzc4Nn0.-PCtwPySSZzyKv-ZAI7bF367pBuUSlFGgN79SyBrD3w';
+  static String _full(String phone10) => '+91$phone10';
 
-  static Map<String, String> get _headers => {
-        'Content-Type': 'application/json',
-        'apikey': _anonKey,
-        'Authorization': 'Bearer $_anonKey',
-      };
-
-  static Map<String, dynamic> _decode(http.Response r) {
+  /// OTP भेजता है। login_screen इसके 'requestId' को पकड़ता है,
+  /// इसलिए यहाँ फोन नंबर ही requestId की तरह लौटाते हैं।
+  static Future<Map<String, dynamic>> sendOtp(String phone10) async {
     try {
-      final d = jsonDecode(r.body);
-      if (d is Map<String, dynamic>) return d;
-    } catch (_) {}
-    return <String, dynamic>{};
-  }
-
-  static Future<Map<String, dynamic>> sendOtp(String phone) async {
-    final response = await http
-        .post(
-          Uri.parse(_baseUrl),
-          headers: _headers,
-          body: jsonEncode({
-            'action': 'send',
-            'phone': '+91${phone.trim()}',
-          }),
-        )
-        .timeout(const Duration(seconds: 20));
-
-    final data = _decode(response);
-
-    if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw Exception(data['error'] ?? 'OTP भेजा नहीं जा सका');
+      await _client.auth.signInWithOtp(
+        phone: _full(phone10),
+        shouldCreateUser: true,
+      );
+      return {'success': true, 'requestId': phone10};
+    } on AuthException catch (e) {
+      throw Exception(_friendly(e.message));
+    } catch (_) {
+      throw Exception('इंटरनेट या सर्वर की समस्या है। थोड़ी देर बाद कोशिश करें।');
     }
-
-    return data;
   }
 
+  /// OTP जाँचता है और असली लॉगिन सेशन बनाता है।
   static Future<bool> verifyOtp({
     required String requestId,
     required String otpCode,
   }) async {
-    final response = await http
-        .post(
-          Uri.parse(_baseUrl),
-          headers: _headers,
-          body: jsonEncode({
-            'action': 'verify',
-            'requestId': requestId,
-            'otpCode': otpCode,
-          }),
-        )
-        .timeout(const Duration(seconds: 20));
-
-    final data = _decode(response);
-
-    if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw Exception(data['error'] ?? 'OTP सत्यापित नहीं हुआ');
+    try {
+      final res = await _client.auth.verifyOTP(
+        phone: _full(requestId),
+        token: otpCode,
+        type: OtpType.sms,
+      );
+      return res.session != null;
+    } on AuthException catch (e) {
+      final m = e.message.toLowerCase();
+      if (m.contains('invalid') || m.contains('expired') || m.contains('token')) {
+        return false;
+      }
+      throw Exception(_friendly(e.message));
+    } catch (_) {
+      throw Exception('इंटरनेट या सर्वर की समस्या है। थोड़ी देर बाद कोशिश करें।');
     }
+  }
 
-    return data['verified'] == true;
+  static Future<void> signOut() => _client.auth.signOut();
+
+  static String _friendly(String m) {
+    final s = m.toLowerCase();
+    if (s.contains('rate') || s.contains('seconds') || s.contains('too many')) {
+      return 'बहुत जल्दी-जल्दी कोशिश हुई। कुछ देर रुककर दोबारा करें।';
+    }
+    if (s.contains('sms') || s.contains('hook')) {
+      return 'SMS भेजा नहीं जा सका। थोड़ी देर बाद कोशिश करें।';
+    }
+    return 'लॉगिन में समस्या आई। दोबारा कोशिश करें।';
   }
 }
