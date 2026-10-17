@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'app_shell.dart';
 import 'theme.dart';
 import 'otp_service.dart';
+import 'strings.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -92,7 +93,10 @@ class _LoginScreenState extends State<LoginScreen> {
         !RegExp(r'^[6-9]').hasMatch(phone) ||
         !RegExp(r'^\d{10}$').hasMatch(phone)) {
       setState(() {
-        _phoneError = 'कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें';
+        _phoneError = t(
+          'कृपया सही 10 अंकों का मोबाइल नंबर दर्ज करें',
+          'Please enter a valid 10-digit mobile number',
+        );
       });
       return;
     }
@@ -100,7 +104,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (_sendingOtp || _verifyingOtp) return;
 
     if (_otpSent && _seconds > 0 && phone == _sentTo) {
-      _msg('OTP पहले ही भेजा जा चुका है');
+      _msg(t('OTP पहले ही भेजा जा चुका है', 'OTP has already been sent'));
       return;
     }
 
@@ -124,7 +128,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (requestId == null || requestId.toString().isEmpty) {
         throw Exception(
-          'OTP request ID नहीं मिला। OTP API का response चेक करें।',
+          t(
+            'OTP request ID नहीं मिला। OTP API का response चेक करें।',
+            'OTP request ID not found. Check the OTP API response.',
+          ),
         );
       }
 
@@ -138,7 +145,12 @@ class _LoginScreenState extends State<LoginScreen> {
       });
 
       _startTimer();
-      _msg('OTP भेजने की रिक्वेस्ट सफल रही। अपना SMS चेक करें।');
+      _msg(
+        t(
+          'OTP भेजने की रिक्वेस्ट सफल रही। अपना SMS चेक करें।',
+          'OTP request sent. Please check your SMS.',
+        ),
+      );
 
       Future.delayed(const Duration(milliseconds: 300), () {
         if (mounted) _otpFocus.requestFocus();
@@ -174,7 +186,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final code = _otp.text.trim();
 
     if (requestId == null || requestId.isEmpty) {
-      _msg('पहले OTP भेजें।');
+      _msg(t('पहले OTP भेजें।', 'Send the OTP first.'));
       return;
     }
 
@@ -193,14 +205,19 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) return;
 
       if (!verified) {
-        _msg('गलत OTP है। कृपया दोबारा जाँचें।');
+        _msg(
+          t(
+            'गलत OTP है। कृपया दोबारा जाँचें।',
+            'Wrong OTP. Please check again.',
+          ),
+        );
         _otp.clear();
         return;
       }
 
       _timer?.cancel();
 
-      _msg('OTP सत्यापित हो गया।');
+      _msg(t('OTP सत्यापित हो गया।', 'OTP verified.'));
 
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
@@ -246,6 +263,40 @@ class _LoginScreenState extends State<LoginScreen> {
     return '+91';
   }
 
+  Widget _langToggle() {
+    return InkWell(
+      onTap: AppLang.toggle,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: AppColors.primary, width: 1.2),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.language,
+              size: 18,
+              color: AppColors.primary,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              AppLang.isHindi ? 'English' : 'हिंदी',
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: AppColors.primary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _logoRow() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(8, 8, 16, 0),
@@ -268,36 +319,40 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
           const SizedBox(width: 10),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text.rich(
-                const TextSpan(
-                  children: [
-                    TextSpan(
-                      text: 'Room',
-                      style: TextStyle(color: AppColors.primaryDark),
-                    ),
-                    TextSpan(
-                      text: 'Mitra',
-                      style: TextStyle(color: Color(0xFF3FAE5A)),
-                    ),
-                  ],
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text.rich(
+                  const TextSpan(
+                    children: [
+                      TextSpan(
+                        text: 'Room',
+                        style: TextStyle(color: AppColors.primaryDark),
+                      ),
+                      TextSpan(
+                        text: 'Mitra',
+                        style: TextStyle(color: Color(0xFF3FAE5A)),
+                      ),
+                    ],
+                  ),
+                  style: const TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
-                style: const TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.w800,
+                Text(
+                  t('कमरा ढूँढना हुआ आसान।', 'Finding a room made easy.'),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppColors.text,
+                  ),
                 ),
-              ),
-              const Text(
-                'कमरा ढूँढना हुआ आसान।',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: AppColors.text,
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
+          const SizedBox(width: 8),
+          _langToggle(),
         ],
       ),
     );
@@ -324,9 +379,9 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'आपका स्वागत है',
-                  style: TextStyle(
+                Text(
+                  t('आपका स्वागत है', 'Welcome'),
+                  style: const TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.w800,
                     color: AppColors.text,
@@ -342,9 +397,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                const Text(
-                  'RoomMitra में लॉगिन करके अपने लिए सही कमरा खोजें।',
-                  style: TextStyle(
+                Text(
+                  t(
+                    'RoomMitra में लॉगिन करके अपने लिए सही कमरा खोजें।',
+                    'Log in to RoomMitra and find the right room for you.',
+                  ),
+                  style: const TextStyle(
                     fontSize: 14.5,
                     height: 1.35,
                     color: AppColors.text,
@@ -393,11 +451,23 @@ class _LoginScreenState extends State<LoginScreen> {
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
       child: Row(
         children: [
-          _feature(Icons.verified_user, 'सुरक्षित', 'लॉगिन'),
+          _feature(
+            Icons.verified_user,
+            t('सुरक्षित', 'Secure'),
+            t('लॉगिन', 'login'),
+          ),
           _featureDivider(),
-          _feature(Icons.home, 'सही और', 'विश्वसनीय लिस्टिंग'),
+          _feature(
+            Icons.home,
+            t('सही और', 'Genuine and'),
+            t('विश्वसनीय लिस्टिंग', 'trusted listings'),
+          ),
           _featureDivider(),
-          _feature(Icons.bolt, 'तेज़ और', 'आसान प्रक्रिया'),
+          _feature(
+            Icons.bolt,
+            t('तेज़ और', 'Quick and'),
+            t('आसान प्रक्रिया', 'easy process'),
+          ),
         ],
       ),
     );
@@ -435,22 +505,28 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(width: 12),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'मोबाइल नंबर से लॉगिन करें',
-                      style: TextStyle(
+                      t(
+                        'मोबाइल नंबर से लॉगिन करें',
+                        'Login with mobile number',
+                      ),
+                      style: const TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w800,
                         color: AppColors.text,
                       ),
                     ),
-                    SizedBox(height: 2),
+                    const SizedBox(height: 2),
                     Text(
-                      'अपना 10 अंकों का मोबाइल नंबर दर्ज करें।',
-                      style: TextStyle(
+                      t(
+                        'अपना 10 अंकों का मोबाइल नंबर दर्ज करें।',
+                        'Enter your 10-digit mobile number.',
+                      ),
+                      style: const TextStyle(
                         fontSize: 13,
                         color: AppColors.muted,
                       ),
@@ -522,11 +598,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       color: AppColors.text,
                       letterSpacing: 1,
                     ),
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       border: InputBorder.none,
                       isDense: true,
-                      hintText: 'मोबाइल नंबर दर्ज करें',
-                      hintStyle: TextStyle(
+                      hintText: t(
+                        'मोबाइल नंबर दर्ज करें',
+                        'Enter mobile number',
+                      ),
+                      hintStyle: const TextStyle(
                         fontSize: 15,
                         color: AppColors.muted,
                         letterSpacing: 0,
@@ -569,18 +648,18 @@ class _LoginScreenState extends State<LoginScreen> {
                         color: Colors.white,
                       ),
                     )
-                  : const Row(
+                  : Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'OTP भेजें',
-                          style: TextStyle(
+                          t('OTP भेजें', 'Send OTP'),
+                          style: const TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
-                        SizedBox(width: 8),
-                        Icon(Icons.arrow_forward, size: 20),
+                        const SizedBox(width: 8),
+                        const Icon(Icons.arrow_forward, size: 20),
                       ],
                     ),
             ),
@@ -591,22 +670,22 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _orDivider() {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 60, vertical: 14),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 14),
       child: Row(
         children: [
-          Expanded(child: Divider(color: AppColors.border)),
+          const Expanded(child: Divider(color: AppColors.border)),
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 14),
+            padding: const EdgeInsets.symmetric(horizontal: 14),
             child: Text(
-              'या',
-              style: TextStyle(
+              t('या', 'or'),
+              style: const TextStyle(
                 fontSize: 14,
                 color: AppColors.muted,
               ),
             ),
           ),
-          Expanded(child: Divider(color: AppColors.border)),
+          const Expanded(child: Divider(color: AppColors.border)),
         ],
       ),
     );
@@ -705,9 +784,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'OTP दर्ज करें',
-                          style: TextStyle(
+                        Text(
+                          t('OTP दर्ज करें', 'Enter OTP'),
+                          style: const TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.w800,
                             color: AppColors.text,
@@ -718,8 +797,11 @@ class _LoginScreenState extends State<LoginScreen> {
                             ? Text.rich(
                                 TextSpan(
                                   children: [
-                                    const TextSpan(
-                                      text: 'आपके मोबाइल नंबर ',
+                                    TextSpan(
+                                      text: t(
+                                        'आपके मोबाइल नंबर ',
+                                        'Enter the 6-digit OTP sent to ',
+                                      ),
                                     ),
                                     TextSpan(
                                       text: _phoneShown,
@@ -728,9 +810,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                         color: AppColors.text,
                                       ),
                                     ),
-                                    const TextSpan(
-                                      text:
-                                          ' पर भेजा गया 6 अंकों का OTP दर्ज करें।',
+                                    TextSpan(
+                                      text: t(
+                                        ' पर भेजा गया 6 अंकों का OTP दर्ज करें।',
+                                        '.',
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -739,9 +823,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                   color: AppColors.muted,
                                 ),
                               )
-                            : const Text(
-                                'पहले ऊपर नंबर डालकर OTP भेजें।',
-                                style: TextStyle(
+                            : Text(
+                                t(
+                                  'पहले ऊपर नंबर डालकर OTP भेजें।',
+                                  'First enter your number above and send the OTP.',
+                                ),
+                                style: const TextStyle(
                                   fontSize: 13,
                                   color: AppColors.muted,
                                 ),
@@ -770,10 +857,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(width: 8),
                       Text(
                         _sendingOtp
-                            ? 'OTP भेजा जा रहा है...'
+                            ? t('OTP भेजा जा रहा है...', 'Sending OTP...')
                             : _seconds > 0
-                                ? 'OTP दोबारा भेजें (00:$secondsText)'
-                                : 'OTP दोबारा भेजें',
+                                ? t(
+                                    'OTP दोबारा भेजें (00:$secondsText)',
+                                    'Resend OTP (00:$secondsText)',
+                                  )
+                                : t('OTP दोबारा भेजें', 'Resend OTP'),
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: canResend
@@ -808,8 +898,12 @@ class _LoginScreenState extends State<LoginScreen> {
         width: double.infinity,
         height: 52,
         child: OutlinedButton(
-          onPressed: () =>
-              _msg('Google लॉगिन बैकएंड जुड़ने पर चालू होगा'),
+          onPressed: () => _msg(
+            t(
+              'Google लॉगिन बैकएंड जुड़ने पर चालू होगा',
+              'Google login will work once the backend is connected',
+            ),
+          ),
           style: OutlinedButton.styleFrom(
             backgroundColor: Colors.white,
             side: const BorderSide(
@@ -820,10 +914,10 @@ class _LoginScreenState extends State<LoginScreen> {
               borderRadius: BorderRadius.circular(12),
             ),
           ),
-          child: const Row(
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
+              const Text(
                 'G',
                 style: TextStyle(
                   fontSize: 24,
@@ -831,10 +925,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   color: Color(0xFF4285F4),
                 ),
               ),
-              SizedBox(width: 12),
+              const SizedBox(width: 12),
               Text(
-                'Google से जारी रखें',
-                style: TextStyle(
+                t('Google से जारी रखें', 'Continue with Google'),
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: AppColors.text,
@@ -852,27 +946,27 @@ class _LoginScreenState extends State<LoginScreen> {
       padding: const EdgeInsets.only(top: 18),
       child: InkWell(
         onTap: _goToPhone,
-        child: const Padding(
-          padding: EdgeInsets.all(6),
+        child: Padding(
+          padding: const EdgeInsets.all(6),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
+              const Icon(
                 Icons.person_outline,
                 size: 22,
                 color: AppColors.text,
               ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               Text(
-                'पहले से अकाउंट है? ',
-                style: TextStyle(
+                t('पहले से अकाउंट है? ', 'Already have an account? '),
+                style: const TextStyle(
                   fontSize: 14,
                   color: AppColors.text,
                 ),
               ),
               Text(
-                'लॉगिन करें',
-                style: TextStyle(
+                t('लॉगिन करें', 'Log in'),
+                style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w800,
                   color: AppColors.primary,
@@ -887,7 +981,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _link(String text) {
     return InkWell(
-      onTap: () => _msg('$text जल्द जुड़ेगा'),
+      onTap: () => _msg(t('$text जल्द जुड़ेगा', '$text coming soon')),
       child: Text(
         text,
         style: const TextStyle(
@@ -911,11 +1005,17 @@ class _LoginScreenState extends State<LoginScreen> {
         alignment: WrapAlignment.center,
         crossAxisAlignment: WrapCrossAlignment.center,
         children: [
-          const Text('लॉगिन करते समय आप हमारी ', style: style),
+          Text(
+            t(
+              'लॉगिन करते समय आप हमारी ',
+              'By logging in, you agree to our ',
+            ),
+            style: style,
+          ),
           _link('Terms & Conditions'),
-          const Text(' और ', style: style),
+          Text(t(' और ', ' and '), style: style),
           _link('Privacy Policy'),
-          const Text(' से सहमत होते हैं।', style: style),
+          Text(t(' से सहमत होते हैं।', '.'), style: style),
         ],
       ),
     );
@@ -925,31 +1025,36 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
 
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.dark.copyWith(
-        statusBarColor: Colors.transparent,
-      ),
-      child: Scaffold(
-        backgroundColor: const Color(0xFFF7FCF9),
-        body: SafeArea(
-          child: SingleChildScrollView(
-            controller: _scroll,
-            child: Column(
-              children: [
-                _logoRow(),
-                _hero(width),
-                _features(),
-                _phoneCard(),
-                _orDivider(),
-                _otpCard(),
-                _googleButton(),
-                _alreadyHaveAccount(),
-                _terms(),
-              ],
+    return ValueListenableBuilder<String>(
+      valueListenable: AppLang.notifier,
+      builder: (context, lang, _) {
+        return AnnotatedRegion<SystemUiOverlayStyle>(
+          value: SystemUiOverlayStyle.dark.copyWith(
+            statusBarColor: Colors.transparent,
+          ),
+          child: Scaffold(
+            backgroundColor: const Color(0xFFF7FCF9),
+            body: SafeArea(
+              child: SingleChildScrollView(
+                controller: _scroll,
+                child: Column(
+                  children: [
+                    _logoRow(),
+                    _hero(width),
+                    _features(),
+                    _phoneCard(),
+                    _orDivider(),
+                    _otpCard(),
+                    _googleButton(),
+                    _alreadyHaveAccount(),
+                    _terms(),
+                  ],
+                ),
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
