@@ -3,6 +3,7 @@ import 'admin_screen.dart';
 import 'data.dart';
 import 'help_screen.dart';
 import 'home_screen.dart' show RoomMitraLogo;
+import 'invite_screen.dart';
 import 'messages_screen.dart';
 import 'my_listings_screen.dart';
 import 'terms_screen.dart';
@@ -301,6 +302,18 @@ class ProfileScreen extends StatelessWidget {
         'सुरक्षा और गोपनीयता',
         'लॉगिन और डेटा सुरक्षा सेटिंग्स',
         () => showMsg(context, 'यह हिस्सा Supabase जुड़ने पर आएगा'),
+      ),
+      _MenuItem(
+        Icons.group_add,
+        'दोस्तों को बुलाएँ',
+        'RoomMitra का लिंक WhatsApp पर शेयर करें',
+        () {
+          Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => const InviteScreen(),
+            ),
+          );
+        },
       ),
       _MenuItem(
         Icons.notifications,
