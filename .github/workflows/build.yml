@@ -21,6 +21,18 @@ jobs:
         run: |
           sed -i 's#<application#<uses-permission android:name="android.permission.INTERNET"/>\n    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>\n    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>\n    <application#' out/android/app/src/main/AndroidManifest.xml
           grep -n "uses-permission" out/android/app/src/main/AndroidManifest.xml
+      - name: Add R8 keep rules
+        run: |
+          cat > out/android/app/proguard-rules.pro << 'EOF'
+          -keep class kotlin.Unit { *; }
+          -keep class kotlin.Result { *; }
+          -keep class kotlin.Result$Failure { *; }
+          -keep class kotlin.coroutines.Continuation { *; }
+          -keep class kotlin.coroutines.intrinsics.CoroutineSingletons { *; }
+          -keep class kotlin.coroutines.intrinsics.IntrinsicsKt { *; }
+          -keep class io.flutter.plugins.sharedpreferences.** { *; }
+          EOF
+          cat out/android/app/proguard-rules.pro
       - name: Copy app files
         run: |
           rm -rf out/lib
@@ -34,7 +46,7 @@ jobs:
         working-directory: out
         run: |
           flutter pub get
-          flutter build apk --release --no-shrink
+          flutter build apk --release
       - uses: actions/upload-artifact@v4
         with:
           name: RoomMitra-APK
