@@ -250,3 +250,246 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+  Widget _cityChip() {
+    return PopupMenuButton<String>(
+      onSelected: appState.setCity,
+      itemBuilder: (_) => _cities
+          .map((c) => PopupMenuItem(value: c.name, child: Text(c.name)))
+          .toList(),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: AppColors.tint,
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.location_on, size: 20, color: AppColors.primary),
+            const SizedBox(width: 8),
+            Text(
+              appState.city,
+              style: const TextStyle(
+                  color: AppColors.primary,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(width: 4),
+            const Icon(Icons.keyboard_arrow_down,
+                size: 20, color: AppColors.primary),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _searchBar() {
+    return GestureDetector(
+      onTap: widget.onSearchTap,
+      child: Container(
+        height: 54,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(28),
+          border: Border.all(color: AppColors.border, width: 1.4),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.search, color: AppColors.primary, size: 26),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                t('किराए का कमरा, PG, फ्लैट खोजें...',
+                    'Search rental room, PG, flat...'),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(color: AppColors.muted, fontSize: 15),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _categories() {
+    final cats = _cats;
+    return Row(
+      children: List.generate(cats.length, (i) {
+        final sel = i == _cat;
+        return Expanded(
+          child: GestureDetector(
+            onTap: () => setState(() => _cat = i),
+            child: Column(
+              children: [
+                Container(
+                  width: 66,
+                  height: 66,
+                  decoration: BoxDecoration(
+                    color: sel ? AppColors.primary : AppColors.tint,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    cats[i].icon,
+                    size: 32,
+                    color: sel ? Colors.white : AppColors.primary,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  cats[i].label,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.text),
+                ),
+              ],
+            ),
+          ),
+        );
+      }),
+    );
+  }
+
+  Widget _banner() {
+    return Container(
+      clipBehavior: Clip.hardEdge,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF083F28), Color(0xFF1E6B3F)],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Stack(
+        children: [
+          const Positioned(
+            right: 0,
+            top: 0,
+            child: Icon(Icons.home, size: 90, color: Color(0x22FFFFFF)),
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.home_outlined,
+                            color: AppColors.accent, size: 30),
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: Text(
+                            t('मकान मालिक हैं?', 'Are you a house owner?'),
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w800),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      t('अपनी प्रॉपर्टी लिस्ट करें और\nसीधे किरायेदार पाएं',
+                          'List your property and\nfind tenants directly'),
+                      style:
+                          const TextStyle(color: Colors.white, fontSize: 13),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              ElevatedButton(
+                onPressed: widget.onListTap,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF7BF03A),
+                  foregroundColor: const Color(0xFF063D24),
+                  shape: const StadiumBorder(),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(t('अब लिस्ट करें', 'List now'),
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w800, fontSize: 13)),
+                    const SizedBox(width: 4),
+                    const Icon(Icons.arrow_forward, size: 16),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _sectionHeader(String title) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            title,
+            style: const TextStyle(
+                fontSize: 21,
+                fontWeight: FontWeight.w800,
+                color: AppColors.text),
+          ),
+        ),
+        InkWell(
+          onTap: widget.onSearchTap,
+          child: Row(
+            children: [
+              Text(
+                t('सभी देखें', 'See all'),
+                style: const TextStyle(
+                    color: AppColors.primary,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700),
+              ),
+              const SizedBox(width: 4),
+              const Icon(Icons.arrow_forward,
+                  size: 16, color: AppColors.primary),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _stat(IconData icon, String text) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 15, color: AppColors.muted),
+        const SizedBox(width: 4),
+        Text(text,
+            style: const TextStyle(fontSize: 12, color: AppColors.muted)),
+      ],
+    );
+  }
+
+  String _tagFor(Listing l) {
+    if (l.verified) return t('सत्यापित', 'Verified');
+    if (l.immediate) return t('तुरंत उपलब्ध', 'Available now');
+    if (l.directOwner) return t('मालिक से सीधे', 'Direct from owner');
+    return l.kind;
+  }
+
+  void _openDetail(Listing l) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => DetailScreen(listing: l),
+      ),
+    );
+  }
