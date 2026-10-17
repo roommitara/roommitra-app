@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'admin_screen.dart';
 import 'data.dart';
 import 'help_screen.dart';
 import 'home_screen.dart' show RoomMitraLogo;
 import 'invite_screen.dart';
+import 'login_screen.dart';
 import 'messages_screen.dart';
 import 'my_listings_screen.dart';
+import 'otp_service.dart';
+import 'strings.dart';
 import 'terms_screen.dart';
 import 'theme.dart';
 
@@ -31,6 +35,62 @@ class ProfileScreen extends StatelessWidget {
   final VoidCallback onAdd;
   const ProfileScreen({super.key, required this.onAdd});
 
+  /// लॉगिन किए हुए फोन के सिर्फ अंक (जैसे 919805793737)
+  String _digits() {
+    try {
+      final raw = Supabase.instance.client.auth.currentUser?.phone ?? '';
+      return raw.replaceAll(RegExp(r'\D'), '');
+    } catch (_) {
+      return '';
+    }
+  }
+
+  String _phoneFull() {
+    final d = _digits();
+    if (d.length == 12 && d.startsWith('91')) {
+      return '+91 ${d.substring(2, 7)} ${d.substring(7)}';
+    }
+    return d.isEmpty ? '—' : '+$d';
+  }
+
+  String _phoneShort() {
+    final d = _digits();
+    if (d.length == 12 && d.startsWith('91')) {
+      return '${d.substring(2, 7)} ${d.substring(7)}';
+    }
+    return d.isEmpty ? '—' : d;
+  }
+
+  Widget _langToggle() {
+    return InkWell(
+      onTap: AppLang.toggle,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: Colors.white24,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.white70, width: 1),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.language, size: 17, color: Colors.white),
+            const SizedBox(width: 5),
+            Text(
+              AppLang.isHindi ? 'English' : 'हिंदी',
+              style: const TextStyle(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _topBar(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
@@ -42,11 +102,13 @@ class ProfileScreen extends StatelessWidget {
       ),
       padding:
           EdgeInsets.fromLTRB(16, MediaQuery.of(context).padding.top + 10, 16, 12),
-      child: const Row(
+      child: Row(
         children: [
-          RoomMitraLogo(),
-          Spacer(),
-          Icon(Icons.settings, color: Colors.white, size: 26),
+          const RoomMitraLogo(),
+          const Spacer(),
+          _langToggle(),
+          const SizedBox(width: 10),
+          const Icon(Icons.settings, color: Colors.white, size: 26),
         ],
       ),
     );
@@ -71,7 +133,7 @@ class ProfileScreen extends StatelessWidget {
             child: const Icon(Icons.person, color: Colors.white, size: 40),
           ),
           const SizedBox(width: 14),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -79,40 +141,43 @@ class ProfileScreen extends StatelessWidget {
                   children: [
                     Flexible(
                       child: Text(
-                        'डेमो उपयोगकर्ता',
+                        t('उपयोगकर्ता', 'User'),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontSize: 19,
                             fontWeight: FontWeight.w800,
                             color: AppColors.text),
                       ),
                     ),
-                    SizedBox(width: 6),
-                    Icon(Icons.verified, color: AppColors.primary, size: 20),
+                    const SizedBox(width: 6),
+                    const Icon(Icons.verified,
+                        color: AppColors.primary, size: 20),
                   ],
                 ),
-                SizedBox(height: 6),
+                const SizedBox(height: 6),
                 Row(
                   children: [
-                    Icon(Icons.phone, size: 16, color: AppColors.primary),
-                    SizedBox(width: 6),
-                    Text('+91 98765 43210',
-                        style:
-                            TextStyle(fontSize: 13, color: AppColors.text)),
+                    const Icon(Icons.phone,
+                        size: 16, color: AppColors.primary),
+                    const SizedBox(width: 6),
+                    Text(_phoneFull(),
+                        style: const TextStyle(
+                            fontSize: 13, color: AppColors.text)),
                   ],
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Row(
                   children: [
-                    Icon(Icons.email, size: 16, color: AppColors.primary),
-                    SizedBox(width: 6),
+                    const Icon(Icons.email,
+                        size: 16, color: AppColors.primary),
+                    const SizedBox(width: 6),
                     Flexible(
-                      child: Text('demo@example.com',
+                      child: Text(t('ईमेल जोड़ा नहीं गया', 'Email not added'),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style:
-                              TextStyle(fontSize: 13, color: AppColors.text)),
+                          style: const TextStyle(
+                              fontSize: 13, color: AppColors.text)),
                     ),
                   ],
                 ),
@@ -148,6 +213,10 @@ class ProfileScreen extends StatelessWidget {
       );
     }
 
+    final cityText = AppLang.isHindi
+        ? (cityHindi[appState.city] ?? '')
+        : '${appState.city}';
+
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -157,12 +226,12 @@ class ProfileScreen extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const Row(
+          Row(
             children: [
               Expanded(
                 child: Text(
-                  'मेरी जानकारी',
-                  style: TextStyle(
+                  t('मेरी जानकारी', 'My information'),
+                  style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
                       color: AppColors.text),
@@ -173,9 +242,10 @@ class ProfileScreen extends StatelessWidget {
           const SizedBox(height: 12),
           Row(
             children: [
-              cell(Icons.person, 'पूरा नाम', 'डेमो उपयोगकर्ता'),
-              cell(Icons.phone, 'मोबाइल', '98765 43210'),
-              cell(Icons.location_on, 'शहर', cityHindi[appState.city] ?? ''),
+              cell(Icons.person, t('पूरा नाम', 'Full name'),
+                  t('उपयोगकर्ता', 'User')),
+              cell(Icons.phone, t('मोबाइल', 'Mobile'), _phoneShort()),
+              cell(Icons.location_on, t('शहर', 'City'), cityText),
             ],
           ),
         ],
@@ -233,32 +303,62 @@ class ProfileScreen extends StatelessWidget {
   }
 
   Future<void> _logout(BuildContext context) async {
-    await showDialog<void>(
+    final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        title: const Text('लॉगआउट'),
-        content: const Text(
-          'यह अभी डेमो है। असली लॉगिन और लॉगआउट Supabase जुड़ने पर काम करेगा।',
-          style: TextStyle(height: 1.4),
+        title: Text(t('लॉगआउट', 'Logout')),
+        content: Text(
+          t(
+            'क्या आप अपने खाते से बाहर जाना चाहते हैं?',
+            'Do you want to log out of your account?',
+          ),
+          style: const TextStyle(height: 1.4),
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('ठीक है'),
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(t('रद्द करें', 'Cancel')),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(t('लॉगआउट', 'Logout')),
           ),
         ],
       ),
+    );
+
+    if (ok != true) return;
+
+    try {
+      await OtpService.signOut();
+    } catch (_) {
+      // साइन-आउट में नेटवर्क की दिक्कत हो तो भी आगे बढ़ो
+    }
+
+    if (!context.mounted) return;
+
+    Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+      MaterialPageRoute<void>(builder: (_) => const LoginScreen()),
+      (route) => false,
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    return ValueListenableBuilder<String>(
+      valueListenable: AppLang.notifier,
+      builder: (context, lang, _) => _buildBody(context),
+    );
+  }
+
+  Widget _buildBody(BuildContext context) {
     final items = <_MenuItem>[
       _MenuItem(
         Icons.home_work,
-        'मेरी लिस्टिंग',
-        'मालिक डैशबोर्ड: बदलें, हटाएं, सक्रिय/निष्क्रिय करें',
+        t('मेरी लिस्टिंग', 'My listings'),
+        t('मालिक डैशबोर्ड: बदलें, हटाएं, सक्रिय/निष्क्रिय करें',
+            'Owner dashboard: edit, delete, activate/deactivate'),
         () {
           Navigator.of(context).push(
             MaterialPageRoute<void>(
@@ -269,8 +369,9 @@ class ProfileScreen extends StatelessWidget {
       ),
       _MenuItem(
         Icons.chat_bubble,
-        'मेरे संदेश',
-        'मकान मालिकों और किरायेदारों से चैट',
+        t('मेरे संदेश', 'My messages'),
+        t('मकान मालिकों और किरायेदारों से चैट',
+            'Chat with owners and tenants'),
         () {
           Navigator.of(context).push(
             MaterialPageRoute<void>(
@@ -281,8 +382,9 @@ class ProfileScreen extends StatelessWidget {
       ),
       _MenuItem(
         Icons.admin_panel_settings,
-        'एडमिन पैनल',
-        'डेमो: असली ऐप में सिर्फ एडमिन को दिखेगा',
+        t('एडमिन पैनल', 'Admin panel'),
+        t('डेमो: असली ऐप में सिर्फ एडमिन को दिखेगा',
+            'Demo: in the real app only admins will see this'),
         () {
           Navigator.of(context).push(
             MaterialPageRoute<void>(
@@ -293,20 +395,25 @@ class ProfileScreen extends StatelessWidget {
       ),
       _MenuItem(
         Icons.manage_accounts,
-        'प्रोफाइल अपडेट करें',
-        'अपनी जानकारी और फोटो अपडेट करें',
-        () => showMsg(context, 'प्रोफाइल अपडेट Supabase जुड़ने पर आएगा'),
+        t('प्रोफाइल अपडेट करें', 'Update profile'),
+        t('अपनी जानकारी और फोटो अपडेट करें',
+            'Update your details and photo'),
+        () => showMsg(context,
+            t('प्रोफाइल अपडेट जल्द आएगा', 'Profile update coming soon')),
       ),
       _MenuItem(
         Icons.shield,
-        'सुरक्षा और गोपनीयता',
-        'लॉगिन और डेटा सुरक्षा सेटिंग्स',
-        () => showMsg(context, 'यह हिस्सा Supabase जुड़ने पर आएगा'),
+        t('सुरक्षा और गोपनीयता', 'Security & privacy'),
+        t('लॉगिन और डेटा सुरक्षा सेटिंग्स',
+            'Login and data security settings'),
+        () => showMsg(context,
+            t('यह हिस्सा जल्द आएगा', 'This section is coming soon')),
       ),
       _MenuItem(
         Icons.group_add,
-        'दोस्तों को बुलाएँ',
-        'RoomMitra का लिंक WhatsApp पर शेयर करें',
+        t('दोस्तों को बुलाएँ', 'Invite friends'),
+        t('RoomMitra का लिंक WhatsApp पर शेयर करें',
+            'Share the RoomMitra link on WhatsApp'),
         () {
           Navigator.of(context).push(
             MaterialPageRoute<void>(
@@ -317,8 +424,9 @@ class ProfileScreen extends StatelessWidget {
       ),
       _MenuItem(
         Icons.notifications,
-        'नोटिफिकेशन सेटिंग',
-        'मैसेज, नए कमरे के नोटिफिकेशन',
+        t('नोटिफिकेशन सेटिंग', 'Notification settings'),
+        t('मैसेज, नए कमरे के नोटिफिकेशन',
+            'Notifications for messages and new rooms'),
         () {
           Navigator.of(context).push(
             MaterialPageRoute<void>(
@@ -329,8 +437,9 @@ class ProfileScreen extends StatelessWidget {
       ),
       _MenuItem(
         Icons.help,
-        'सहायता और सपोर्ट',
-        'FAQ, हेल्प सेंटर और संपर्क करें',
+        t('सहायता और सपोर्ट', 'Help & support'),
+        t('FAQ, हेल्प सेंटर और संपर्क करें',
+            'FAQ, help center and contact'),
         () {
           Navigator.of(context).push(
             MaterialPageRoute<void>(
@@ -341,8 +450,9 @@ class ProfileScreen extends StatelessWidget {
       ),
       _MenuItem(
         Icons.description,
-        'नियम और शर्तें',
-        'ऐप की शर्तें और गोपनीयता नीति',
+        t('नियम और शर्तें', 'Terms & conditions'),
+        t('ऐप की शर्तें और गोपनीयता नीति',
+            'App terms and privacy policy'),
         () {
           Navigator.of(context).push(
             MaterialPageRoute<void>(
@@ -353,8 +463,8 @@ class ProfileScreen extends StatelessWidget {
       ),
       _MenuItem(
         Icons.logout,
-        'लॉगआउट',
-        'अपने खाते से बाहर जाएँ',
+        t('लॉगआउट', 'Logout'),
+        t('अपने खाते से बाहर जाएँ', 'Sign out of your account'),
         () => _logout(context),
       ),
     ];
@@ -392,19 +502,20 @@ class ProfileScreen extends StatelessWidget {
                     color: AppColors.tint,
                     borderRadius: BorderRadius.circular(14),
                   ),
-                  child: const Row(
+                  child: Row(
                     children: [
-                      Icon(Icons.favorite,
+                      const Icon(Icons.favorite,
                           color: AppColors.primary, size: 22),
-                      SizedBox(width: 10),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: Text(
-                          'RoomMitra का उपयोग करने के लिए धन्यवाद!',
-                          style: TextStyle(
+                          t('RoomMitra का उपयोग करने के लिए धन्यवाद!',
+                              'Thank you for using RoomMitra!'),
+                          style: const TextStyle(
                               fontSize: 12.5, color: AppColors.text),
                         ),
                       ),
-                      Text('v1.0.0',
+                      const Text('v1.0.0',
                           style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
@@ -443,18 +554,25 @@ class NotificationSettingsScreen extends StatefulWidget {
 
 class _NotificationSettingsScreenState
     extends State<NotificationSettingsScreen> {
-  static const List<_PrefItem> _items = [
-    _PrefItem('messages', Icons.chat_bubble, 'मैसेज',
-        'किसी का नया संदेश आने पर'),
-    _PrefItem('rooms', Icons.home, 'नए कमरे',
-        'आपके शहर में नया कमरा जुड़ने पर'),
-    _PrefItem('bookings', Icons.calendar_month, 'बुकिंग',
-        'विज़िट अनुरोध और उसके जवाब पर'),
-    _PrefItem('safety', Icons.shield, 'सुरक्षा अलर्ट',
-        'रिपोर्ट और सुरक्षा की ज़रूरी सूचना'),
-    _PrefItem('offers', Icons.campaign, 'ऑफर और ऐप अपडेट',
-        'नई सुविधाओं और खबरों की जानकारी'),
-  ];
+  List<_PrefItem> get _items => [
+        _PrefItem('messages', Icons.chat_bubble, t('मैसेज', 'Messages'),
+            t('किसी का नया संदेश आने पर', 'When you get a new message')),
+        _PrefItem('rooms', Icons.home, t('नए कमरे', 'New rooms'),
+            t('आपके शहर में नया कमरा जुड़ने पर',
+                'When a new room is added in your city')),
+        _PrefItem('bookings', Icons.calendar_month, t('बुकिंग', 'Bookings'),
+            t('विज़िट अनुरोध और उसके जवाब पर',
+                'On visit requests and their replies')),
+        _PrefItem('safety', Icons.shield, t('सुरक्षा अलर्ट', 'Safety alerts'),
+            t('रिपोर्ट और सुरक्षा की ज़रूरी सूचना',
+                'Important report and safety notices')),
+        _PrefItem(
+            'offers',
+            Icons.campaign,
+            t('ऑफर और ऐप अपडेट', 'Offers and app updates'),
+            t('नई सुविधाओं और खबरों की जानकारी',
+                'News about new features')),
+      ];
 
   Widget _topBar() {
     return Container(
@@ -540,6 +658,15 @@ class _NotificationSettingsScreenState
 
   @override
   Widget build(BuildContext context) {
+    return ValueListenableBuilder<String>(
+      valueListenable: AppLang.notifier,
+      builder: (context, lang, _) => _buildBody(context),
+    );
+  }
+
+  Widget _buildBody(BuildContext context) {
+    final items = _items;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF7FCF9),
       body: Column(
@@ -556,29 +683,30 @@ class _NotificationSettingsScreenState
                     color: AppColors.tint,
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: const Row(
+                  child: Row(
                     children: [
-                      CircleAvatar(
+                      const CircleAvatar(
                         radius: 24,
                         backgroundColor: AppColors.primary,
                         child: Icon(Icons.tune, color: Colors.white, size: 26),
                       ),
-                      SizedBox(width: 12),
+                      const SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'नोटिफिकेशन सेटिंग',
-                              style: TextStyle(
+                              t('नोटिफिकेशन सेटिंग', 'Notification settings'),
+                              style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w800,
                                   color: AppColors.text),
                             ),
-                            SizedBox(height: 2),
+                            const SizedBox(height: 2),
                             Text(
-                              'चुनें कि आपको किस बारे में सूचना चाहिए।',
-                              style: TextStyle(
+                              t('चुनें कि आपको किस बारे में सूचना चाहिए।',
+                                  'Choose what you want to be notified about.'),
+                              style: const TextStyle(
                                   fontSize: 12.5, color: AppColors.text),
                             ),
                           ],
@@ -596,8 +724,8 @@ class _NotificationSettingsScreenState
                   ),
                   child: Column(
                     children: [
-                      for (var i = 0; i < _items.length; i++)
-                        _row(_items[i], last: i == _items.length - 1),
+                      for (var i = 0; i < items.length; i++)
+                        _row(items[i], last: i == items.length - 1),
                     ],
                   ),
                 ),
@@ -609,16 +737,19 @@ class _NotificationSettingsScreenState
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(color: AppColors.border),
                   ),
-                  child: const Row(
+                  child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Icons.info_outline,
+                      const Icon(Icons.info_outline,
                           color: AppColors.primary, size: 20),
-                      SizedBox(width: 10),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: Text(
-                          'यह अभी डेमो है। असली नोटिफिकेशन Supabase जुड़ने के बाद आपके फोन पर आएँगे और ये स्विच तभी असर करेंगे।',
-                          style: TextStyle(
+                          t(
+                            'यह अभी डेमो है। असली नोटिफिकेशन Supabase जुड़ने के बाद आपके फोन पर आएँगे और ये स्विच तभी असर करेंगे।',
+                            'This is a demo for now. Real notifications will arrive on your phone once Supabase is connected, and only then will these switches take effect.',
+                          ),
+                          style: const TextStyle(
                               fontSize: 12.5,
                               height: 1.4,
                               color: AppColors.text),
