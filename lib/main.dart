@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'app_shell.dart';
 import 'login_screen.dart';
 import 'onboarding_screen.dart';
+import 'otp_service.dart';
 import 'theme.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Supabase.initialize(url: supabaseUrl, anonKey: supabaseAnonKey);
   runApp(const RoomMitraApp());
 }
 
@@ -56,6 +61,21 @@ class _SplashScreenState extends State<SplashScreen>
 
   void _goNext() {
     if (!mounted) return;
+
+    // पहले से लॉगिन है तो सीधे ऐप खोलो
+    final loggedIn = Supabase.instance.client.auth.currentSession != null;
+    if (loggedIn) {
+      Navigator.of(context).pushReplacement(
+        PageRouteBuilder(
+          pageBuilder: (_, __, ___) => const AppShell(),
+          transitionsBuilder: (_, animation, __, child) =>
+              FadeTransition(opacity: animation, child: child),
+          transitionDuration: const Duration(milliseconds: 500),
+        ),
+      );
+      return;
+    }
+
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
         pageBuilder: (ctx, __, ___) => OnboardingScreen(
