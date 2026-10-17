@@ -4,6 +4,7 @@ import 'data.dart';
 import 'detail_screen.dart';
 import 'messages_screen.dart';
 import 'notifications_screen.dart';
+import 'strings.dart';
 import 'theme.dart';
 
 class RoomItem {
@@ -65,6 +66,7 @@ class RoomMitraLogo extends StatelessWidget {
               ),
               style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800),
             ),
+            // यह टैगलाइन हर भाषा में हिंदी ही रहती है
             const Text(
               'कमरा ढूँढना हुआ आसान।',
               style: TextStyle(color: Colors.white, fontSize: 12),
@@ -106,12 +108,12 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _cat = 0;
 
-  static const List<_Cat> _cats = [
-    _Cat(Icons.home_rounded, 'सभी प्रकार'),
-    _Cat(Icons.bed, 'PG / हॉस्टल'),
-    _Cat(Icons.apartment, 'फ्लैट'),
-    _Cat(Icons.meeting_room, 'रूम / शेयरिंग'),
-  ];
+  List<_Cat> get _cats => [
+        _Cat(Icons.home_rounded, t('सभी प्रकार', 'All types')),
+        _Cat(Icons.bed, t('PG / हॉस्टल', 'PG / Hostel')),
+        _Cat(Icons.apartment, t('फ्लैट', 'Flat')),
+        _Cat(Icons.meeting_room, t('रूम / शेयरिंग', 'Room / Sharing')),
+      ];
 
   static const List<_City> _cities = [
     _City('Nahan', Icons.location_city, Color(0xFF7FB0DC), Color(0xFF9CC6A0)),
@@ -293,16 +295,17 @@ class _HomeScreenState extends State<HomeScreen> {
           borderRadius: BorderRadius.circular(28),
           border: Border.all(color: AppColors.border, width: 1.4),
         ),
-        child: const Row(
+        child: Row(
           children: [
-            Icon(Icons.search, color: AppColors.primary, size: 26),
-            SizedBox(width: 12),
+            const Icon(Icons.search, color: AppColors.primary, size: 26),
+            const SizedBox(width: 12),
             Expanded(
               child: Text(
-                'किराए का कमरा, PG, फ्लैट खोजें...',
+                t('किराए का कमरा, PG, फ्लैट खोजें...',
+                    'Search rental room, PG, flat...'),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: AppColors.muted, fontSize: 15),
+                style: const TextStyle(color: AppColors.muted, fontSize: 15),
               ),
             ),
           ],
@@ -312,8 +315,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _categories() {
+    final cats = _cats;
     return Row(
-      children: List.generate(_cats.length, (i) {
+      children: List.generate(cats.length, (i) {
         final sel = i == _cat;
         return Expanded(
           child: GestureDetector(
@@ -328,14 +332,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
-                    _cats[i].icon,
+                    cats[i].icon,
                     size: 32,
                     color: sel ? Colors.white : AppColors.primary,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  _cats[i].label,
+                  cats[i].label,
                   textAlign: TextAlign.center,
                   maxLines: 2,
                   style: const TextStyle(
@@ -377,15 +381,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Row(
+                    Row(
                       children: [
-                        Icon(Icons.home_outlined,
+                        const Icon(Icons.home_outlined,
                             color: AppColors.accent, size: 30),
-                        SizedBox(width: 8),
+                        const SizedBox(width: 8),
                         Flexible(
                           child: Text(
-                            'मकान मालिक हैं?',
-                            style: TextStyle(
+                            t('मकान मालिक हैं?', 'Are you a house owner?'),
+                            style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 20,
                                 fontWeight: FontWeight.w800),
@@ -394,9 +398,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                     const SizedBox(height: 8),
-                    const Text(
-                      'अपनी प्रॉपर्टी लिस्ट करें और\nसीधे किरायेदार पाएं',
-                      style: TextStyle(color: Colors.white, fontSize: 13),
+                    Text(
+                      t('अपनी प्रॉपर्टी लिस्ट करें और\nसीधे किरायेदार पाएं',
+                          'List your property and\nfind tenants directly'),
+                      style:
+                          const TextStyle(color: Colors.white, fontSize: 13),
                     ),
                   ],
                 ),
@@ -411,14 +417,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text('अब लिस्ट करें',
-                        style: TextStyle(
+                    Text(t('अब लिस्ट करें', 'List now'),
+                        style: const TextStyle(
                             fontWeight: FontWeight.w800, fontSize: 13)),
-                    SizedBox(width: 4),
-                    Icon(Icons.arrow_forward, size: 16),
+                    const SizedBox(width: 4),
+                    const Icon(Icons.arrow_forward, size: 16),
                   ],
                 ),
               ),
@@ -443,17 +449,18 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         InkWell(
           onTap: widget.onSearchTap,
-          child: const Row(
+          child: Row(
             children: [
               Text(
-                'सभी देखें',
-                style: TextStyle(
+                t('सभी देखें', 'See all'),
+                style: const TextStyle(
                     color: AppColors.primary,
                     fontSize: 13,
                     fontWeight: FontWeight.w700),
               ),
-              SizedBox(width: 4),
-              Icon(Icons.arrow_forward, size: 16, color: AppColors.primary),
+              const SizedBox(width: 4),
+              const Icon(Icons.arrow_forward,
+                  size: 16, color: AppColors.primary),
             ],
           ),
         ),
@@ -474,9 +481,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   String _tagFor(Listing l) {
-    if (l.verified) return 'सत्यापित';
-    if (l.immediate) return 'तुरंत उपलब्ध';
-    if (l.directOwner) return 'मालिक से सीधे';
+    if (l.verified) return t('सत्यापित', 'Verified');
+    if (l.immediate) return t('तुरंत उपलब्ध', 'Available now');
+    if (l.directOwner) return t('मालिक से सीधे', 'Direct from owner');
     return l.kind;
   }
 
@@ -525,7 +532,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      '₹${inr(l.price)}/माह',
+                      '₹${inr(l.price)}${t('/माह', '/month')}',
                       style: const TextStyle(
                           color: Colors.white,
                           fontSize: 12,
@@ -547,248 +554,3 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       child: Icon(
                         fav ? Icons.favorite : Icons.favorite_border,
-                        size: 20,
-                        color: fav ? const Color(0xFFFF6B6B) : Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    l.title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.text),
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      const Icon(Icons.location_on_outlined,
-                          size: 16, color: AppColors.muted),
-                      const SizedBox(width: 3),
-                      Expanded(
-                        child: Text(
-                          l.area,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                              fontSize: 13, color: AppColors.muted),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 12,
-                    runSpacing: 4,
-                    children: [
-                      _stat(Icons.bed_outlined, '${l.rooms} Room'),
-                      _stat(Icons.bathtub_outlined, l.bathLabel),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: AppColors.tint,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      _tagFor(l),
-                      style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.primary),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _roomRow(double w) {
-    final rooms =
-        sampleListings.where((l) => l.city == appState.city).take(4).toList();
-    if (rooms.isEmpty) {
-      return Container(
-        width: double.infinity,
-        margin: const EdgeInsets.symmetric(vertical: 6),
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: AppColors.tintLight,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.border),
-        ),
-        child: const Column(
-          children: [
-            Icon(Icons.search_off, size: 40, color: AppColors.muted),
-            SizedBox(height: 8),
-            Text(
-              'इस शहर में अभी कोई कमरा नहीं है',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.muted),
-            ),
-          ],
-        ),
-      );
-    }
-    return SizedBox(
-      height: 272,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(vertical: 6),
-        clipBehavior: Clip.none,
-        itemCount: rooms.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 12),
-        itemBuilder: (context, i) => _roomCard(rooms[i], w),
-      ),
-    );
-  }
-
-  Widget _cityRow() {
-    return SizedBox(
-      height: 104,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: _cities.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 12),
-        itemBuilder: (context, i) {
-          final c = _cities[i];
-          final sel = c.name == appState.city;
-          return GestureDetector(
-            onTap: () => appState.setCity(c.name),
-            child: SizedBox(
-              width: 112,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    height: 72,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: sel ? AppColors.primary : Colors.transparent,
-                        width: 2,
-                      ),
-                      gradient: LinearGradient(
-                        colors: [c.c1, c.c2],
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                      ),
-                    ),
-                    child: Icon(c.icon, size: 36, color: Colors.white),
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      const Icon(Icons.location_on_outlined,
-                          size: 16, color: AppColors.primary),
-                      const SizedBox(width: 2),
-                      Expanded(
-                        child: Text(
-                          c.name,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.text),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final top = MediaQuery.of(context).padding.top;
-    final cardW = (MediaQuery.of(context).size.width - 32 - 12) / 2;
-    return ListenableBuilder(
-      listenable: appState,
-      builder: (context, _) {
-        return AnnotatedRegion<SystemUiOverlayStyle>(
-          value: SystemUiOverlayStyle.light.copyWith(
-            statusBarColor: Colors.transparent,
-          ),
-          child: Scaffold(
-            backgroundColor: Colors.white,
-            body: SingleChildScrollView(
-              child: Container(
-                color: AppColors.primaryDark,
-                child: Column(
-                  children: [
-                    _header(top),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        borderRadius:
-                            BorderRadius.vertical(top: Radius.circular(26)),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              _cityChip(),
-                              const Spacer(),
-                              GestureDetector(
-                                onTap: widget.onSearchTap,
-                                child: const Icon(Icons.tune,
-                                    size: 30, color: AppColors.primary),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-                          _searchBar(),
-                          const SizedBox(height: 20),
-                          _categories(),
-                          const SizedBox(height: 20),
-                          _banner(),
-                          const SizedBox(height: 22),
-                          _sectionHeader('Featured Rooms'),
-                          const SizedBox(height: 8),
-                          _roomRow(cardW),
-                          const SizedBox(height: 14),
-                          _sectionHeader('लोकप्रिय शहर'),
-                          const SizedBox(height: 12),
-                          _cityRow(),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
