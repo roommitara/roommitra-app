@@ -8,8 +8,60 @@ import 'theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Supabase.initialize(url: supabaseUrl, anonKey: supabaseAnonKey);
+
+  String? startupError;
+  try {
+    await Supabase.initialize(url: supabaseUrl, anonKey: supabaseAnonKey);
+  } catch (e, st) {
+    startupError = '$e\n\n$st';
+  }
+
+  if (startupError != null) {
+    runApp(ErrorApp(message: startupError));
+    return;
+  }
+
   runApp(const RoomMitraApp());
+}
+
+class ErrorApp extends StatelessWidget {
+  final String message;
+  const ErrorApp({super.key, required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        backgroundColor: Colors.white,
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'स्टार्टअप एरर - इसका स्क्रीनशॉट भेजें',
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  SelectableText(
+                    message,
+                    style: const TextStyle(color: Colors.black, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class RoomMitraApp extends StatelessWidget {
@@ -63,7 +115,12 @@ class _SplashScreenState extends State<SplashScreen>
     if (!mounted) return;
 
     // पहले से लॉगिन है तो सीधे ऐप खोलो
-    final loggedIn = Supabase.instance.client.auth.currentSession != null;
+    bool loggedIn = false;
+    try {
+      loggedIn = Supabase.instance.client.auth.currentSession != null;
+    } catch (_) {
+      loggedIn = false;
+    }
     if (loggedIn) {
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
