@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'strings.dart';
 
 /// जाँच के लिए: यहाँ अपना 10 अंकों का मोबाइल नंबर डालें (जैसे '9876543210'),
 /// ताकि "कॉल करें" और "WhatsApp करें" बटन आपके नंबर पर खुलें।
@@ -15,24 +16,31 @@ const Map<String, String> cityHindi = {
   'Kala Amb': 'काला अंब',
 };
 
+/// शहर का नाम चुनी हुई भाषा में: हिंदी में नाहन, English में Nahan
+String cityName(String c) => AppLang.isHindi ? (cityHindi[c] ?? c) : c;
+
 class Amenity {
   final String id;
-  final String label;
+  final String _hi;
+  final String _en;
   final IconData icon;
-  const Amenity(this.id, this.label, this.icon);
+  const Amenity(this.id, this._hi, this._en, this.icon);
+
+  /// चुनी हुई भाषा में नाम
+  String get label => t(_hi, _en);
 }
 
 const List<Amenity> allAmenities = [
-  Amenity('wifi', 'WiFi', Icons.wifi),
-  Amenity('ac', 'AC', Icons.ac_unit),
-  Amenity('bed', 'बेड', Icons.bed),
-  Amenity('wardrobe', 'वार्डरोब', Icons.checkroom),
-  Amenity('water', 'पानी', Icons.water_drop),
-  Amenity('parking', 'पार्किंग', Icons.local_parking),
-  Amenity('balcony', 'बालकनी', Icons.balcony),
-  Amenity('food', 'खाना', Icons.restaurant),
-  Amenity('electricity', 'बिजली', Icons.bolt),
-  Amenity('tv', 'TV', Icons.tv),
+  Amenity('wifi', 'WiFi', 'WiFi', Icons.wifi),
+  Amenity('ac', 'AC', 'AC', Icons.ac_unit),
+  Amenity('bed', 'बेड', 'Bed', Icons.bed),
+  Amenity('wardrobe', 'वार्डरोब', 'Wardrobe', Icons.checkroom),
+  Amenity('water', 'पानी', 'Water', Icons.water_drop),
+  Amenity('parking', 'पार्किंग', 'Parking', Icons.local_parking),
+  Amenity('balcony', 'बालकनी', 'Balcony', Icons.balcony),
+  Amenity('food', 'खाना', 'Food', Icons.restaurant),
+  Amenity('electricity', 'बिजली', 'Electricity', Icons.bolt),
+  Amenity('tv', 'TV', 'TV', Icons.tv),
 ];
 
 /// भारतीय तरीके से अंक लिखना: 12000 -> 12,000 और 100000 -> 1,00,000
@@ -52,7 +60,8 @@ String inr(int n) {
 
 class Listing {
   final String id;
-  final String title;
+  final String _title;
+  final String _titleEn;
   final String area;
   final String city;
   final String type; // PG, 1RK, 1BHK, 2BHK, 3BHK+
@@ -63,7 +72,8 @@ class Listing {
   final String bathLabel;
   final int sqft;
   final String floor;
-  final String desc;
+  final String _desc;
+  final String _descEn;
   final Set<String> amenities;
   final String image;
   final int photos;
@@ -86,7 +96,8 @@ class Listing {
 
   const Listing({
     required this.id,
-    required this.title,
+    required String title,
+    String titleEn = '',
     required this.area,
     required this.city,
     required this.type,
@@ -97,7 +108,8 @@ class Listing {
     required this.bathLabel,
     required this.sqft,
     required this.floor,
-    required this.desc,
+    required String desc,
+    String descEn = '',
     required this.amenities,
     required this.image,
     required this.photos,
@@ -113,7 +125,30 @@ class Listing {
     this.lng,
     this.locality = '',
     this.address = '',
-  });
+  })  : _title = title,
+        _titleEn = titleEn,
+        _desc = desc,
+        _descEn = descEn;
+
+  /// चुनी हुई भाषा में टाइटल (English न हो तो मूल टाइटल)
+  String get title => (AppLang.isHindi || _titleEn.isEmpty) ? _title : _titleEn;
+
+  /// चुनी हुई भाषा में विवरण (English न हो तो मूल विवरण)
+  String get desc => (AppLang.isHindi || _descEn.isEmpty) ? _desc : _descEn;
+
+  /// प्रकार का नाम चुनी हुई भाषा में (kind की असली वैल्यू फ़िल्टर के लिए वैसी ही रहती है)
+  String get kindLabel {
+    switch (kind) {
+      case 'फ्लैट':
+        return t('फ्लैट', 'Flat');
+      case 'रूम':
+        return t('रूम', 'Room');
+      case 'हॉस्टल':
+        return t('हॉस्टल', 'Hostel');
+      default:
+        return kind;
+    }
+  }
 
   /// क्या इस कमरे की असली मैप लोकेशन सेव है?
   bool get hasLocation => lat != null && lng != null;
@@ -126,6 +161,7 @@ const List<Listing> sampleListings = [
   Listing(
     id: 'n1',
     title: '1BHK रूम (फर्निश्ड)',
+    titleEn: '1BHK Room (Furnished)',
     area: 'Rani Tal, Nahan',
     city: 'Nahan',
     type: '1BHK',
@@ -137,6 +173,8 @@ const List<Listing> sampleListings = [
     sqft: 450,
     floor: '2nd Floor',
     desc: 'पूरी तरह से फर्निश्ड रूम, अलमारी, वाई-फाई, पार्किंग की सुविधा। शांत और सुरक्षित लोकेशन।',
+    descEn:
+        'Fully furnished room with wardrobe, WiFi and parking. Quiet and safe location.',
     amenities: {'wifi', 'bed', 'wardrobe', 'water', 'parking', 'electricity'},
     image: 'assets/room1.jpg',
     photos: 8,
@@ -149,6 +187,7 @@ const List<Listing> sampleListings = [
   Listing(
     id: 'n2',
     title: 'PG (लड़कों के लिए)',
+    titleEn: 'PG (for boys)',
     area: 'Jamta Road, Nahan',
     city: 'Nahan',
     type: 'PG',
@@ -160,6 +199,8 @@ const List<Listing> sampleListings = [
     sqft: 300,
     floor: '1st Floor',
     desc: 'साफ-सुथरा PG, 24x7 पानी, वाई-फाई, खाना-रहना की सुविधा। कॉलेज और ऑफिस के पास।',
+    descEn:
+        'Clean PG with 24x7 water, WiFi, and food and stay facility. Close to college and offices.',
     amenities: {'wifi', 'bed', 'water', 'food', 'electricity'},
     image: 'assets/room2.jpg',
     photos: 6,
@@ -171,6 +212,7 @@ const List<Listing> sampleListings = [
   Listing(
     id: 'n3',
     title: '1RK रूम (सेमी फर्निश्ड)',
+    titleEn: '1RK Room (Semi-furnished)',
     area: 'Sabzi Mandi, Nahan',
     city: 'Nahan',
     type: '1RK',
@@ -182,6 +224,8 @@ const List<Listing> sampleListings = [
     sqft: 250,
     floor: '1st Floor',
     desc: 'सेमी फर्निश्ड रूम, किचन, बाथरूम, बालकनी। बजट फ्रेंडली और अच्छी लोकेशन।',
+    descEn:
+        'Semi-furnished room with kitchen, bathroom and balcony. Budget friendly with a good location.',
     amenities: {'water', 'electricity', 'balcony'},
     image: 'assets/room1.jpg',
     photos: 5,
@@ -192,6 +236,7 @@ const List<Listing> sampleListings = [
   Listing(
     id: 'p1',
     title: '2BHK फ्लैट (फर्निश्ड)',
+    titleEn: '2BHK Flat (Furnished)',
     area: 'Paonta Chowk, Paonta Sahib',
     city: 'Paonta Sahib',
     type: '2BHK',
@@ -203,6 +248,8 @@ const List<Listing> sampleListings = [
     sqft: 850,
     floor: '3rd Floor',
     desc: 'फुली फर्निश्ड, मॉड्यूलर किचन, AC, सोसायटी में पार्किंग। परिवार के लिए बेहतरीन विकल्प।',
+    descEn:
+        'Fully furnished, modular kitchen, AC, parking in the society. An excellent choice for families.',
     amenities: {
       'wifi',
       'ac',
@@ -356,21 +403,28 @@ Future<void> contactOwner(BuildContext context, Listing l,
     {required bool whatsapp}) async {
   final phone = l.phone.isNotEmpty ? l.phone : demoPhone;
   if (phone.length != 10) {
-    showMsg(context,
-        'यह डेमो कमरा है, इसमें अभी मालिक का नंबर नहीं है। जाँच के लिए data.dart में demoPhone में अपना नंबर डालें।');
+    showMsg(
+        context,
+        t('यह डेमो कमरा है, इसमें अभी मालिक का नंबर नहीं है। जाँच के लिए data.dart में demoPhone में अपना नंबर डालें।',
+            'This is a demo room and has no owner number yet. To test, put your number in demoPhone in data.dart.'));
     return;
   }
   final Uri uri;
   if (whatsapp) {
-    final text = Uri.encodeComponent(
-        'नमस्ते, मैंने RoomMitra पर आपकी लिस्टिंग "${l.title}" देखी है। क्या यह अभी उपलब्ध है?');
+    final text = Uri.encodeComponent(t(
+        'नमस्ते, मैंने RoomMitra पर आपकी लिस्टिंग "${l.title}" देखी है। क्या यह अभी उपलब्ध है?',
+        'Hello, I saw your listing "${l.title}" on RoomMitra. Is it still available?'));
     uri = Uri.parse('https://wa.me/91$phone?text=$text');
   } else {
     uri = Uri.parse('tel:+91$phone');
   }
   final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
   if (!ok && context.mounted) {
-    showMsg(context, whatsapp ? 'WhatsApp नहीं खुल सका' : 'फोन ऐप नहीं खुल सका');
+    showMsg(
+        context,
+        whatsapp
+            ? t('WhatsApp नहीं खुल सका', 'Could not open WhatsApp')
+            : t('फोन ऐप नहीं खुल सका', 'Could not open the phone app'));
   }
 }
 
@@ -384,7 +438,10 @@ Uri mapsDirectionsUrl(double lat, double lng) {
 /// किसी कमरे तक का रास्ता Google Maps में खोलना
 Future<void> openDirections(BuildContext context, Listing l) async {
   if (!l.hasLocation) {
-    showMsg(context, 'इस कमरे की मैप लोकेशन अभी सेव नहीं है');
+    showMsg(
+        context,
+        t('इस कमरे की मैप लोकेशन अभी सेव नहीं है',
+            "This room's map location is not saved yet"));
     return;
   }
   try {
@@ -393,9 +450,11 @@ Future<void> openDirections(BuildContext context, Listing l) async {
       mode: LaunchMode.externalApplication,
     );
     if (!ok && context.mounted) {
-      showMsg(context, 'Google Maps नहीं खुल सका');
+      showMsg(context, t('Google Maps नहीं खुल सका', 'Could not open Google Maps'));
     }
   } catch (_) {
-    if (context.mounted) showMsg(context, 'Google Maps नहीं खुल सका');
+    if (context.mounted) {
+      showMsg(context, t('Google Maps नहीं खुल सका', 'Could not open Google Maps'));
+    }
   }
 }
