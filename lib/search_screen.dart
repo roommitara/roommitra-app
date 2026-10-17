@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'data.dart';
 import 'detail_screen.dart';
 import 'home_screen.dart' show RoomMitraLogo;
+import 'strings.dart';
 import 'theme.dart';
 
 class _TypeChip {
-  final String label;
+  /// यह असली वैल्यू है (फ़िल्टर इसी से मिलान करता है), दिखने वाला नाम अलग से बनता है
+  final String key;
   final IconData icon;
-  const _TypeChip(this.label, this.icon);
+  const _TypeChip(this.key, this.icon);
+
+  String get label => key == 'सभी' ? t('सभी', 'All') : key;
 }
 
 class SearchScreen extends StatefulWidget {
@@ -33,11 +37,11 @@ class _SearchScreenState extends State<SearchScreen> {
     _TypeChip('3BHK+', Icons.home_outlined),
   ];
 
-  static const List<String> _sortLabels = [
-    'किराया (कम से ज्यादा)',
-    'किराया (ज्यादा से कम)',
-    'नए पहले',
-  ];
+  List<String> get _sortLabels => [
+        t('किराया (कम से ज्यादा)', 'Rent (low to high)'),
+        t('किराया (ज्यादा से कम)', 'Rent (high to low)'),
+        t('नए पहले', 'Newest first'),
+      ];
 
   @override
   void dispose() {
@@ -114,7 +118,7 @@ class _SearchScreenState extends State<SearchScreen> {
       onSelected: appState.setCity,
       itemBuilder: (_) => allCities
           .map((c) => PopupMenuItem<String>(
-              value: c, child: Text(cityHindi[c] ?? c)))
+              value: c, child: Text(cityName(c))))
           .toList(),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
@@ -124,7 +128,7 @@ class _SearchScreenState extends State<SearchScreen> {
             const Icon(Icons.location_on, size: 20, color: AppColors.primary),
             const SizedBox(width: 4),
             Text(
-              cityHindi[appState.city] ?? appState.city,
+              cityName(appState.city),
               style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
@@ -139,7 +143,7 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _searchBar() {
-    final cityName = cityHindi[appState.city] ?? appState.city;
+    final city = cityName(appState.city);
     return Container(
       height: 54,
       padding: const EdgeInsets.only(left: 14, right: 8),
@@ -161,7 +165,7 @@ class _SearchScreenState extends State<SearchScreen> {
               decoration: InputDecoration(
                 border: InputBorder.none,
                 isDense: true,
-                hintText: '$cityName में कमरा खोजें',
+                hintText: t('$city में कमरा खोजें', 'Search rooms in $city'),
                 hintStyle:
                     const TextStyle(fontSize: 15, color: AppColors.muted),
               ),
@@ -198,10 +202,10 @@ class _SearchScreenState extends State<SearchScreen> {
         itemCount: _types.length,
         separatorBuilder: (_, __) => const SizedBox(width: 10),
         itemBuilder: (context, i) {
-          final t = _types[i];
-          final sel = _type == t.label;
+          final chip = _types[i];
+          final sel = _type == chip.key;
           return GestureDetector(
-            onTap: () => setState(() => _type = t.label),
+            onTap: () => setState(() => _type = chip.key),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
@@ -210,11 +214,11 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
               child: Row(
                 children: [
-                  Icon(t.icon,
+                  Icon(chip.icon,
                       size: 20, color: sel ? Colors.white : AppColors.primary),
                   const SizedBox(width: 8),
                   Text(
-                    t.label,
+                    chip.label,
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
@@ -265,26 +269,31 @@ class _SearchScreenState extends State<SearchScreen> {
 
   Widget _controls() {
     final n = _filters.activeCount;
+    final labels = _sortLabels;
+    final filterWord = t('फिल्टर', 'Filter');
     return Wrap(
       spacing: 8,
       runSpacing: 8,
       children: [
         GestureDetector(
           onTap: _openFilter,
-          child: _pill(Icons.tune, n > 0 ? 'फिल्टर ($n)' : 'फिल्टर',
+          child: _pill(Icons.tune, n > 0 ? '$filterWord ($n)' : filterWord,
               arrow: true, active: n > 0),
         ),
         PopupMenuButton<int>(
           onSelected: (v) => setState(() => _sort = v),
           itemBuilder: (_) => List.generate(
-            _sortLabels.length,
-            (i) => PopupMenuItem<int>(value: i, child: Text(_sortLabels[i])),
+            labels.length,
+            (i) => PopupMenuItem<int>(value: i, child: Text(labels[i])),
           ),
-          child: _pill(Icons.swap_vert, _sortLabels[_sort], arrow: true),
+          child: _pill(Icons.swap_vert, labels[_sort], arrow: true),
         ),
         GestureDetector(
-          onTap: () => showMsg(context, 'मैप वाला हिस्सा बाद में जुड़ेगा'),
-          child: _pill(Icons.map_outlined, 'मैप पर देखें'),
+          onTap: () => showMsg(
+              context,
+              t('मैप वाला हिस्सा बाद में जुड़ेगा',
+                  'Map view will be added later')),
+          child: _pill(Icons.map_outlined, t('मैप पर देखें', 'View on map')),
         ),
       ],
     );
@@ -311,7 +320,7 @@ class _SearchScreenState extends State<SearchScreen> {
       children: [
         Expanded(
           child: Text(
-            'कुल $count परिणाम',
+            t('कुल $count परिणाम', 'Total $count results'),
             style: const TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w800,
@@ -407,7 +416,7 @@ class _SearchScreenState extends State<SearchScreen> {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
-        '₹${inr(price)}/माह',
+        '₹${inr(price)}${t('/माह', '/month')}',
         style: const TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w800,
@@ -437,7 +446,7 @@ class _SearchScreenState extends State<SearchScreen> {
             child: ElevatedButton.icon(
               onPressed: () => contactOwner(context, l, whatsapp: false),
               icon: const Icon(Icons.call, size: 18),
-              label: const Text('कॉल करें'),
+              label: Text(t('कॉल करें', 'Call')),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
@@ -457,7 +466,7 @@ class _SearchScreenState extends State<SearchScreen> {
             child: OutlinedButton.icon(
               onPressed: () => contactOwner(context, l, whatsapp: true),
               icon: const Icon(Icons.chat, size: 18),
-              label: const Text('WhatsApp करें'),
+              label: Text(t('WhatsApp करें', 'WhatsApp')),
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.primary,
                 side: const BorderSide(color: AppColors.primary, width: 1.2),
@@ -676,19 +685,20 @@ class _SearchScreenState extends State<SearchScreen> {
             fit: BoxFit.contain,
           ),
           const SizedBox(height: 8),
-          const Text(
-            'कोई कमरा नहीं मिला',
+          Text(
+            t('कोई कमरा नहीं मिला', 'No rooms found'),
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
                 fontSize: 27,
                 fontWeight: FontWeight.w800,
                 color: AppColors.primary),
           ),
           const SizedBox(height: 8),
-          const Text(
-            'आपके द्वारा चुनी गई जानकारी के अनुसार,\nकोई भी कमरा उपलब्ध नहीं है।',
+          Text(
+            t('आपके द्वारा चुनी गई जानकारी के अनुसार,\nकोई भी कमरा उपलब्ध नहीं है।',
+                'According to your selection,\nno rooms are available.'),
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
                 fontSize: 15, height: 1.5, color: AppColors.text),
           ),
           const SizedBox(height: 18),
@@ -703,15 +713,16 @@ class _SearchScreenState extends State<SearchScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Row(
+                Row(
                   children: [
-                    Icon(Icons.lightbulb_outline,
+                    const Icon(Icons.lightbulb_outline,
                         size: 24, color: AppColors.primary),
-                    SizedBox(width: 8),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'आप ये भी कोशिश कर सकते हैं:',
-                        style: TextStyle(
+                        t('आप ये भी कोशिश कर सकते हैं:',
+                            'You can also try:'),
+                        style: const TextStyle(
                             fontSize: 15.5,
                             fontWeight: FontWeight.w800,
                             color: AppColors.primary),
@@ -720,9 +731,18 @@ class _SearchScreenState extends State<SearchScreen> {
                   ],
                 ),
                 const SizedBox(height: 6),
-                _suggestRow('किराया रेंज थोड़ा बदलें', _openFilter),
-                _suggestRow('किसी दूसरे इलाके को चुनें', _openFilter),
-                _suggestRow('फिल्टर कम करके फिर से खोजें', _resetAll),
+                _suggestRow(
+                    t('किराया रेंज थोड़ा बदलें',
+                        'Change the rent range a little'),
+                    _openFilter),
+                _suggestRow(
+                    t('किसी दूसरे इलाके को चुनें',
+                        'Choose a different area'),
+                    _openFilter),
+                _suggestRow(
+                    t('फिल्टर कम करके फिर से खोजें',
+                        'Reduce filters and search again'),
+                    _resetAll),
               ],
             ),
           ),
@@ -733,7 +753,7 @@ class _SearchScreenState extends State<SearchScreen> {
             child: ElevatedButton.icon(
               onPressed: _resetAll,
               icon: const Icon(Icons.search, size: 24),
-              label: const Text('फिर से खोजें'),
+              label: Text(t('फिर से खोजें', 'Search again')),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
@@ -750,65 +770,70 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: appState,
-      builder: (context, _) {
-        final results = _resultsWith(_filters);
-        return Scaffold(
-          backgroundColor: const Color(0xFFF7FCF9),
-          body: CustomScrollView(
-            slivers: [
-              SliverToBoxAdapter(
-                child: SafeArea(
-                  bottom: false,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _searchBar(),
-                        const SizedBox(height: 14),
-                        _typeChips(),
-                        const SizedBox(height: 12),
-                        _controls(),
-                        const SizedBox(height: 16),
-                        _countRow(results.length),
-                      ],
+    return ValueListenableBuilder<String>(
+      valueListenable: AppLang.notifier,
+      builder: (context, lang, _) {
+        return ListenableBuilder(
+          listenable: appState,
+          builder: (context, _) {
+            final results = _resultsWith(_filters);
+            return Scaffold(
+              backgroundColor: const Color(0xFFF7FCF9),
+              body: CustomScrollView(
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: SafeArea(
+                      bottom: false,
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _searchBar(),
+                            const SizedBox(height: 14),
+                            _typeChips(),
+                            const SizedBox(height: 12),
+                            _controls(),
+                            const SizedBox(height: 16),
+                            _countRow(results.length),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                  if (results.isEmpty)
+                    SliverToBoxAdapter(child: _empty())
+                  else if (_grid)
+                    SliverPadding(
+                      padding: const EdgeInsets.fromLTRB(16, 4, 16, 20),
+                      sliver: SliverGrid(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, i) => _gridCard(results[i]),
+                          childCount: results.length,
+                        ),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 12,
+                          crossAxisSpacing: 12,
+                          mainAxisExtent: 300,
+                        ),
+                      ),
+                    )
+                  else
+                    SliverPadding(
+                      padding: const EdgeInsets.fromLTRB(16, 4, 16, 20),
+                      sliver: SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, i) => _listCard(results[i]),
+                          childCount: results.length,
+                        ),
+                      ),
+                    ),
+                ],
               ),
-              if (results.isEmpty)
-                SliverToBoxAdapter(child: _empty())
-              else if (_grid)
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 20),
-                  sliver: SliverGrid(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, i) => _gridCard(results[i]),
-                      childCount: results.length,
-                    ),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 12,
-                      crossAxisSpacing: 12,
-                      mainAxisExtent: 300,
-                    ),
-                  ),
-                )
-              else
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 20),
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, i) => _listCard(results[i]),
-                      childCount: results.length,
-                    ),
-                  ),
-                ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
@@ -837,12 +862,14 @@ class _FilterScreenState extends State<FilterScreen> {
   final _localityCtrl = TextEditingController();
 
   static const List<int> _distances = [1, 2, 5, 10, 20];
-  static const List<MapEntry<String, String>> _kinds = [
-    MapEntry('PG', 'PG'),
-    MapEntry('फ्लैट', 'फ्लैट'),
-    MapEntry('रूम', 'रूम'),
-    MapEntry('हॉस्टल', 'बॉयज/गर्ल्स हॉस्टल'),
-  ];
+
+  /// key = असली वैल्यू (listing.kind से मिलती है), value = दिखने वाला नाम
+  List<MapEntry<String, String>> get _kinds => [
+        const MapEntry('PG', 'PG'),
+        MapEntry('फ्लैट', t('फ्लैट', 'Flat')),
+        MapEntry('रूम', t('रूम', 'Room')),
+        MapEntry('हॉस्टल', t('बॉयज/गर्ल्स हॉस्टल', 'Boys/Girls hostel')),
+      ];
 
   @override
   void initState() {
@@ -876,12 +903,14 @@ class _FilterScreenState extends State<FilterScreen> {
       children: [
         Icon(icon, size: 22, color: AppColors.primary),
         const SizedBox(width: 8),
-        Text(
-          text,
-          style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w800,
-              color: AppColors.text),
+        Flexible(
+          child: Text(
+            text,
+            style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w800,
+                color: AppColors.text),
+          ),
         ),
       ],
     );
@@ -918,7 +947,10 @@ class _FilterScreenState extends State<FilterScreen> {
             icon: const Icon(Icons.search, color: Colors.white),
           ),
           IconButton(
-            onPressed: () => showMsg(context, 'पसंदीदा कमरे नीचे के "पसंदीदा" टैब में दिखेंगे'),
+            onPressed: () => showMsg(
+                context,
+                t('पसंदीदा कमरे नीचे के "पसंदीदा" टैब में दिखेंगे',
+                    'Favourite rooms will appear in the "Favorites" tab below')),
             icon: const Icon(Icons.favorite_border, color: Colors.white),
           ),
         ],
@@ -946,20 +978,22 @@ class _FilterScreenState extends State<FilterScreen> {
             child: const Icon(Icons.filter_alt, color: Colors.white, size: 30),
           ),
           const SizedBox(width: 12),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'फ़िल्टर',
-                  style: TextStyle(
+                  t('फ़िल्टर', 'Filter'),
+                  style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
                       color: AppColors.text),
                 ),
                 Text(
-                  'अपनी जरूरत के अनुसार कमरे को फ़िल्टर करें',
-                  style: TextStyle(fontSize: 12, color: AppColors.text),
+                  t('अपनी जरूरत के अनुसार कमरे को फ़िल्टर करें',
+                      'Filter rooms as per your need'),
+                  style:
+                      const TextStyle(fontSize: 12, color: AppColors.text),
                 ),
               ],
             ),
@@ -973,8 +1007,8 @@ class _FilterScreenState extends State<FilterScreen> {
               });
             },
             icon: const Icon(Icons.refresh, size: 18),
-            label: const Text('सभी फ़िल्टर\nहटाएं',
-                style: TextStyle(fontSize: 11.5, height: 1.2)),
+            label: Text(t('सभी फ़िल्टर\nहटाएं', 'Clear all\nfilters'),
+                style: const TextStyle(fontSize: 11.5, height: 1.2)),
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.primary,
               backgroundColor: Colors.white,
@@ -995,7 +1029,8 @@ class _FilterScreenState extends State<FilterScreen> {
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _title(Icons.currency_rupee, 'किराया रेंज (प्रति माह)'),
+          _title(Icons.currency_rupee,
+              t('किराया रेंज (प्रति माह)', 'Rent range (per month)')),
           const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1045,7 +1080,7 @@ class _FilterScreenState extends State<FilterScreen> {
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _title(Icons.location_on, 'स्थान'),
+          _title(Icons.location_on, t('स्थान', 'Location')),
           const SizedBox(height: 10),
           Container(
             height: 48,
@@ -1065,12 +1100,13 @@ class _FilterScreenState extends State<FilterScreen> {
                     onChanged: (v) => setState(() => _f.locality = v),
                     style:
                         const TextStyle(fontSize: 14, color: AppColors.text),
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       border: InputBorder.none,
                       isDense: true,
-                      hintText: 'कॉलोनी, एरिया या इलाके का नाम',
-                      hintStyle:
-                          TextStyle(fontSize: 14, color: AppColors.muted),
+                      hintText: t('कॉलोनी, एरिया या इलाके का नाम',
+                          'Colony, area or locality name'),
+                      hintStyle: const TextStyle(
+                          fontSize: 14, color: AppColors.muted),
                     ),
                   ),
                 ),
@@ -1078,7 +1114,7 @@ class _FilterScreenState extends State<FilterScreen> {
             ),
           ),
           const SizedBox(height: 14),
-          _title(Icons.my_location, 'दूरी'),
+          _title(Icons.my_location, t('दूरी', 'Distance')),
           const SizedBox(height: 10),
           Container(
             height: 48,
@@ -1095,7 +1131,8 @@ class _FilterScreenState extends State<FilterScreen> {
                     color: AppColors.text),
                 items: _distances
                     .map((d) => DropdownMenuItem<int>(
-                        value: d, child: Text('$d km तक')))
+                        value: d,
+                        child: Text(t('$d km तक', 'Up to $d km'))))
                     .toList(),
                 onChanged: (v) {
                   if (v != null) setState(() => _f.distanceKm = v);
@@ -1137,7 +1174,7 @@ class _FilterScreenState extends State<FilterScreen> {
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _title(Icons.bed, 'कमरों की संख्या'),
+          _title(Icons.bed, t('कमरों की संख्या', 'Number of rooms')),
           const SizedBox(height: 10),
           Wrap(
             spacing: 8,
@@ -1150,7 +1187,7 @@ class _FilterScreenState extends State<FilterScreen> {
             }).toList(),
           ),
           const SizedBox(height: 16),
-          _title(Icons.home, 'प्रकार'),
+          _title(Icons.home, t('प्रकार', 'Type')),
           const SizedBox(height: 10),
           Wrap(
             spacing: 8,
@@ -1172,7 +1209,8 @@ class _FilterScreenState extends State<FilterScreen> {
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _title(Icons.star, 'सुविधाएँ (एक या अधिक चुनें)'),
+          _title(Icons.star,
+              t('सुविधाएँ (एक या अधिक चुनें)', 'Amenities (select one or more)')),
           const SizedBox(height: 12),
           LayoutBuilder(
             builder: (context, c) {
@@ -1272,20 +1310,26 @@ class _FilterScreenState extends State<FilterScreen> {
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _title(Icons.settings, 'अन्य विकल्प'),
+          _title(Icons.settings, t('अन्य विकल्प', 'Other options')),
           const SizedBox(height: 6),
-          _switchRow('केवल सत्यापित प्रॉपर्टी', _f.verifiedOnly,
+          _switchRow(
+              t('केवल सत्यापित प्रॉपर्टी', 'Verified properties only'),
+              _f.verifiedOnly,
               (v) => setState(() => _f.verifiedOnly = v)),
-          _switchRow('सुरक्षित महिला प्रॉपर्टी', _f.safeWomen,
+          _switchRow(
+              t('सुरक्षित महिला प्रॉपर्टी', 'Women-safe property'),
+              _f.safeWomen,
               (v) => setState(() => _f.safeWomen = v)),
-          _switchRow('केवल मालिक से सीधे', _f.directOwner,
+          _switchRow(
+              t('केवल मालिक से सीधे', 'Direct from owner only'),
+              _f.directOwner,
               (v) => setState(() => _f.directOwner = v)),
-          _switchRow('लड़कियों के लिए', _f.girlsOnly,
+          _switchRow(t('लड़कियों के लिए', 'For girls'), _f.girlsOnly,
               (v) => setState(() => _f.girlsOnly = v)),
-          _switchRow('तुरंत उपलब्ध', _f.immediate,
+          _switchRow(t('तुरंत उपलब्ध', 'Available immediately'), _f.immediate,
               (v) => setState(() => _f.immediate = v)),
-          _switchRow('कमर्शियल प्रॉपर्टी', _f.commercial,
-              (v) => setState(() => _f.commercial = v)),
+          _switchRow(t('कमर्शियल प्रॉपर्टी', 'Commercial property'),
+              _f.commercial, (v) => setState(() => _f.commercial = v)),
         ],
       ),
     );
@@ -1293,57 +1337,63 @@ class _FilterScreenState extends State<FilterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final count = widget.countFor(_f);
-    return Scaffold(
-      backgroundColor: const Color(0xFFF7FCF9),
-      body: Column(
-        children: [
-          _topBar(),
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
-              children: [
-                _headerCard(),
-                _priceCard(),
-                _locationCard(),
-                _roomsKindCard(),
-                _amenitiesCard(),
-                _optionsCard(),
-              ],
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.fromLTRB(
-                16, 10, 16, 10 + MediaQuery.of(context).padding.bottom),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                    color: Color(0x14000000),
-                    blurRadius: 10,
-                    offset: Offset(0, -2)),
-              ],
-            ),
-            child: SizedBox(
-              width: double.infinity,
-              height: 54,
-              child: ElevatedButton.icon(
-                onPressed: () => Navigator.of(context).pop(_f),
-                icon: const Icon(Icons.search, size: 22),
-                label: Text('फ़िल्टर लागू करें ($count परिणाम)'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
-                  textStyle: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w700),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14)),
+    return ValueListenableBuilder<String>(
+      valueListenable: AppLang.notifier,
+      builder: (context, lang, _) {
+        final count = widget.countFor(_f);
+        return Scaffold(
+          backgroundColor: const Color(0xFFF7FCF9),
+          body: Column(
+            children: [
+              _topBar(),
+              Expanded(
+                child: ListView(
+                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
+                  children: [
+                    _headerCard(),
+                    _priceCard(),
+                    _locationCard(),
+                    _roomsKindCard(),
+                    _amenitiesCard(),
+                    _optionsCard(),
+                  ],
                 ),
               ),
-            ),
+              Container(
+                padding: EdgeInsets.fromLTRB(
+                    16, 10, 16, 10 + MediaQuery.of(context).padding.bottom),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                        color: Color(0x14000000),
+                        blurRadius: 10,
+                        offset: Offset(0, -2)),
+                  ],
+                ),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 54,
+                  child: ElevatedButton.icon(
+                    onPressed: () => Navigator.of(context).pop(_f),
+                    icon: const Icon(Icons.search, size: 22),
+                    label: Text(t('फ़िल्टर लागू करें ($count परिणाम)',
+                        'Apply filters ($count results)')),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      textStyle: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w700),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14)),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
