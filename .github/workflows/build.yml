@@ -21,6 +21,25 @@ jobs:
         run: |
           sed -i 's#<application#<uses-permission android:name="android.permission.INTERNET"/>\n    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>\n    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>\n    <application#' out/android/app/src/main/AndroidManifest.xml
           grep -n "uses-permission" out/android/app/src/main/AndroidManifest.xml
+      - name: Add Google login deep link
+        run: |
+          python3 - << 'EOF'
+          p = 'out/android/app/src/main/AndroidManifest.xml'
+          s = open(p).read()
+          add = '''
+            <meta-data android:name="flutter_deeplinking_enabled" android:value="false" />
+            <intent-filter>
+              <action android:name="android.intent.action.VIEW" />
+              <category android:name="android.intent.category.DEFAULT" />
+              <category android:name="android.intent.category.BROWSABLE" />
+              <data android:scheme="roommitra" android:host="login-callback" />
+            </intent-filter>
+          '''
+          if 'login-callback' not in s:
+              s = s.replace('</activity>', add + '</activity>', 1)
+          open(p, 'w').write(s)
+          EOF
+          grep -n "login-callback" out/android/app/src/main/AndroidManifest.xml
       - name: Add R8 keep rules
         run: |
           cat > out/android/app/proguard-rules.pro << 'EOF'
