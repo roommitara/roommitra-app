@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'data.dart';
 import 'detail_screen.dart';
 import 'home_screen.dart' show RoomMitraLogo;
+import 'strings.dart';
 import 'theme.dart';
 
 class FavoritesScreen extends StatelessWidget {
@@ -49,21 +50,22 @@ class FavoritesScreen extends StatelessWidget {
             child: const Icon(Icons.favorite, color: Colors.white, size: 28),
           ),
           const SizedBox(width: 12),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'मेरे पसंदीदा कमरे',
-                  style: TextStyle(
+                  t('मेरे पसंदीदा कमरे', 'My favourite rooms'),
+                  style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w800,
                       color: AppColors.text),
                 ),
-                SizedBox(height: 2),
+                const SizedBox(height: 2),
                 Text(
-                  'आपके द्वारा सेव किए गए सभी कमरे यहाँ दिखाई देंगे।',
-                  style: TextStyle(
+                  t('आपके द्वारा सेव किए गए सभी कमरे यहाँ दिखाई देंगे।',
+                      'All the rooms you have saved will appear here.'),
+                  style: const TextStyle(
                       fontSize: 12, height: 1.3, color: AppColors.text),
                 ),
               ],
@@ -84,7 +86,7 @@ class FavoritesScreen extends StatelessWidget {
                     size: 18, color: AppColors.primary),
                 const SizedBox(width: 4),
                 Text(
-                  'कुल $count',
+                  t('कुल $count', 'Total $count'),
                   style: const TextStyle(
                       fontSize: 12.5,
                       fontWeight: FontWeight.w800,
@@ -111,12 +113,12 @@ class FavoritesScreen extends StatelessWidget {
   }
 
   List<String> _tags(Listing l) {
-    final t = <String>[l.kind];
-    if (l.verified) t.add('सत्यापित');
-    if (l.immediate) t.add('तुरंत उपलब्ध');
-    if (l.directOwner) t.add('मालिक से सीधे');
-    if (l.safeWomen) t.add('सुरक्षित महिला');
-    return t.take(3).toList();
+    final tags = <String>[l.kindLabel];
+    if (l.verified) tags.add(t('सत्यापित', 'Verified'));
+    if (l.immediate) tags.add(t('तुरंत उपलब्ध', 'Available now'));
+    if (l.directOwner) tags.add(t('मालिक से सीधे', 'Direct from owner'));
+    if (l.safeWomen) tags.add(t('सुरक्षित महिला', 'Women-safe'));
+    return tags.take(3).toList();
   }
 
   String _amenityLine(Listing l) {
@@ -247,7 +249,7 @@ class FavoritesScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      '₹${inr(l.price)}/माह',
+                      '₹${inr(l.price)}${t('/माह', '/month')}',
                       style: const TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w800,
@@ -279,7 +281,7 @@ class FavoritesScreen extends StatelessWidget {
                     spacing: 6,
                     runSpacing: 6,
                     children: _tags(l)
-                        .map((t) => Container(
+                        .map((tag) => Container(
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 9, vertical: 4),
                               decoration: BoxDecoration(
@@ -287,7 +289,7 @@ class FavoritesScreen extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
-                                t,
+                                tag,
                                 style: const TextStyle(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w600,
@@ -312,25 +314,26 @@ class FavoritesScreen extends StatelessWidget {
         children: [
           const Icon(Icons.favorite_border, size: 72, color: AppColors.muted),
           const SizedBox(height: 14),
-          const Text(
-            'अभी कोई पसंदीदा कमरा नहीं है',
+          Text(
+            t('अभी कोई पसंदीदा कमरा नहीं है', 'No favourite rooms yet'),
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w800,
                 color: AppColors.text),
           ),
           const SizedBox(height: 6),
-          const Text(
-            'कमरे पर दिल का निशान दबाकर उसे यहाँ सेव करें।',
+          Text(
+            t('कमरे पर दिल का निशान दबाकर उसे यहाँ सेव करें।',
+                'Tap the heart icon on a room to save it here.'),
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 14, color: AppColors.muted),
+            style: const TextStyle(fontSize: 14, color: AppColors.muted),
           ),
           const SizedBox(height: 18),
           ElevatedButton.icon(
             onPressed: onSearchTap,
             icon: const Icon(Icons.search, size: 20),
-            label: const Text('कमरे खोजें'),
+            label: Text(t('कमरे खोजें', 'Search rooms')),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
@@ -349,31 +352,36 @@ class FavoritesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: appState,
-      builder: (context, _) {
-        final favs =
-            sampleListings.where((l) => appState.isFav(l.id)).toList();
-        return Scaffold(
-          backgroundColor: const Color(0xFFF7FCF9),
-          body: Column(
-            children: [
-              _topBar(context),
-              Expanded(
-                child: ListView(
-                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
-                  children: [
-                    _headerCard(favs.length),
-                    const SizedBox(height: 12),
-                    if (favs.isEmpty)
-                      _empty()
-                    else
-                      ...favs.map((l) => _card(context, l)),
-                  ],
-                ),
+    return ValueListenableBuilder<String>(
+      valueListenable: AppLang.notifier,
+      builder: (context, lang, _) {
+        return ListenableBuilder(
+          listenable: appState,
+          builder: (context, _) {
+            final favs =
+                sampleListings.where((l) => appState.isFav(l.id)).toList();
+            return Scaffold(
+              backgroundColor: const Color(0xFFF7FCF9),
+              body: Column(
+                children: [
+                  _topBar(context),
+                  Expanded(
+                    child: ListView(
+                      padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+                      children: [
+                        _headerCard(favs.length),
+                        const SizedBox(height: 12),
+                        if (favs.isEmpty)
+                          _empty()
+                        else
+                          ...favs.map((l) => _card(context, l)),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
