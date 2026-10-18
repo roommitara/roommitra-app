@@ -108,6 +108,14 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _cat = 0;
 
+  @override
+  void initState() {
+    super.initState();
+    if (!listingsStore.loaded) {
+      listingsStore.load();
+    }
+  }
+
   List<_Cat> get _cats => [
         _Cat(Icons.home_rounded, t('सभी प्रकार', 'All types')),
         _Cat(Icons.bed, t('PG / हॉस्टल', 'PG / Hostel')),
@@ -250,6 +258,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
   Widget _cityChip() {
     return PopupMenuButton<String>(
       onSelected: appState.setCity,
@@ -483,7 +492,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (l.verified) return t('सत्यापित', 'Verified');
     if (l.immediate) return t('तुरंत उपलब्ध', 'Available now');
     if (l.directOwner) return t('मालिक से सीधे', 'Direct from owner');
-    return l.kind;
+    return l.kindLabel;
   }
 
   void _openDetail(Listing l) {
@@ -493,6 +502,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
   Widget _roomCard(Listing l, double w) {
     final fav = appState.isFav(l.id);
     return GestureDetector(
@@ -513,8 +523,8 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Stack(
               children: [
-                Image.asset(
-                  l.image,
+                ListingImage(
+                  listing: l,
                   height: 112,
                   width: double.infinity,
                   fit: BoxFit.cover,
@@ -597,7 +607,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     runSpacing: 4,
                     children: [
                       _stat(Icons.bed_outlined, '${l.rooms} Room'),
-                      _stat(Icons.bathtub_outlined, l.bathLabel),
+                      if (l.bathLabel.isNotEmpty)
+                        _stat(Icons.bathtub_outlined, l.bathLabel),
                     ],
                   ),
                   const SizedBox(height: 10),
@@ -625,20 +636,62 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _infoBox(Widget child) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.tintLight,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: child,
+    );
+  }
+
   Widget _roomRow(double w) {
-    final rooms =
-        sampleListings.where((l) => l.city == appState.city).take(4).toList();
-    if (rooms.isEmpty) {
-      return Container(
-        width: double.infinity,
-        margin: const EdgeInsets.symmetric(vertical: 6),
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: AppColors.tintLight,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.border),
+    // पहली बार लोड हो रहा है
+    if (!listingsStore.loaded && listingsStore.error == null) {
+      return const SizedBox(
+        height: 140,
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+    // लोड नहीं हो सका
+    if (!listingsStore.loaded && listingsStore.error != null) {
+      return _infoBox(
+        Column(
+          children: [
+            const Icon(Icons.wifi_off, size: 40, color: AppColors.muted),
+            const SizedBox(height: 8),
+            Text(
+              listingsStore.error!,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.muted),
+            ),
+            const SizedBox(height: 8),
+            TextButton(
+              onPressed: listingsStore.loading ? null : listingsStore.load,
+              child: Text(t('फिर कोशिश करें', 'Try again')),
+            ),
+          ],
         ),
-        child: Column(
+      );
+    }
+    final rooms = listingsStore.items
+        .where((l) =>
+            l.city == appState.city &&
+            l.status == 'approved' &&
+            l.isAvailable)
+        .take(4)
+        .toList();
+    if (rooms.isEmpty) {
+      return _infoBox(
+        Column(
           children: [
             const Icon(Icons.search_off, size: 40, color: AppColors.muted),
             const SizedBox(height: 8),
@@ -738,7 +791,7 @@ class _HomeScreenState extends State<HomeScreen> {
       valueListenable: AppLang.notifier,
       builder: (context, lang, _) {
         return ListenableBuilder(
-          listenable: appState,
+          listenable: Listenable.merge([appState, listingsStore]),
           builder: (context, _) {
             return AnnotatedRegion<SystemUiOverlayStyle>(
               value: SystemUiOverlayStyle.light.copyWith(
