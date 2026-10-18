@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'strings.dart';
 
@@ -94,6 +95,12 @@ class Listing {
   final String locality;
   final String address;
 
+  /// Supabase से आए असली कमरों के लिए (डेमो कमरों में ये खाली रहते हैं)
+  final String ownerId;
+  final String status;
+  final bool isAvailable;
+  final List<String> photoUrls;
+
   const Listing({
     required this.id,
     required String title,
@@ -125,10 +132,62 @@ class Listing {
     this.lng,
     this.locality = '',
     this.address = '',
+    this.ownerId = '',
+    this.status = 'approved',
+    this.isAvailable = true,
+    this.photoUrls = const <String>[],
   })  : _title = title,
         _titleEn = titleEn,
         _desc = desc,
         _descEn = descEn;
+
+  /// Supabase की room_listings पंक्ति से कमरा बनाना
+  factory Listing.fromRow(Map<String, dynamic> r, int index) {
+    final storage = Supabase.instance.client.storage.from('room-photos');
+    final urls = <String>[];
+    final rawPhotos = r['photo_urls'];
+    if (rawPhotos is List) {
+      for (final p in rawPhotos) {
+        final s = p?.toString() ?? '';
+        if (s.isEmpty) continue;
+        urls.add(s.startsWith('http') ? s : storage.getPublicUrl(s));
+      }
+    }
+    final am = <String>{};
+    final rawAm = r['amenities'];
+    if (rawAm is List) {
+      for (final a in rawAm) {
+        if (a != null) am.add(a.toString());
+      }
+    }
+    final city = (r['city'] ?? '').toString();
+    final locality = (r['locality'] ?? '').toString();
+    final rent = r['monthly_rent'];
+    return Listing(
+      id: r['id'].toString(),
+      title: (r['title'] ?? '').toString(),
+      area: locality.isEmpty ? city : '$locality, $city',
+      city: city,
+      type: 'Room',
+      kind: 'रूम',
+      rooms: 1,
+      price: rent is num ? rent.toInt() : 0,
+      typeLabel: 'Room',
+      bathLabel: '',
+      sqft: 0,
+      floor: '',
+      desc: (r['description'] ?? '').toString(),
+      amenities: am,
+      image: 'assets/room1.jpg',
+      photos: urls.isEmpty ? 1 : urls.length,
+      order: index,
+      locality: locality,
+      ownerId: (r['owner_id'] ?? '').toString(),
+      status: (r['status'] ?? '').toString(),
+      isAvailable: r['is_available'] == true,
+      photoUrls: urls,
+    );
+  }
 
   /// चुनी हुई भाषा में टाइटल (English न हो तो मूल टाइटल)
   String get title => (AppLang.isHindi || _titleEn.isEmpty) ? _title : _titleEn;
@@ -152,6 +211,35 @@ class Listing {
 
   /// क्या इस कमरे की असली मैप लोकेशन सेव है?
   bool get hasLocation => lat != null && lng != null;
+}
+
+/// कमरे की मुख्य फोटो: नेटवर्क फोटो हो तो वह, वरना (या न खुले तो) asset फोटो
+class ListingImage extends StatelessWidget {
+  final Listing listing;
+  final BoxFit fit;
+  final double? width;
+  final double? height;
+  const ListingImage({
+    super.key,
+    required this.listing,
+    this.fit = BoxFit.cover,
+    this.width,
+    this.height,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final fallback = Image.asset(listing.image,
+        fit: fit, width: width, height: height);
+    if (listing.photoUrls.isEmpty) return fallback;
+    return Image.network(
+      listing.photoUrls.first,
+      fit: fit,
+      width: width,
+      height: height,
+      errorBuilder: (_, __, ___) => fallback,
+    );
+  }
 }
 
 /// नमूना (डेमो) कमरे। इलाकों के नाम सिर्फ उदाहरण हैं।
@@ -270,6 +358,45 @@ const List<Listing> sampleListings = [
     locality: 'Paonta Chowk',
   ),
 ];
+
+/// Supabase से आए असली (approved + उपलब्ध) कमरे।
+/// RLS अपना काम करती है: हम सिर्फ वही माँगते हैं जो सबको दिखना चाहिए।
+class ListingsStore extends ChangeNotifier {
+  List<Listing> items = <Listing>[];
+  bool loading = false;
+  bool loaded = false;
+  String? error;
+
+  Future<void> load() async {
+    if (loading) return;
+    loading = true;
+    error = null;
+    notifyListeners();
+    try {
+      final rows = await Supabase.instance.client
+          .from('room_listings')
+          .select(
+              'id, owner_id, title, description, city, locality, monthly_rent, photo_urls, amenities, is_available, status')
+          .eq('status', 'approved')
+          .eq('is_available', true);
+      final list = <Listing>[];
+      var i = 0;
+      for (final r in rows) {
+        list.add(Listing.fromRow(Map<String, dynamic>.from(r), i));
+        i++;
+      }
+      items = list;
+      loaded = true;
+    } catch (e) {
+      error = t('कमरे लोड नहीं हो सके। इंटरनेट जाँचकर फिर कोशिश करें।',
+          'Could not load rooms. Check your internet and try again.');
+    }
+    loading = false;
+    notifyListeners();
+  }
+}
+
+final ListingsStore listingsStore = ListingsStore();
 
 /// फ़िल्टर वाली स्क्रीन के सभी विकल्प
 class Filters {
