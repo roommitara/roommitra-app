@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'data.dart';
 import 'home_screen.dart' show RoomMitraLogo;
+import 'strings.dart';
 import 'theme.dart';
 
 enum NotifKind { message, room, booking, safety, read, offer, views, update }
@@ -9,36 +10,54 @@ enum NotifKind { message, room, booking, safety, read, offer, views, update }
 class NotifItem {
   final NotifKind kind;
   final String title;
+  final String? titleEn;
   final String body;
+  final String? bodyEn;
   final String? extra;
+  final String? extraEn;
   final IconData? extraIcon;
   final String time;
+  final String? timeEn;
   bool unread;
 
   NotifItem({
     required this.kind,
     required this.title,
+    this.titleEn,
     required this.body,
+    this.bodyEn,
     this.extra,
+    this.extraEn,
     this.extraIcon,
     required this.time,
+    this.timeEn,
     this.unread = false,
   });
+
+  String get tTitle => t(title, titleEn ?? title);
+  String get tBody => t(body, bodyEn ?? body);
+  String? get tExtra => extra == null ? null : t(extra!, extraEn ?? extra!);
+  String get tTime => t(time, timeEn ?? time);
 }
 
 final List<NotifItem> demoNotifications = [
   NotifItem(
     kind: NotifKind.message,
     title: 'नया संदेश',
+    titleEn: 'New message',
     body: 'राहुल शर्मा ने आपको संदेश भेजा है: "क्या यह कमरा अभी भी खाली है?"',
+    bodyEn: 'Rahul Sharma sent you a message: "Is this room still vacant?"',
     time: '10:24 AM',
     unread: true,
   ),
   NotifItem(
     kind: NotifKind.room,
     title: 'नई लिस्टिंग',
+    titleEn: 'New listing',
     body: '2BHK फ्लैट (सेमी फर्निश्ड) का नया लिस्टिंग पोस्ट किया गया है।',
+    bodyEn: 'A new listing for a 2BHK flat (semi furnished) has been posted.',
     extra: 'चौगान, नाहन',
+    extraEn: 'Chaugan, Nahan',
     extraIcon: Icons.location_on,
     time: '09:12 AM',
     unread: true,
@@ -46,8 +65,11 @@ final List<NotifItem> demoNotifications = [
   NotifItem(
     kind: NotifKind.booking,
     title: 'बुकिंग अनुरोध',
+    titleEn: 'Booking request',
     body: 'अमित यादव ने आपके कमरे को देखने के लिए अनुरोध भेजा है।',
+    bodyEn: 'Amit Yadav has sent a request to view your room.',
     extra: '16 अक्टूबर 2026, 11:00 AM',
+    extraEn: '16 October 2026, 11:00 AM',
     extraIcon: Icons.event,
     time: '08:45 AM',
     unread: true,
@@ -55,33 +77,53 @@ final List<NotifItem> demoNotifications = [
   NotifItem(
     kind: NotifKind.read,
     title: 'संदेश पढ़ा गया',
+    titleEn: 'Message read',
     body: 'सीमा पवार ने आपका संदेश पढ़ लिया है।\n"जी हाँ, यह कमरा अभी उपलब्ध है।"',
+    bodyEn:
+        'Seema Pawar has read your message.\n"Yes, this room is available."',
     time: '07:30 AM',
   ),
   NotifItem(
     kind: NotifKind.safety,
     title: 'सुरक्षा अलर्ट',
-    body: 'कृपया ध्यान दें: हाल ही में एक फर्जी लिस्टिंग की रिपोर्ट की गई है। हम इसकी जाँच कर रहे हैं।',
+    titleEn: 'Safety alert',
+    body:
+        'कृपया ध्यान दें: हाल ही में एक फर्जी लिस्टिंग की रिपोर्ट की गई है। हम इसकी जाँच कर रहे हैं।',
+    bodyEn:
+        'Please note: a fake listing was recently reported. We are looking into it.',
     time: 'कल 07:15 PM',
+    timeEn: 'Yesterday 07:15 PM',
   ),
   NotifItem(
     kind: NotifKind.offer,
     title: 'स्पेशल ऑफर',
+    titleEn: 'Special offer',
     body: 'आज के लिए खास! अपने कमरे की लिस्टिंग करें और जल्दी किरायेदार पाएं।',
+    bodyEn: 'Special for today! List your room and find a tenant quickly.',
     time: 'कल 12:20 PM',
+    timeEn: 'Yesterday 12:20 PM',
   ),
   NotifItem(
     kind: NotifKind.views,
     title: 'आपका कमरा देखा गया',
+    titleEn: 'Your room was viewed',
     body: 'आपकी लिस्टिंग 1RK फ्लैट को आज 12 बार देखा गया है।',
+    bodyEn: 'Your listing 1RK flat has been viewed 12 times today.',
     extra: 'व्यू डिटेल देखें',
+    extraEn: 'View details',
     time: 'कल 10:05 AM',
+    timeEn: 'Yesterday 10:05 AM',
   ),
   NotifItem(
     kind: NotifKind.update,
     title: 'ऐप अपडेट',
-    body: 'RoomMitra का नया वर्ज़न अब उपलब्ध है। बेहतर अनुभव के लिए अभी अपडेट करें।',
+    titleEn: 'App update',
+    body:
+        'RoomMitra का नया वर्ज़न अब उपलब्ध है। बेहतर अनुभव के लिए अभी अपडेट करें।',
+    bodyEn:
+        'A new version of RoomMitra is now available. Update now for a better experience.',
     time: '12 अक्टूबर 2026',
+    timeEn: '12 October 2026',
   ),
 ];
 
@@ -95,7 +137,14 @@ class NotificationsScreen extends StatefulWidget {
 class _NotificationsScreenState extends State<NotificationsScreen> {
   int _tab = 0;
 
-  static const _tabs = ['सभी', 'मैसेज', 'नए कमरे', 'बुकिंग', 'सुरक्षा'];
+  List<String> get _tabs => [
+        t('सभी', 'All'),
+        t('मैसेज', 'Messages'),
+        t('नए कमरे', 'New rooms'),
+        t('बुकिंग', 'Bookings'),
+        t('सुरक्षा', 'Safety'),
+      ];
+
   static const _tabIcons = [
     Icons.notifications,
     Icons.chat_bubble_outline,
@@ -165,7 +214,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         n.unread = false;
       }
     });
-    showMsg(context, 'सभी नोटिफिकेशन पढ़े हुए हो गए');
+    showMsg(
+        context,
+        t('सभी नोटिफिकेशन पढ़े हुए हो गए',
+            'All notifications marked as read'));
   }
 
   Widget _header(double top) {
@@ -217,9 +269,14 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 setState(() => demoNotifications.clear());
               }
             },
-            itemBuilder: (_) => const [
-              PopupMenuItem(value: 0, child: Text('सभी को पढ़ा हुआ करें')),
-              PopupMenuItem(value: 1, child: Text('सभी नोटिफिकेशन हटाएं')),
+            itemBuilder: (_) => [
+              PopupMenuItem(
+                  value: 0,
+                  child: Text(t('सभी को पढ़ा हुआ करें', 'Mark all as read'))),
+              PopupMenuItem(
+                  value: 1,
+                  child: Text(
+                      t('सभी नोटिफिकेशन हटाएं', 'Delete all notifications'))),
             ],
           ),
         ],
@@ -233,40 +290,47 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('नोटिफिकेशन',
-                    style: TextStyle(
+                Text(t('नोटिफिकेशन', 'Notifications'),
+                    style: const TextStyle(
                         fontSize: 26,
                         fontWeight: FontWeight.w800,
                         color: AppColors.text)),
-                SizedBox(height: 2),
-                Text('आपके सभी अपडेट एक ही जगह पर',
-                    style: TextStyle(fontSize: 13, color: AppColors.muted)),
+                const SizedBox(height: 2),
+                Text(
+                    t('आपके सभी अपडेट एक ही जगह पर',
+                        'All your updates in one place'),
+                    style:
+                        const TextStyle(fontSize: 13, color: AppColors.muted)),
               ],
             ),
           ),
           GestureDetector(
-            onTap: () => showMsg(context, 'नोटिफिकेशन सेटिंग जल्द जुड़ेगी'),
+            onTap: () => showMsg(
+                context,
+                t('नोटिफिकेशन सेटिंग जल्द जुड़ेगी',
+                    'Notification settings coming soon')),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
               decoration: BoxDecoration(
                 color: AppColors.tint,
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.settings, size: 17, color: AppColors.primary),
-                  SizedBox(width: 5),
-                  Text('सेटिंग',
-                      style: TextStyle(
+                  const Icon(Icons.settings, size: 17, color: AppColors.primary),
+                  const SizedBox(width: 5),
+                  Text(t('सेटिंग', 'Settings'),
+                      style: const TextStyle(
                           fontSize: 12.5,
                           fontWeight: FontWeight.w600,
                           color: AppColors.text)),
-                  Icon(Icons.chevron_right, size: 18, color: AppColors.text),
+                  const Icon(Icons.chevron_right,
+                      size: 18, color: AppColors.text),
                 ],
               ),
             ),
@@ -277,12 +341,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
 
   Widget _tabRow() {
+    final tabs = _tabs;
     return SizedBox(
       height: 46,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16),
-        itemCount: _tabs.length,
+        itemCount: tabs.length,
         separatorBuilder: (_, __) => const SizedBox(width: 8),
         itemBuilder: (context, i) {
           final sel = _tab == i;
@@ -303,7 +368,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       size: 19,
                       color: sel ? Colors.white : AppColors.primary),
                   const SizedBox(width: 7),
-                  Text(_tabs[i],
+                  Text(tabs[i],
                       style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
@@ -333,10 +398,14 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
 
   Widget _card(NotifItem n) {
+    final extra = n.tExtra;
     return GestureDetector(
       onTap: () {
         setState(() => n.unread = false);
-        showMsg(context, '${n.title} — डिटेल अगले चरण में जुड़ेगी');
+        showMsg(
+            context,
+            t('${n.tTitle} — डिटेल अगले चरण में जुड़ेगी',
+                '${n.tTitle} — details will be added in the next step'));
       },
       child: Container(
         padding: const EdgeInsets.all(12),
@@ -384,22 +453,22 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   Row(
                     children: [
                       Expanded(
-                        child: Text(n.title,
+                        child: Text(n.tTitle,
                             style: const TextStyle(
                                 fontSize: 15.5,
                                 fontWeight: FontWeight.w800,
                                 color: AppColors.text)),
                       ),
-                      Text(n.time,
+                      Text(n.tTime,
                           style: const TextStyle(
                               fontSize: 11.5, color: AppColors.muted)),
                     ],
                   ),
                   const SizedBox(height: 3),
-                  Text(n.body,
+                  Text(n.tBody,
                       style: const TextStyle(
                           fontSize: 13, height: 1.35, color: AppColors.muted)),
-                  if (n.extra != null) ...[
+                  if (extra != null) ...[
                     const SizedBox(height: 4),
                     Row(
                       children: [
@@ -407,15 +476,17 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                           Icon(n.extraIcon, size: 14, color: AppColors.primary),
                           const SizedBox(width: 4),
                         ],
-                        Text(n.extra!,
-                            style: TextStyle(
-                                fontSize: 12.5,
-                                color: n.extraIcon == null
-                                    ? AppColors.primary
-                                    : AppColors.muted,
-                                fontWeight: n.extraIcon == null
-                                    ? FontWeight.w700
-                                    : FontWeight.w400)),
+                        Flexible(
+                          child: Text(extra,
+                              style: TextStyle(
+                                  fontSize: 12.5,
+                                  color: n.extraIcon == null
+                                      ? AppColors.primary
+                                      : AppColors.muted,
+                                  fontWeight: n.extraIcon == null
+                                      ? FontWeight.w700
+                                      : FontWeight.w400)),
+                        ),
                       ],
                     ),
                   ],
@@ -449,9 +520,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             const SizedBox(height: 10),
             Expanded(
               child: items.isEmpty
-                  ? const Center(
-                      child: Text('कोई नोटिफिकेशन नहीं है',
-                          style: TextStyle(
+                  ? Center(
+                      child: Text(
+                          t('कोई नोटिफिकेशन नहीं है', 'No notifications'),
+                          style: const TextStyle(
                               fontSize: 15, color: AppColors.muted)),
                     )
                   : ListView.separated(
