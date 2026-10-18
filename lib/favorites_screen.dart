@@ -5,10 +5,23 @@ import 'home_screen.dart' show RoomMitraLogo;
 import 'strings.dart';
 import 'theme.dart';
 
-class FavoritesScreen extends StatelessWidget {
+class FavoritesScreen extends StatefulWidget {
   /// खाली स्क्रीन पर "कमरे खोजें" दबाने पर चलेगा
   final VoidCallback onSearchTap;
   const FavoritesScreen({super.key, required this.onSearchTap});
+
+  @override
+  State<FavoritesScreen> createState() => _FavoritesScreenState();
+}
+
+class _FavoritesScreenState extends State<FavoritesScreen> {
+  @override
+  void initState() {
+    super.initState();
+    if (!listingsStore.loaded && !listingsStore.loading) {
+      listingsStore.load();
+    }
+  }
 
   Widget _topBar(BuildContext context) {
     return Container(
@@ -162,7 +175,7 @@ class FavoritesScreen extends StatelessWidget {
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    Image.asset(l.image, fit: BoxFit.cover),
+                    ListingImage(listing: l, fit: BoxFit.cover),
                     Positioned(
                       left: 6,
                       bottom: 6,
@@ -261,9 +274,12 @@ class FavoritesScreen extends StatelessWidget {
                     spacing: 10,
                     runSpacing: 4,
                     children: [
-                      _stat(Icons.home_outlined, l.typeLabel),
-                      _stat(Icons.square_foot, '${l.sqft} sq ft'),
-                      _stat(Icons.apartment, l.floor),
+                      if (l.typeLabel.isNotEmpty)
+                        _stat(Icons.home_outlined, l.typeLabel),
+                      if (l.sqft > 0)
+                        _stat(Icons.square_foot, '${l.sqft} sq ft'),
+                      if (l.floor.isNotEmpty)
+                        _stat(Icons.apartment, l.floor),
                     ],
                   ),
                   if (amen.isNotEmpty) ...[
@@ -331,7 +347,7 @@ class FavoritesScreen extends StatelessWidget {
           ),
           const SizedBox(height: 18),
           ElevatedButton.icon(
-            onPressed: onSearchTap,
+            onPressed: widget.onSearchTap,
             icon: const Icon(Icons.search, size: 20),
             label: Text(t('कमरे खोजें', 'Search rooms')),
             style: ElevatedButton.styleFrom(
@@ -350,16 +366,55 @@ class FavoritesScreen extends StatelessWidget {
     );
   }
 
+  Widget _loadingBox() {
+    return const Padding(
+      padding: EdgeInsets.symmetric(vertical: 60),
+      child: Center(child: CircularProgressIndicator()),
+    );
+  }
+
+  Widget _errorBox() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 40, 24, 24),
+      child: Column(
+        children: [
+          const Icon(Icons.wifi_off, size: 56, color: AppColors.muted),
+          const SizedBox(height: 12),
+          Text(
+            listingsStore.error ?? '',
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: AppColors.muted),
+          ),
+          const SizedBox(height: 10),
+          TextButton(
+            onPressed: listingsStore.loading ? null : listingsStore.load,
+            child: Text(t('फिर कोशिश करें', 'Try again')),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<String>(
       valueListenable: AppLang.notifier,
       builder: (context, lang, _) {
         return ListenableBuilder(
-          listenable: appState,
+          listenable: Listenable.merge([appState, listingsStore]),
           builder: (context, _) {
-            final favs =
-                sampleListings.where((l) => appState.isFav(l.id)).toList();
+            final loaded = listingsStore.loaded;
+            final favs = loaded
+                ? listingsStore.items
+                    .where((l) =>
+                        appState.isFav(l.id) &&
+                        l.status == 'approved' &&
+                        l.isAvailable)
+                    .toList()
+                : <Listing>[];
             return Scaffold(
               backgroundColor: const Color(0xFFF7FCF9),
               body: Column(
@@ -371,7 +426,11 @@ class FavoritesScreen extends StatelessWidget {
                       children: [
                         _headerCard(favs.length),
                         const SizedBox(height: 12),
-                        if (favs.isEmpty)
+                        if (!loaded && listingsStore.error == null)
+                          _loadingBox()
+                        else if (!loaded)
+                          _errorBox()
+                        else if (favs.isEmpty)
                           _empty()
                         else
                           ...favs.map((l) => _card(context, l)),
