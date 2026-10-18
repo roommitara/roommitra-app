@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'data.dart';
+import 'detail_screen.dart' show DetailScreen;
 import 'home_screen.dart' show RoomMitraLogo;
 import 'strings.dart';
 import 'theme.dart';
 
-/// डेमो: मालिक की अपनी लिस्टिंग (असली डेटा Supabase जुड़ने पर आएगा)
+/// डेमो: सिर्फ इस फोन में जोड़ी गई लिस्टिंग (ऑनलाइन सेव नहीं होतीं)।
+/// असली लिस्टिंग नीचे MyRealListingsStore में Supabase से आती हैं।
 class MyListing {
   final String id;
   String title;
@@ -52,66 +55,64 @@ class MyListing {
 }
 
 final ValueNotifier<List<MyListing>> myListings =
-    ValueNotifier<List<MyListing>>([
-  MyListing(
-    id: 'm1',
-    title: '1BHK रूम (फर्निश्ड)',
-    titleEn: '1BHK Room (Furnished)',
-    area: 'Rani Tal, Nahan',
-    price: 6000,
-    typeLabel: '1BHK',
-    sqft: 450,
-    floor: '2nd Floor',
-    desc: 'पूरी तरह से फर्निश्ड रूम, अलमारी, वाई-फाई, पार्किंग की सुविधा। शांत और सुरक्षित लोकेशन।',
-    descEn:
-        'Fully furnished room with wardrobe, WiFi and parking. Quiet and safe location.',
-    image: 'assets/room1.jpg',
-    photos: 8,
-    status: 'active',
-    views: 24,
-    inquiries: 5,
-  ),
-  MyListing(
-    id: 'm2',
-    title: 'PG (लड़कों के लिए)',
-    titleEn: 'PG (for boys)',
-    area: 'Jamta Road, Nahan',
-    price: 3500,
-    typeLabel: 'Bed (Sharing)',
-    sqft: 300,
-    floor: '1st Floor',
-    desc: 'साफ-सुथरा PG, 24x7 पानी, वाई-फाई, खाना-रहना की सुविधा। कॉलेज और ऑफिस के पास।',
-    descEn:
-        'Clean PG with 24x7 water, WiFi, and food and stay facility. Close to college and offices.',
-    image: 'assets/room2.jpg',
-    photos: 6,
-    status: 'active',
-    views: 18,
-    inquiries: 2,
-  ),
-  MyListing(
-    id: 'm3',
-    title: '1RK रूम (सेमी फर्निश्ड)',
-    titleEn: '1RK Room (Semi-furnished)',
-    area: 'Sabzi Mandi, Nahan',
-    price: 4500,
-    typeLabel: '1RK',
-    sqft: 250,
-    floor: '1st Floor',
-    desc: 'सेमी फर्निश्ड रूम, किचन, बाथरूम, बालकनी। बजट फ्रेंडली और अच्छी लोकेशन।',
-    descEn:
-        'Semi-furnished room with kitchen, bathroom and balcony. Budget friendly with a good location.',
-    image: 'assets/room1.jpg',
-    photos: 5,
-    status: 'pending',
-    views: 0,
-    inquiries: 0,
-  ),
-]);
+    ValueNotifier<List<MyListing>>(<MyListing>[]);
 
 void _refresh() {
   myListings.value = List<MyListing>.of(myListings.value);
 }
+
+/// साइन-इन मालिक की अपनी असली लिस्टिंग (Supabase room_listings से)
+class MyRealListingsStore extends ChangeNotifier {
+  List<Listing> items = <Listing>[];
+  bool loading = false;
+  bool loaded = false;
+  bool notSignedIn = false;
+  String? error;
+  String? _uid;
+
+  Future<void> load() async {
+    if (loading) return;
+    final user = Supabase.instance.client.auth.currentUser;
+    // दूसरे अकाउंट की पुरानी लिस्टिंग न दिखें
+    if (_uid != user?.id) {
+      _uid = user?.id;
+      items = <Listing>[];
+      loaded = false;
+    }
+    loading = true;
+    error = null;
+    notifyListeners();
+    try {
+      if (user == null) {
+        notSignedIn = true;
+        items = <Listing>[];
+        loaded = true;
+      } else {
+        notSignedIn = false;
+        final rows = await Supabase.instance.client
+            .from('room_listings')
+            .select(
+                'id, owner_id, title, description, city, locality, monthly_rent, photo_urls, amenities, is_available, status')
+            .eq('owner_id', user.id);
+        final list = <Listing>[];
+        var i = 0;
+        for (final r in rows) {
+          list.add(Listing.fromRow(Map<String, dynamic>.from(r), i));
+          i++;
+        }
+        items = list;
+        loaded = true;
+      }
+    } catch (e) {
+      error = t('आपकी लिस्टिंग लोड नहीं हो सकीं। इंटरनेट जाँचकर फिर कोशिश करें।',
+          'Could not load your listings. Check your internet and try again.');
+    }
+    loading = false;
+    notifyListeners();
+  }
+}
+
+final MyRealListingsStore myRealListings = MyRealListingsStore();
 
 Widget _topBar(BuildContext context) {
   return Container(
@@ -154,6 +155,14 @@ class MyListingsScreen extends StatefulWidget {
 }
 
 class _MyListingsScreenState extends State<MyListingsScreen> {
+  String? _busyId;
+
+  @override
+  void initState() {
+    super.initState();
+    myRealListings.load();
+  }
+
   Widget _ownerCard() {
     return Container(
       padding: const EdgeInsets.all(14),
@@ -231,24 +240,410 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
     );
   }
 
-  Widget _stats(List<MyListing> items) {
-    final active = items.where((m) => m.status == 'active').length;
-    final views = items.fold<int>(0, (s, m) => s + m.views);
-    final inq = items.fold<int>(0, (s, m) => s + m.inquiries);
+  Widget _stats(List<Listing> items) {
+    final live =
+        items.where((l) => l.status == 'approved' && l.isAvailable).length;
+    final rented = items.where((l) => l.status == 'rented').length;
+    final pending = items.where((l) => l.status == 'pending').length;
     return Row(
       children: [
         _statTile(Icons.home, '${items.length}',
             t('कुल लिस्टिंग', 'Total listings')),
         const SizedBox(width: 8),
-        _statTile(
-            Icons.check_circle_outline, '$active', t('सक्रिय', 'Active')),
+        _statTile(Icons.check_circle_outline, '$live',
+            t('सार्वजनिक', 'Live')),
         const SizedBox(width: 8),
-        _statTile(Icons.visibility, '$views', t('कुल व्यूज़', 'Total views')),
+        _statTile(Icons.key, '$rented', t('किराये पर चढ़ी', 'Rented')),
         const SizedBox(width: 8),
-        _statTile(Icons.chat_bubble_outline, '$inq', t('पूछताछ', 'Inquiries')),
+        _statTile(Icons.hourglass_empty, '$pending', t('लंबित', 'Pending')),
       ],
     );
   }
+
+  // ---------------------------------------------------------------------
+  // असली लिस्टिंग (Supabase)
+  // ---------------------------------------------------------------------
+
+  Widget _realStatusChip(Listing l) {
+    Color bg;
+    String text;
+    switch (l.status) {
+      case 'approved':
+        if (l.isAvailable) {
+          bg = AppColors.primary;
+          text = t('सार्वजनिक (सक्रिय)', 'Live');
+        } else {
+          bg = AppColors.muted;
+          text = t('अनुपलब्ध', 'Unavailable');
+        }
+        break;
+      case 'pending':
+        bg = const Color(0xFF8A5A00);
+        text = t('अप्रूवल के लिए लंबित', 'Pending approval');
+        break;
+      case 'rented':
+        bg = AppColors.primaryDark;
+        text = t('किराये पर चढ़ गया', 'Rented');
+        break;
+      case 'rejected':
+        bg = AppColors.danger;
+        text = t('अस्वीकृत', 'Rejected');
+        break;
+      case 'hidden':
+        bg = AppColors.muted;
+        text = t('छिपी हुई', 'Hidden');
+        break;
+      case 'draft':
+        bg = AppColors.muted;
+        text = t('ड्राफ्ट', 'Draft');
+        break;
+      default:
+        bg = AppColors.muted;
+        text = l.status;
+    }
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(
+            fontSize: 11, fontWeight: FontWeight.w700, color: Colors.white),
+      ),
+    );
+  }
+
+  String _statusNote(Listing l) {
+    switch (l.status) {
+      case 'pending':
+        return t(
+            'एडमिन की मंज़ूरी का इंतज़ार है। मंज़ूरी तक यह सार्वजनिक नहीं दिखेगी।',
+            'Waiting for admin approval. It will not be public until approved.');
+      case 'rejected':
+        return t('यह लिस्टिंग मंज़ूर नहीं हुई, इसलिए सार्वजनिक नहीं है।',
+            'This listing was not approved, so it is not public.');
+      case 'hidden':
+        return t('यह लिस्टिंग अभी छिपी हुई है, सार्वजनिक नहीं दिख रही।',
+            'This listing is currently hidden and not shown publicly.');
+      case 'draft':
+        return t('यह ड्राफ्ट है, अभी सार्वजनिक नहीं।',
+            'This is a draft and is not public yet.');
+      case 'rented':
+        return t('यह कमरा किराये पर चढ़ चुका है, सार्वजनिक सूची में नहीं दिखता।',
+            'This room is rented and is not shown in public listings.');
+      default:
+        return '';
+    }
+  }
+
+  Future<bool> _confirm(String title, String body, String yes) async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        title: Text(title),
+        content: Text(body, style: const TextStyle(height: 1.4)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(t('रहने दें', 'Cancel')),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(yes),
+          ),
+        ],
+      ),
+    );
+    return ok == true;
+  }
+
+  Future<void> _changeRental(Listing l, {required bool rented}) async {
+    final ok = rented
+        ? await _confirm(
+            t('किराये पर चढ़ गया?', 'Mark as rented?'),
+            t('"${l.title}" को "किराये पर चढ़ गया" चिह्नित करें? यह कमरा सार्वजनिक सूची से हट जाएगा।',
+                'Mark "${l.title}" as rented? This room will be removed from the public listings.'),
+            t('हाँ, चढ़ गया', 'Yes, rented'))
+        : await _confirm(
+            t('फिर से लिस्ट करें?', 'List again?'),
+            t('यह कमरा फिर से मंज़ूरी (pending) में जाएगा। मंज़ूरी मिलने तक यह सार्वजनिक नहीं दिखेगा।',
+                'This room will go back to pending approval. It will not be public until it is approved.'),
+            t('फिर से लिस्ट करें', 'List again'));
+    if (!ok || !mounted) return;
+
+    setState(() => _busyId = l.id);
+    String? err;
+    try {
+      await Supabase.instance.client.rpc(
+        'set_listing_rental_status',
+        params: {'p_listing': l.id, 'p_rented': rented},
+      );
+    } on PostgrestException catch (e) {
+      err = e.message;
+    } catch (_) {
+      err = t('इंटरनेट जाँचकर फिर कोशिश करें',
+          'Check your internet and try again');
+    }
+    if (err == null) {
+      await myRealListings.load();
+      await listingsStore.load();
+    }
+    if (!mounted) return;
+    setState(() => _busyId = null);
+
+    if (err != null) {
+      showMsg(context,
+          '${t('बदलाव नहीं हो सका', 'Could not make the change')}: $err');
+      return;
+    }
+    final after = myRealListings.items.where((x) => x.id == l.id).toList();
+    final status = after.isEmpty ? '' : after.first.status;
+    if (rented && status == 'rented') {
+      showMsg(
+          context,
+          t('लिस्टिंग "किराये पर चढ़ गया" चिह्नित हो गई। अब यह सार्वजनिक सूची में नहीं दिखेगी।',
+              'Listing marked as rented. It will no longer show in public listings.'));
+    } else if (!rented && status == 'pending') {
+      showMsg(
+          context,
+          t('लिस्टिंग फिर से लिस्ट हुई। यह मंज़ूरी (pending) में गई है, मंज़ूरी तक सार्वजनिक नहीं दिखेगी।',
+              'Listing listed again. It is now pending approval and will not be public until approved.'));
+    } else {
+      showMsg(context, t('बदलाव सेव हो गया', 'Change saved'));
+    }
+  }
+
+  Widget _realCard(Listing l) {
+    final busy = _busyId == l.id;
+    final canMarkRented = l.status == 'approved' && l.isAvailable;
+    final canRelist = l.status == 'rented';
+    final note = _statusNote(l);
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                width: 108,
+                height: 118,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      ListingImage(listing: l, fit: BoxFit.cover),
+                      if (l.photoUrls.isNotEmpty)
+                        Positioned(
+                          left: 6,
+                          bottom: 6,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 7, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: const Color(0x99000000),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.photo_camera,
+                                    size: 13, color: Colors.white),
+                                const SizedBox(width: 4),
+                                Text(
+                                  t('${l.photoUrls.length} फोटो',
+                                      '${l.photoUrls.length} photos'),
+                                  style: const TextStyle(
+                                      fontSize: 11,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l.title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.text),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        const Icon(Icons.location_on,
+                            size: 15, color: AppColors.primary),
+                        const SizedBox(width: 3),
+                        Expanded(
+                          child: Text(
+                            l.area,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                                fontSize: 12.5, color: AppColors.primary),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 6,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: AppColors.tint,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            '₹${inr(l.price)}${t('/माह', '/month')}',
+                            style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.primary),
+                          ),
+                        ),
+                        _realStatusChip(l),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          if (note.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Text(
+              note,
+              style: const TextStyle(
+                  fontSize: 12.5, height: 1.35, color: AppColors.muted),
+            ),
+          ],
+          const SizedBox(height: 10),
+          if (busy)
+            Row(
+              children: [
+                const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2.5),
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  t('बदल रहे हैं...', 'Updating...'),
+                  style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.text),
+                ),
+              ],
+            )
+          else
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                _actionBtn(Icons.visibility_outlined, t('देखें', 'View'), () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => DetailScreen(listing: l),
+                    ),
+                  );
+                }),
+                if (canMarkRented)
+                  _actionBtn(
+                      Icons.key,
+                      t('किराये पर चढ़ गया', 'Mark as Rented'),
+                      () => _changeRental(l, rented: true)),
+                if (canRelist)
+                  _actionBtn(
+                      Icons.replay,
+                      t('फिर से लिस्ट करें', 'List again'),
+                      () => _changeRental(l, rented: false)),
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _realSection() {
+    final s = myRealListings;
+    if (!s.loaded && s.error == null) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 40),
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+    if (!s.loaded) {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(16, 30, 16, 30),
+        child: Column(
+          children: [
+            const Icon(Icons.wifi_off, size: 48, color: AppColors.muted),
+            const SizedBox(height: 10),
+            Text(
+              s.error ?? '',
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                  fontSize: 14.5,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.muted),
+            ),
+            const SizedBox(height: 8),
+            TextButton(
+              onPressed: s.loading ? null : s.load,
+              child: Text(t('फिर कोशिश करें', 'Try again')),
+            ),
+          ],
+        ),
+      );
+    }
+    if (s.notSignedIn) {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(24, 30, 24, 30),
+        child: Text(
+          t('अपनी लिस्टिंग देखने के लिए पहले लॉगिन करें।',
+              'Please log in first to see your listings.'),
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontSize: 14.5, color: AppColors.muted),
+        ),
+      );
+    }
+    if (s.items.isEmpty) return _empty();
+    return Column(children: s.items.map(_realCard).toList());
+  }
+
+  // ---------------------------------------------------------------------
+  // डेमो लिस्टिंग (सिर्फ इस फोन में)
+  // ---------------------------------------------------------------------
 
   Widget _statusChip(String status) {
     Color bg;
@@ -545,6 +940,32 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
     );
   }
 
+  Widget _demoSection(List<MyListing> demo) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 8),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFFF6E0),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFFE8C77A)),
+          ),
+          child: Text(
+            t('डेमो लिस्टिंग: ये अभी सिर्फ इस फोन में हैं, ऑनलाइन सेव नहीं हुईं और दूसरों को नहीं दिखेंगी।',
+                'Demo listings: these exist only on this phone, are not saved online and are not visible to others.'),
+            style: const TextStyle(
+                fontSize: 12.5, height: 1.35, color: AppColors.text),
+          ),
+        ),
+        const SizedBox(height: 10),
+        ...demo.map(_card),
+      ],
+    );
+  }
+
   Widget _empty() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 40, 24, 40),
@@ -588,35 +1009,40 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
           _topBar(context),
           Expanded(
             child: ListenableBuilder(
-              listenable: myListings,
+              listenable: Listenable.merge([myRealListings, myListings]),
               builder: (context, _) {
-                final items = myListings.value;
-                return ListView(
-                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
-                  children: [
-                    _ownerCard(),
-                    const SizedBox(height: 12),
-                    _stats(items),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        const Icon(Icons.home,
-                            color: AppColors.primary, size: 22),
-                        const SizedBox(width: 8),
-                        Text(
-                          t('मेरी लिस्टिंग (${items.length})',
-                              'My listings (${items.length})'),
-                          style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w800,
-                              color: AppColors.text),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    if (items.isEmpty) _empty(),
-                    ...items.map(_card),
-                  ],
+                final real = myRealListings.items;
+                final demo = myListings.value;
+                return RefreshIndicator(
+                  onRefresh: () => myRealListings.load(),
+                  child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+                    children: [
+                      _ownerCard(),
+                      const SizedBox(height: 12),
+                      _stats(real),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          const Icon(Icons.home,
+                              color: AppColors.primary, size: 22),
+                          const SizedBox(width: 8),
+                          Text(
+                            t('मेरी लिस्टिंग (${real.length})',
+                                'My listings (${real.length})'),
+                            style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.text),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      _realSection(),
+                      if (demo.isNotEmpty) _demoSection(demo),
+                    ],
+                  ),
                 );
               },
             ),
@@ -661,7 +1087,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
 }
 
 // ---------------------------------------------------------------------------
-// लिस्टिंग बदलने का फॉर्म
+// लिस्टिंग बदलने का फॉर्म (सिर्फ डेमो लिस्टिंग के लिए)
 // ---------------------------------------------------------------------------
 
 class EditListingScreen extends StatefulWidget {
