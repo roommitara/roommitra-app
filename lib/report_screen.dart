@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'data.dart';
 import 'home_screen.dart' show RoomMitraLogo;
 import 'notifications_screen.dart';
@@ -9,12 +10,13 @@ import 'theme.dart';
 class _ReportType {
   final IconData icon;
   final Color color;
+  final String reason; // Supabase room_reports.reason की वैल्यू
   final String title;
   final String titleEn;
   final String sub;
   final String subEn;
-  const _ReportType(
-      this.icon, this.color, this.title, this.titleEn, this.sub, this.subEn);
+  const _ReportType(this.icon, this.color, this.reason, this.title,
+      this.titleEn, this.sub, this.subEn);
 
   String get tTitle => t(title, titleEn);
   String get tSub => t(sub, subEn);
@@ -24,46 +26,55 @@ const List<_ReportType> _types = [
   _ReportType(
       Icons.person_search,
       Color(0xFFE53935),
-      'फर्जी लिस्टिंग की रिपोर्ट करें',
-      'Report a fake listing',
-      'अगर कोई प्रॉपर्टी असली नहीं है या फोटो/जानकारी गलत है।',
-      'If a property is not real or the photos/details are wrong.'),
+      'fake_listing',
+      'फर्जी लिस्टिंग',
+      'Fake listing',
+      'अगर कोई प्रॉपर्टी असली नहीं है या फोटो गलत हैं।',
+      'If a property is not real or the photos are wrong.'),
+  _ReportType(
+      Icons.key_off,
+      Color(0xFF2F6FE4),
+      'already_rented',
+      'पहले ही किराये पर चढ़ चुका',
+      'Already rented',
+      'अगर यह कमरा पहले ही किराये पर दिया जा चुका है।',
+      'If this room has already been rented out.'),
   _ReportType(
       Icons.currency_rupee,
       Color(0xFFF2A81D),
+      'wrong_price',
+      'गलत किराया',
+      'Wrong price',
+      'अगर लिस्टिंग में लिखा किराया असल किराये से अलग है।',
+      'If the rent shown is different from the actual rent.'),
+  _ReportType(
+      Icons.gpp_bad,
+      Color(0xFF7E57C2),
+      'scam',
       'धोखाधड़ी / पैसे की मांग',
       'Fraud / demand for money',
       'अगर कोई एडवांस या ज्यादा पैसे की मांग कर रहा है।',
       'If someone is asking for advance or extra money.'),
   _ReportType(
-      Icons.person,
-      Color(0xFF2F6FE4),
-      'गलत जानकारी',
-      'Wrong information',
-      'अगर प्रॉपर्टी विवरण, लोकेशन या मालिक की जानकारी गलत है।',
-      'If the property details, location or owner information is wrong.'),
-  _ReportType(
-      Icons.gpp_maybe,
-      Color(0xFF7E57C2),
-      'असुरक्षित माहौल',
-      'Unsafe environment',
-      'अगर आपको जगह, मकान मालिक या किसी परिस्थिति से खतरा महसूस हो।',
-      'If you feel unsafe because of the place, the owner or a situation.'),
-  _ReportType(
-      Icons.chat_bubble,
+      Icons.report_problem,
       Color(0xFF00796B),
-      'किसी से बदतमीजी / दुर्व्यवहार',
-      'Rude behavior / abuse',
-      'अगर कोई यूज़र, मालिक या एजेंट अपमानजनक व्यवहार करे।',
-      'If a user, owner or agent behaves in an insulting way.'),
+      'inappropriate',
+      'अनुचित / असुरक्षित / दुर्व्यवहार',
+      'Inappropriate / unsafe / abusive',
+      'अगर कुछ अनुचित लगे, खतरा महसूस हो या कोई बदतमीजी करे।',
+      'If something seems inappropriate, unsafe or someone behaves rudely.'),
   _ReportType(
       Icons.more_horiz,
       Color(0xFF546E7A),
+      'other',
       'अन्य समस्या',
       'Other problem',
       'ऊपर दी गई श्रेणियों में से कोई और समस्या हो तो यहाँ बताएं।',
       'If you have any other problem not listed above, tell us here.'),
 ];
+
+final RegExp _uuidRe = RegExp(
+    r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$');
 
 class ReportScreen extends StatefulWidget {
   final Listing? listing;
@@ -75,6 +86,7 @@ class ReportScreen extends StatefulWidget {
 
 class _ReportScreenState extends State<ReportScreen> {
   int? _sel;
+  bool _sending = false;
   final TextEditingController _details = TextEditingController();
 
   @override
@@ -262,13 +274,97 @@ class _ReportScreenState extends State<ReportScreen> {
     );
   }
 
-  void _submit() {
+  Future<void> _submit() async {
+    if (_sending) return;
     if (_sel == null) {
       showMsg(context,
           t('कृपया पहले एक श्रेणी चुनें', 'Please choose a category first'));
       return;
     }
+    final l = widget.listing;
+    if (l == null) {
+      showMsg(
+          context,
+          t('रिपोर्ट किसी कमरे की डिटेल स्क्रीन से ही भेजी जा सकती है।',
+              'A report can only be sent from a room details screen.'));
+      return;
+    }
+    if (!_uuidRe.hasMatch(l.id)) {
+      showMsg(
+          context,
+          t('यह डेमो कमरा है, इसकी रिपोर्ट सेव नहीं हो सकती।',
+              'This is a demo room, its report cannot be saved.'));
+      return;
+    }
+    final client = Supabase.instance.client;
+    final user = client.auth.currentUser;
+    if (user == null) {
+      showMsg(
+          context,
+          t('रिपोर्ट करने के लिए पहले लॉगिन करें।',
+              'Please log in first to send a report.'));
+      return;
+    }
+
     final rt = _types[_sel!];
+    setState(() => _sending = true);
+    try {
+      final existing = await client
+          .from('room_reports')
+          .select('id')
+          .eq('listing_id', l.id)
+          .eq('reporter_id', user.id)
+          .limit(1);
+      if (existing.isNotEmpty) {
+        if (!mounted) return;
+        setState(() => _sending = false);
+        showMsg(
+            context,
+            t('आप इस कमरे की रिपोर्ट पहले ही कर चुके हैं। हमारी टीम जाँच कर रही है।',
+                'You have already reported this room. Our team is reviewing it.'));
+        return;
+      }
+
+      final text = _details.text.trim();
+      await client.from('room_reports').insert({
+        'listing_id': l.id,
+        'reporter_id': user.id,
+        'reason': rt.reason,
+        'details': text.isEmpty ? null : text,
+        'status': 'open',
+      });
+    } on PostgrestException catch (e) {
+      if (!mounted) return;
+      setState(() => _sending = false);
+      if (e.code == '23505') {
+        showMsg(
+            context,
+            t('आप इस कमरे की रिपोर्ट पहले ही कर चुके हैं।',
+                'You have already reported this room.'));
+      } else if (e.code == '42501') {
+        showMsg(
+            context,
+            t('आपको यह रिपोर्ट भेजने की अनुमति नहीं है। दोबारा लॉगिन करके देखें।',
+                'You are not allowed to send this report. Try logging in again.'));
+      } else {
+        showMsg(
+            context,
+            t('रिपोर्ट भेजी नहीं जा सकी। कुछ देर बाद फिर कोशिश करें।',
+                'Could not send the report. Please try again later.'));
+      }
+      return;
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _sending = false);
+      showMsg(
+          context,
+          t('रिपोर्ट भेजी नहीं जा सकी। इंटरनेट जाँचकर फिर कोशिश करें।',
+              'Could not send the report. Check your internet and try again.'));
+      return;
+    }
+
+    if (!mounted) return;
+    setState(() => _sending = false);
     demoNotifications.insert(
       0,
       NotifItem(
@@ -283,6 +379,7 @@ class _ReportScreenState extends State<ReportScreen> {
     );
     showDialog<void>(
       context: context,
+      barrierDismissible: false,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
         title: Row(
@@ -295,8 +392,8 @@ class _ReportScreenState extends State<ReportScreen> {
           ],
         ),
         content: Text(t(
-            'धन्यवाद! हमारी टीम आपकी रिपोर्ट की जाँच करेगी और आपको अपडेट देगी।',
-            'Thank you! Our team will review your report and update you.')),
+            'धन्यवाद! हमारी टीम आपकी रिपोर्ट की जाँच करेगी।',
+            'Thank you! Our team will review your report.')),
         actions: [
           TextButton(
             onPressed: () {
@@ -340,8 +437,11 @@ class _ReportScreenState extends State<ReportScreen> {
                           children: [
                             ClipRRect(
                               borderRadius: BorderRadius.circular(8),
-                              child: Image.asset(l.image,
-                                  width: 56, height: 46, fit: BoxFit.cover),
+                              child: ListingImage(
+                                  listing: l,
+                                  width: 56,
+                                  height: 46,
+                                  fit: BoxFit.cover),
                             ),
                             const SizedBox(width: 10),
                             Expanded(
@@ -456,9 +556,18 @@ class _ReportScreenState extends State<ReportScreen> {
                 width: double.infinity,
                 height: 52,
                 child: ElevatedButton.icon(
-                  onPressed: _submit,
-                  icon: const Icon(Icons.verified_user, size: 20),
-                  label: Text(t('रिपोर्ट सबमिट करें', 'Submit report'),
+                  onPressed: _sending ? null : _submit,
+                  icon: _sending
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: Colors.white))
+                      : const Icon(Icons.verified_user, size: 20),
+                  label: Text(
+                      _sending
+                          ? t('भेजी जा रही है...', 'Sending...')
+                          : t('रिपोर्ट सबमिट करें', 'Submit report'),
                       style: const TextStyle(
                           fontSize: 15, fontWeight: FontWeight.w700)),
                   style: ElevatedButton.styleFrom(
