@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'data.dart';
 import 'home_screen.dart' show RoomMitraLogo;
+import 'strings.dart';
 import 'theme.dart';
 
 class _KindOpt {
@@ -25,30 +26,30 @@ class _AddListingScreenState extends State<AddListingScreen> {
   static const int _minPhotos = 5;
   static const int _maxPhotos = 10;
 
-  static const List<_KindOpt> _kinds = [
-    _KindOpt('कमरा', Icons.bed),
-    _KindOpt('फ्लैट', Icons.apartment),
-    _KindOpt('मकान', Icons.home),
-    _KindOpt('PG', Icons.people_outline),
-    _KindOpt('दुकान/ऑफिस', Icons.storefront),
-  ];
+  List<_KindOpt> get _kinds => [
+        _KindOpt(t('कमरा', 'Room'), Icons.bed),
+        _KindOpt(t('फ्लैट', 'Flat'), Icons.apartment),
+        _KindOpt(t('मकान', 'House'), Icons.home),
+        const _KindOpt('PG', Icons.people_outline),
+        _KindOpt(t('दुकान/ऑफिस', 'Shop/Office'), Icons.storefront),
+      ];
 
-  static const List<String> _stepLabels = [
-    'कमरे की\nजानकारी',
-    'किराया &\nडिपॉजिट',
-    'फोटो\nअपलोड',
-    'सुविधाएँ',
-    'लोकेशन',
-    'समाप्त',
-  ];
+  List<String> get _stepLabels => [
+        t('कमरे की\nजानकारी', 'Room\ndetails'),
+        t('किराया &\nडिपॉजिट', 'Rent &\ndeposit'),
+        t('फोटो\nअपलोड', 'Photo\nupload'),
+        t('सुविधाएँ', 'Amenities'),
+        t('लोकेशन', 'Location'),
+        t('समाप्त', 'Finish'),
+      ];
 
-  static const List<String> _photoLabels = [
-    'कमरे की मुख्य फोटो',
-    'दूसरी एंगल',
-    'किचन',
-    'बाथरूम',
-    'बालकनी',
-  ];
+  List<String> get _photoLabels => [
+        t('कमरे की मुख्य फोटो', 'Main room photo'),
+        t('दूसरी एंगल', 'Second angle'),
+        t('किचन', 'Kitchen'),
+        t('बाथरूम', 'Bathroom'),
+        t('बालकनी', 'Balcony'),
+      ];
 
   final ScrollController _scroll = ScrollController();
   final ImagePicker _picker = ImagePicker();
@@ -107,29 +108,44 @@ class _AddListingScreenState extends State<AddListingScreen> {
 
   String? _validate(int s) {
     if (s == 0) {
-      if (_title.text.trim().length < 3) return 'लिस्टिंग का शीर्षक लिखें';
-      if (_area.text.trim().isEmpty) return 'इलाका/एरिया लिखें';
+      if (_title.text.trim().length < 3) {
+        return t('लिस्टिंग का शीर्षक लिखें', 'Enter the listing title');
+      }
+      if (_area.text.trim().isEmpty) {
+        return t('इलाका/एरिया लिखें', 'Enter the area/locality');
+      }
       if (_desc.text.trim().length < 10) {
-        return 'विवरण कम से कम 10 अक्षर का लिखें';
+        return t('विवरण कम से कम 10 अक्षर का लिखें',
+            'Write a description of at least 10 characters');
       }
     } else if (s == 1) {
       final rent = int.tryParse(_rent.text.trim()) ?? 0;
-      if (rent < 500) return 'सही किराया लिखें (कम से कम ₹500)';
+      if (rent < 500) {
+        return t('सही किराया लिखें (कम से कम ₹500)',
+            'Enter a valid rent (at least ₹500)');
+      }
     } else if (s == 2) {
       if (_photos.length < _minPhotos) {
-        return 'कम से कम $_minPhotos फोटो जोड़ें (अभी ${_photos.length})';
+        return t('कम से कम $_minPhotos फोटो जोड़ें (अभी ${_photos.length})',
+            'Add at least $_minPhotos photos (now ${_photos.length})');
       }
     } else if (s == 3) {
-      if (_name.text.trim().length < 2) return 'अपना नाम लिखें';
+      if (_name.text.trim().length < 2) {
+        return t('अपना नाम लिखें', 'Enter your name');
+      }
       if (_phone.text.trim().length != 10) {
-        return 'मोबाइल नंबर 10 अंकों का होना चाहिए';
+        return t('मोबाइल नंबर 10 अंकों का होना चाहिए',
+            'Mobile number must be 10 digits');
       }
       final w = _whatsapp.text.trim();
       if (w.isNotEmpty && w.length != 10) {
-        return 'WhatsApp नंबर 10 अंकों का होना चाहिए';
+        return t('WhatsApp नंबर 10 अंकों का होना चाहिए',
+            'WhatsApp number must be 10 digits');
       }
     } else if (s == 4) {
-      if (_address.text.trim().length < 5) return 'पूरा पता लिखें';
+      if (_address.text.trim().length < 5) {
+        return t('पूरा पता लिखें', 'Enter the full address');
+      }
     }
     return null;
   }
@@ -160,22 +176,26 @@ class _AddListingScreenState extends State<AddListingScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.check_circle, color: AppColors.primary, size: 28),
-            SizedBox(width: 8),
-            Expanded(child: Text('लिस्टिंग तैयार है!')),
+            const Icon(Icons.check_circle, color: AppColors.primary, size: 28),
+            const SizedBox(width: 8),
+            Expanded(child: Text(t('लिस्टिंग तैयार है!', 'Listing is ready!'))),
           ],
         ),
-        content: const Text(
-          'यह अभी डेमो है, इसलिए जानकारी सेव नहीं हुई। Supabase जुड़ने के बाद '
-          'आपकी लिस्टिंग "जाँच में" रहेगी और एडमिन के approve करने पर सबको दिखेगी।',
-          style: TextStyle(height: 1.4),
+        content: Text(
+          t(
+            'यह अभी डेमो है, इसलिए जानकारी सेव नहीं हुई। Supabase जुड़ने के बाद '
+                'आपकी लिस्टिंग "जाँच में" रहेगी और एडमिन के approve करने पर सबको दिखेगी।',
+            'This is a demo for now, so the details were not saved. Once Supabase is connected, '
+                'your listing will stay "under review" and become visible to everyone after the admin approves it.',
+          ),
+          style: const TextStyle(height: 1.4),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('ठीक है'),
+            child: Text(t('ठीक है', 'OK')),
           ),
         ],
       ),
@@ -217,7 +237,10 @@ class _AddListingScreenState extends State<AddListingScreen> {
 
   Future<void> _pick(ImageSource src) async {
     if (_photos.length >= _maxPhotos) {
-      showMsg(context, 'अधिकतम $_maxPhotos फोटो ही जोड़ सकते हैं');
+      showMsg(
+          context,
+          t('अधिकतम $_maxPhotos फोटो ही जोड़ सकते हैं',
+              'You can add a maximum of $_maxPhotos photos'));
       return;
     }
     try {
@@ -244,12 +267,17 @@ class _AddListingScreenState extends State<AddListingScreen> {
       if (!mounted) return;
       setState(() {});
       if (skipped > 0) {
-        showMsg(context,
-            '$skipped फोटो छोड़ी गईं (5MB से बड़ी या सीमा पूरी)');
+        showMsg(
+            context,
+            t('$skipped फोटो छोड़ी गईं (5MB से बड़ी या सीमा पूरी)',
+                '$skipped photos were skipped (larger than 5MB or limit reached)'));
       }
     } catch (e) {
       if (!mounted) return;
-      showMsg(context, 'फोटो नहीं चुन सके, दोबारा कोशिश करें');
+      showMsg(
+          context,
+          t('फोटो नहीं चुन सके, दोबारा कोशिश करें',
+              'Could not pick photos, please try again'));
     }
   }
 
@@ -288,8 +316,9 @@ class _AddListingScreenState extends State<AddListingScreen> {
   }
 
   Widget _stepper() {
+    final labels = _stepLabels;
     final items = <Widget>[];
-    for (var i = 0; i < _stepLabels.length; i++) {
+    for (var i = 0; i < labels.length; i++) {
       final done = i < _step;
       final cur = i == _step;
       final lineColor = AppColors.primary;
@@ -329,7 +358,7 @@ class _AddListingScreenState extends State<AddListingScreen> {
                   Expanded(
                     child: Container(
                       height: 2,
-                      color: i == _stepLabels.length - 1
+                      color: i == labels.length - 1
                           ? Colors.transparent
                           : (i < _step ? lineColor : AppColors.border),
                     ),
@@ -338,7 +367,7 @@ class _AddListingScreenState extends State<AddListingScreen> {
               ),
               const SizedBox(height: 4),
               Text(
-                _stepLabels[i],
+                labels[i],
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 10,
@@ -528,19 +557,23 @@ class _AddListingScreenState extends State<AddListingScreen> {
   // ------------------------------------------------------------ स्टेप 1
 
   Widget _step0() {
+    final kinds = _kinds;
     return Column(
       children: [
-        _headerCard(Icons.home_work, 'कमरे की जानकारी',
-            'अपने कमरे के बारे में बुनियादी जानकारी भरें'),
+        _headerCard(
+            Icons.home_work,
+            t('कमरे की जानकारी', 'Room details'),
+            t('अपने कमरे के बारे में बुनियादी जानकारी भरें',
+                'Fill in the basic details about your room')),
         _card(
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _label('प्रॉपर्टी का प्रकार'),
+              _label(t('प्रॉपर्टी का प्रकार', 'Property type')),
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                children: List.generate(_kinds.length, (i) {
+                children: List.generate(kinds.length, (i) {
                   final sel = i == _kind;
                   return GestureDetector(
                     onTap: () => setState(() => _kind = i),
@@ -554,12 +587,12 @@ class _AddListingScreenState extends State<AddListingScreen> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(_kinds[i].icon,
+                          Icon(kinds[i].icon,
                               size: 20,
                               color: sel ? Colors.white : AppColors.primary),
                           const SizedBox(width: 6),
                           Text(
-                            _kinds[i].label,
+                            kinds[i].label,
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
@@ -573,30 +606,31 @@ class _AddListingScreenState extends State<AddListingScreen> {
                 }),
               ),
               const SizedBox(height: 14),
-              _field('लिस्टिंग का शीर्षक', _title,
-                  hint: 'जैसे - 1BHK रूम (फर्निश्ड)',
+              _field(t('लिस्टिंग का शीर्षक', 'Listing title'), _title,
+                  hint: t('जैसे - 1BHK रूम (फर्निश्ड)',
+                      'e.g. 1BHK Room (Furnished)'),
                   required: true,
                   icon: Icons.title,
                   maxLength: 60),
               _dropdown<String>(
-                'शहर चुनें',
+                t('शहर चुनें', 'Select city'),
                 _city,
                 allCities
                     .map((c) => DropdownMenuItem<String>(
-                        value: c, child: Text(cityHindi[c] ?? c)))
+                        value: c, child: Text(cityName(c))))
                     .toList(),
                 (v) {
                   if (v != null) setState(() => _city = v);
                 },
                 required: true,
               ),
-              _field('इलाका/एरिया', _area,
-                  hint: 'जैसे - Rani Tal',
+              _field(t('इलाका/एरिया', 'Area/Locality'), _area,
+                  hint: t('जैसे - Rani Tal', 'e.g. Rani Tal'),
                   required: true,
                   icon: Icons.location_city,
                   maxLength: 40),
               _dropdown<int>(
-                'कमरे की संख्या',
+                t('कमरे की संख्या', 'Number of rooms'),
                 _rooms,
                 [1, 2, 3, 4, 5]
                     .map((n) => DropdownMenuItem<int>(
@@ -607,9 +641,10 @@ class _AddListingScreenState extends State<AddListingScreen> {
                 },
                 required: true,
               ),
-              _field('विवरण', _desc,
-                  hint:
+              _field(t('विवरण', 'Description'), _desc,
+                  hint: t(
                       'जैसे - कमरे में बेड, अलमारी, वाई-फाई, पानी, बिजली, पार्किंग आदि की सुविधा...',
+                      'e.g. Room has bed, wardrobe, WiFi, water, electricity, parking etc...'),
                   required: true,
                   maxLength: 500,
                   maxLines: 4),
@@ -625,33 +660,38 @@ class _AddListingScreenState extends State<AddListingScreen> {
   Widget _step1() {
     return Column(
       children: [
-        _headerCard(Icons.currency_rupee, 'किराया और डिपॉजिट',
-            'किराया और अन्य ज़रूरी जानकारी भरें'),
+        _headerCard(
+            Icons.currency_rupee,
+            t('किराया और डिपॉजिट', 'Rent and deposit'),
+            t('किराया और अन्य ज़रूरी जानकारी भरें',
+                'Fill in the rent and other important details')),
         _card(
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _field('किराया (₹ प्रति माह)', _rent,
-                  hint: 'जैसे - 5000',
+              _field(t('किराया (₹ प्रति माह)', 'Rent (₹ per month)'), _rent,
+                  hint: t('जैसे - 5000', 'e.g. 5000'),
                   required: true,
                   icon: Icons.currency_rupee,
                   keyboard: TextInputType.number,
                   maxLength: 6,
                   digitsOnly: true),
-              _field('सिक्योरिटी डिपॉजिट (₹)', _deposit,
-                  hint: 'जैसे - 10000 (वैकल्पिक)',
+              _field(t('सिक्योरिटी डिपॉजिट (₹)', 'Security deposit (₹)'),
+                  _deposit,
+                  hint: t('जैसे - 10000 (वैकल्पिक)', 'e.g. 10000 (optional)'),
                   icon: Icons.savings_outlined,
                   keyboard: TextInputType.number,
                   maxLength: 7,
                   digitsOnly: true),
-              _field('एरिया (sq ft)', _sqft,
-                  hint: 'जैसे - 250 (वैकल्पिक)',
+              _field(t('एरिया (sq ft)', 'Area (sq ft)'), _sqft,
+                  hint: t('जैसे - 250 (वैकल्पिक)', 'e.g. 250 (optional)'),
                   icon: Icons.square_foot,
                   keyboard: TextInputType.number,
                   maxLength: 5,
                   digitsOnly: true),
-              _field('मंज़िल', _floor,
-                  hint: 'जैसे - 1st Floor (वैकल्पिक)',
+              _field(t('मंज़िल', 'Floor'), _floor,
+                  hint: t('जैसे - 1st Floor (वैकल्पिक)',
+                      'e.g. 1st Floor (optional)'),
                   icon: Icons.apartment,
                   maxLength: 20),
             ],
@@ -664,15 +704,19 @@ class _AddListingScreenState extends State<AddListingScreen> {
             borderRadius: BorderRadius.circular(14),
             border: Border.all(color: AppColors.border),
           ),
-          child: const Row(
+          child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.info_outline, color: AppColors.primary, size: 22),
-              SizedBox(width: 10),
+              const Icon(Icons.info_outline,
+                  color: AppColors.primary, size: 22),
+              const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  'किराया और डिपॉजिट किरायेदार सीधे आपसे तय करेगा। RoomMitra पर कोई ऑनलाइन पेमेंट नहीं होता।',
-                  style: TextStyle(
+                  t(
+                    'किराया और डिपॉजिट किरायेदार सीधे आपसे तय करेगा। RoomMitra पर कोई ऑनलाइन पेमेंट नहीं होता।',
+                    'The tenant will fix the rent and deposit directly with you. There is no online payment on RoomMitra.',
+                  ),
+                  style: const TextStyle(
                       fontSize: 12.5, height: 1.4, color: AppColors.text),
                 ),
               ),
@@ -686,9 +730,10 @@ class _AddListingScreenState extends State<AddListingScreen> {
   // ------------------------------------------------------------ स्टेप 3 (फोटो)
 
   Widget _photoTile(int i, double w) {
-    final label = i < _photoLabels.length
-        ? '${i + 1}. ${_photoLabels[i]}'
-        : 'फोटो ${i + 1}';
+    final photoLabels = _photoLabels;
+    final label = i < photoLabels.length
+        ? '${i + 1}. ${photoLabels[i]}'
+        : t('फोटो ${i + 1}', 'Photo ${i + 1}');
     return SizedBox(
       width: w,
       height: w * 0.85,
@@ -773,32 +818,40 @@ class _AddListingScreenState extends State<AddListingScreen> {
   Widget _step2() {
     return Column(
       children: [
-        _headerCard(Icons.photo_camera, 'कमरे की फोटो अपलोड करें',
-            'अच्छी क्वालिटी की फोटो डालें ताकि किरायेदार को कमरा बेहतर दिखे। (कम से कम $_minPhotos फोटो ज़रूरी)'),
+        _headerCard(
+            Icons.photo_camera,
+            t('कमरे की फोटो अपलोड करें', 'Upload room photos'),
+            t('अच्छी क्वालिटी की फोटो डालें ताकि किरायेदार को कमरा बेहतर दिखे। (कम से कम $_minPhotos फोटो ज़रूरी)',
+                'Add good quality photos so tenants can see the room better. (At least $_minPhotos photos required)')),
         _card(
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  _pickBtn(Icons.photo_library, 'गैलरी से चुनें',
+                  _pickBtn(Icons.photo_library,
+                      t('गैलरी से चुनें', 'Choose from gallery'),
                       () => _pick(ImageSource.gallery)),
                   const SizedBox(width: 10),
-                  _pickBtn(Icons.photo_camera, 'कैमरा से लें',
+                  _pickBtn(Icons.photo_camera,
+                      t('कैमरा से लें', 'Take with camera'),
                       () => _pick(ImageSource.camera)),
                 ],
               ),
               const SizedBox(height: 6),
-              const Text(
-                'JPG, PNG (अधिकतम 5MB प्रति फोटो)',
-                style: TextStyle(fontSize: 11.5, color: AppColors.muted),
+              Text(
+                t('JPG, PNG (अधिकतम 5MB प्रति फोटो)',
+                    'JPG, PNG (maximum 5MB per photo)'),
+                style:
+                    const TextStyle(fontSize: 11.5, color: AppColors.muted),
               ),
               const SizedBox(height: 14),
               Row(
                 children: [
                   Expanded(
                     child: Text(
-                      'अपलोड की गई फोटो (${_photos.length}/$_maxPhotos)',
+                      t('अपलोड की गई फोटो (${_photos.length}/$_maxPhotos)',
+                          'Uploaded photos (${_photos.length}/$_maxPhotos)'),
                       style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w800,
@@ -808,15 +861,15 @@ class _AddListingScreenState extends State<AddListingScreen> {
                   if (_photos.isNotEmpty)
                     GestureDetector(
                       onTap: () => setState(() => _photos.clear()),
-                      child: const Row(
+                      child: Row(
                         children: [
-                          Text('सभी हटाएं',
-                              style: TextStyle(
+                          Text(t('सभी हटाएं', 'Remove all'),
+                              style: const TextStyle(
                                   fontSize: 12.5,
                                   fontWeight: FontWeight.w600,
                                   color: AppColors.danger)),
-                          SizedBox(width: 4),
-                          Icon(Icons.delete_outline,
+                          const SizedBox(width: 4),
+                          const Icon(Icons.delete_outline,
                               size: 18, color: AppColors.danger),
                         ],
                       ),
@@ -832,10 +885,11 @@ class _AddListingScreenState extends State<AddListingScreen> {
                     color: AppColors.tintLight,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Text(
-                    'अभी कोई फोटो नहीं जोड़ी गई',
+                  child: Text(
+                    t('अभी कोई फोटो नहीं जोड़ी गई', 'No photos added yet'),
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 13, color: AppColors.muted),
+                    style: const TextStyle(
+                        fontSize: 13, color: AppColors.muted),
                   ),
                 )
               else
@@ -860,27 +914,34 @@ class _AddListingScreenState extends State<AddListingScreen> {
             color: AppColors.tint,
             borderRadius: BorderRadius.circular(14),
           ),
-          child: const Column(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  Icon(Icons.lightbulb, color: AppColors.primary, size: 20),
-                  SizedBox(width: 8),
-                  Text('फोटो के लिए सुझाव',
-                      style: TextStyle(
+                  const Icon(Icons.lightbulb,
+                      color: AppColors.primary, size: 20),
+                  const SizedBox(width: 8),
+                  Text(t('फोटो के लिए सुझाव', 'Tips for photos'),
+                      style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w800,
                           color: AppColors.text)),
                 ],
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Text(
-                '• अच्छी रोशनी में फोटो लें (दिन में सबसे बेहतर)\n'
-                '• बेडरूम, किचन, बाथरूम की अलग-अलग फोटो लें\n'
-                '• फोटो साफ़ हो, धुंधली फोटो से बचें\n'
-                '• दरवाज़ा, खिड़की, बालकनी भी दिखाएँ',
-                style: TextStyle(
+                t(
+                  '• अच्छी रोशनी में फोटो लें (दिन में सबसे बेहतर)\n'
+                      '• बेडरूम, किचन, बाथरूम की अलग-अलग फोटो लें\n'
+                      '• फोटो साफ़ हो, धुंधली फोटो से बचें\n'
+                      '• दरवाज़ा, खिड़की, बालकनी भी दिखाएँ',
+                  '• Take photos in good light (daytime is best)\n'
+                      '• Take separate photos of the bedroom, kitchen and bathroom\n'
+                      '• Keep photos sharp, avoid blurry ones\n'
+                      '• Show the door, window and balcony too',
+                ),
+                style: const TextStyle(
                     fontSize: 12.5, height: 1.6, color: AppColors.text),
               ),
             ],
@@ -895,13 +956,16 @@ class _AddListingScreenState extends State<AddListingScreen> {
   Widget _step3() {
     return Column(
       children: [
-        _headerCard(Icons.star, 'सुविधाएँ और संपर्क',
-            'कमरे में जो सुविधाएँ हैं वो चुनें और अपना संपर्क लिखें'),
+        _headerCard(
+            Icons.star,
+            t('सुविधाएँ और संपर्क', 'Amenities and contact'),
+            t('कमरे में जो सुविधाएँ हैं वो चुनें और अपना संपर्क लिखें',
+                'Select the amenities in the room and enter your contact')),
         _card(
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _label('सुविधाएँ (चुनें)'),
+              _label(t('सुविधाएँ (चुनें)', 'Amenities (select)')),
               LayoutBuilder(
                 builder: (context, c) {
                   const gap = 8.0;
@@ -979,32 +1043,32 @@ class _AddListingScreenState extends State<AddListingScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.phone, color: AppColors.primary, size: 22),
-                  SizedBox(width: 8),
-                  Text('आपका संपर्क विवरण',
-                      style: TextStyle(
+                  const Icon(Icons.phone, color: AppColors.primary, size: 22),
+                  const SizedBox(width: 8),
+                  Text(t('आपका संपर्क विवरण', 'Your contact details'),
+                      style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
                           color: AppColors.text)),
                 ],
               ),
               const SizedBox(height: 10),
-              _field('नाम', _name,
-                  hint: 'जैसे - राजेश शर्मा',
+              _field(t('नाम', 'Name'), _name,
+                  hint: t('जैसे - राजेश शर्मा', 'e.g. Rajesh Sharma'),
                   required: true,
                   icon: Icons.person,
                   maxLength: 40),
-              _field('मोबाइल नंबर', _phone,
-                  hint: '10 अंकों का नंबर',
+              _field(t('मोबाइल नंबर', 'Mobile number'), _phone,
+                  hint: t('10 अंकों का नंबर', '10-digit number'),
                   required: true,
                   icon: Icons.phone,
                   keyboard: TextInputType.phone,
                   maxLength: 10,
                   digitsOnly: true),
-              _field('WhatsApp (वैकल्पिक)', _whatsapp,
-                  hint: '10 अंकों का नंबर',
+              _field(t('WhatsApp (वैकल्पिक)', 'WhatsApp (optional)'), _whatsapp,
+                  hint: t('10 अंकों का नंबर', '10-digit number'),
                   icon: Icons.chat,
                   keyboard: TextInputType.phone,
                   maxLength: 10,
@@ -1021,20 +1085,25 @@ class _AddListingScreenState extends State<AddListingScreen> {
   Widget _step4() {
     return Column(
       children: [
-        _headerCard(Icons.location_on, 'लोकेशन',
-            'कमरे का पता लिखें ताकि किरायेदार सही जगह पहुँच सके'),
+        _headerCard(
+            Icons.location_on,
+            t('लोकेशन', 'Location'),
+            t('कमरे का पता लिखें ताकि किरायेदार सही जगह पहुँच सके',
+                'Enter the room address so that the tenant can reach the right place')),
         _card(
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _field('पूरा पता', _address,
-                  hint: 'मकान नंबर, गली, मोहल्ला...',
+              _field(t('पूरा पता', 'Full address'), _address,
+                  hint: t('मकान नंबर, गली, मोहल्ला...',
+                      'House number, street, locality...'),
                   required: true,
                   icon: Icons.home_outlined,
                   maxLength: 150,
                   maxLines: 3),
-              _field('नज़दीकी लैंडमार्क', _landmark,
-                  hint: 'जैसे - रानी ताल के पास (वैकल्पिक)',
+              _field(t('नज़दीकी लैंडमार्क', 'Nearby landmark'), _landmark,
+                  hint: t('जैसे - रानी ताल के पास (वैकल्पिक)',
+                      'e.g. Near Rani Tal (optional)'),
                   icon: Icons.flag_outlined,
                   maxLength: 60),
             ],
@@ -1046,15 +1115,18 @@ class _AddListingScreenState extends State<AddListingScreen> {
             color: AppColors.tint,
             borderRadius: BorderRadius.circular(14),
           ),
-          child: const Row(
+          child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.lock, color: AppColors.primary, size: 22),
-              SizedBox(width: 10),
+              const Icon(Icons.lock, color: AppColors.primary, size: 22),
+              const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  'आपका पूरा पता और फोन नंबर सुरक्षित रहता है। किरायेदार को सिर्फ इलाके का नाम दिखता है।',
-                  style: TextStyle(
+                  t(
+                    'आपका पूरा पता और फोन नंबर सुरक्षित रहता है। किरायेदार को सिर्फ इलाके का नाम दिखता है।',
+                    'Your full address and phone number stay safe. Tenants only see the area name.',
+                  ),
+                  style: const TextStyle(
                       fontSize: 12.5, height: 1.4, color: AppColors.text),
                 ),
               ),
@@ -1102,22 +1174,27 @@ class _AddListingScreenState extends State<AddListingScreen> {
         .join(', ');
     return Column(
       children: [
-        _headerCard(Icons.fact_check, 'सब ठीक है? एक बार देख लें',
-            'सबमिट करने से पहले अपनी जानकारी जाँच लें'),
+        _headerCard(
+            Icons.fact_check,
+            t('सब ठीक है? एक बार देख लें', 'All good? Please review once'),
+            t('सबमिट करने से पहले अपनी जानकारी जाँच लें',
+                'Check your details before submitting')),
         _card(
           Column(
             children: [
-              _sumRow('प्रकार', _kinds[_kind].label),
-              _sumRow('शीर्षक', _title.text.trim()),
-              _sumRow('जगह', '${_area.text.trim()}, ${cityHindi[_city] ?? _city}'),
-              _sumRow('कमरे', _rooms == 5 ? '5+' : '$_rooms'),
-              _sumRow('किराया', rent > 0 ? '₹${inr(rent)}/माह' : ''),
-              _sumRow('डिपॉजिट', dep > 0 ? '₹${inr(dep)}' : ''),
-              _sumRow('फोटो', '${_photos.length}'),
-              _sumRow('सुविधाएँ', amenNames),
-              _sumRow('नाम', _name.text.trim()),
-              _sumRow('मोबाइल', _phone.text.trim()),
-              _sumRow('पता', _address.text.trim()),
+              _sumRow(t('प्रकार', 'Type'), _kinds[_kind].label),
+              _sumRow(t('शीर्षक', 'Title'), _title.text.trim()),
+              _sumRow(t('जगह', 'Place'),
+                  '${_area.text.trim()}, ${cityName(_city)}'),
+              _sumRow(t('कमरे', 'Rooms'), _rooms == 5 ? '5+' : '$_rooms'),
+              _sumRow(t('किराया', 'Rent'),
+                  rent > 0 ? '₹${inr(rent)}${t('/माह', '/month')}' : ''),
+              _sumRow(t('डिपॉजिट', 'Deposit'), dep > 0 ? '₹${inr(dep)}' : ''),
+              _sumRow(t('फोटो', 'Photos'), '${_photos.length}'),
+              _sumRow(t('सुविधाएँ', 'Amenities'), amenNames),
+              _sumRow(t('नाम', 'Name'), _name.text.trim()),
+              _sumRow(t('मोबाइल', 'Mobile'), _phone.text.trim()),
+              _sumRow(t('पता', 'Address'), _address.text.trim()),
             ],
           ),
         ),
@@ -1127,15 +1204,19 @@ class _AddListingScreenState extends State<AddListingScreen> {
             color: AppColors.tint,
             borderRadius: BorderRadius.circular(14),
           ),
-          child: const Row(
+          child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.verified_user, color: AppColors.primary, size: 22),
-              SizedBox(width: 10),
+              const Icon(Icons.verified_user,
+                  color: AppColors.primary, size: 22),
+              const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  'लिस्टिंग 100% फ्री है। सबमिट के बाद एडमिन जाँच करेगा, फिर वह सबको दिखेगी।',
-                  style: TextStyle(
+                  t(
+                    'लिस्टिंग 100% फ्री है। सबमिट के बाद एडमिन जाँच करेगा, फिर वह सबको दिखेगी।',
+                    'Listing is 100% free. After you submit, the admin will review it and then it will be visible to everyone.',
+                  ),
+                  style: const TextStyle(
                       fontSize: 12.5, height: 1.4, color: AppColors.text),
                 ),
               ),
@@ -1183,7 +1264,7 @@ class _AddListingScreenState extends State<AddListingScreen> {
               child: OutlinedButton.icon(
                 onPressed: _back,
                 icon: const Icon(Icons.arrow_back, size: 18),
-                label: const Text('पिछला'),
+                label: Text(t('पिछला', 'Back')),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.primary,
                   side: const BorderSide(color: AppColors.primary, width: 1.2),
@@ -1204,7 +1285,9 @@ class _AddListingScreenState extends State<AddListingScreen> {
                 onPressed: _next,
                 icon: Icon(last ? Icons.send : Icons.arrow_forward, size: 20),
                 iconAlignment: IconAlignment.end,
-                label: Text(last ? 'लिस्टिंग सबमिट करें' : 'अगला चरण'),
+                label: Text(last
+                    ? t('लिस्टिंग सबमिट करें', 'Submit listing')
+                    : t('अगला चरण', 'Next step')),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
@@ -1223,24 +1306,29 @@ class _AddListingScreenState extends State<AddListingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF7FCF9),
-      body: Column(
-        children: [
-          _topBar(),
-          _stepper(),
-          Expanded(
-            child: SingleChildScrollView(
-              controller: _scroll,
-              keyboardDismissBehavior:
-                  ScrollViewKeyboardDismissBehavior.onDrag,
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-              child: _body(),
-            ),
+    return ValueListenableBuilder<String>(
+      valueListenable: AppLang.notifier,
+      builder: (context, lang, _) {
+        return Scaffold(
+          backgroundColor: const Color(0xFFF7FCF9),
+          body: Column(
+            children: [
+              _topBar(),
+              _stepper(),
+              Expanded(
+                child: SingleChildScrollView(
+                  controller: _scroll,
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+                  child: _body(),
+                ),
+              ),
+              _bottomBar(),
+            ],
           ),
-          _bottomBar(),
-        ],
-      ),
+        );
+      },
     );
   }
 }
