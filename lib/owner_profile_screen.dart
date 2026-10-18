@@ -4,11 +4,13 @@ import 'detail_screen.dart';
 import 'home_screen.dart' show RoomMitraLogo;
 import 'messages_screen.dart';
 import 'report_screen.dart';
+import 'strings.dart';
 import 'theme.dart';
 
 /// डेमो: मकान मालिक की जानकारी (असली डेटा Supabase जुड़ने पर आएगा)
 class OwnerInfo {
   final String name;
+  final String nameEn;
   final List<String> listingIds;
   final double rating;
   final int ratingCount;
@@ -16,8 +18,10 @@ class OwnerInfo {
   final int years;
   final bool verified;
   final String about;
+  final String aboutEn;
   const OwnerInfo({
     required this.name,
+    required this.nameEn,
     required this.listingIds,
     required this.rating,
     required this.ratingCount,
@@ -25,12 +29,17 @@ class OwnerInfo {
     required this.years,
     required this.verified,
     required this.about,
+    required this.aboutEn,
   });
+
+  String get displayName => t(name, nameEn);
+  String get displayAbout => t(about, aboutEn);
 }
 
 const List<OwnerInfo> demoOwners = [
   OwnerInfo(
     name: 'राजेश तिवारी',
+    nameEn: 'Rajesh Tiwari',
     listingIds: ['n1', 'n3'],
     rating: 4.5,
     ratingCount: 18,
@@ -39,9 +48,12 @@ const List<OwnerInfo> demoOwners = [
     verified: true,
     about:
         'नमस्कार! मैं राजेश तिवारी हूँ। मैं नाहन में किराये के कमरे उपलब्ध कराता हूँ। साफ-सुथरे, सुरक्षित और आरामदायक कमरे मेरी प्राथमिकता है। छात्रों और कामकाजी लोगों के लिए बेहतर विकल्प उपलब्ध हैं। किराया और डिपॉजिट मैं सीधे किरायेदार से ही तय करता हूँ।',
+    aboutEn:
+        'Hello! I am Rajesh Tiwari. I provide rooms for rent in Nahan. Clean, safe and comfortable rooms are my priority. Good options are available for students and working people. I decide the rent and deposit directly with the tenant.',
   ),
   OwnerInfo(
     name: 'सुनील ठाकुर',
+    nameEn: 'Sunil Thakur',
     listingIds: ['n2'],
     rating: 4.2,
     ratingCount: 9,
@@ -50,9 +62,12 @@ const List<OwnerInfo> demoOwners = [
     verified: true,
     about:
         'नमस्ते! मैं सुनील ठाकुर हूँ। नाहन में लड़कों के लिए PG चलाता हूँ। खाना-रहना और साफ-सफाई का पूरा ध्यान रखा जाता है। कॉलेज और ऑफिस के पास होने से पढ़ने और काम करने वालों के लिए सुविधाजनक है।',
+    aboutEn:
+        'Hello! I am Sunil Thakur. I run a PG for boys in Nahan. Food, stay and cleanliness are fully taken care of. Being close to college and offices, it is convenient for students and working people.',
   ),
   OwnerInfo(
     name: 'रोहित शर्मा',
+    nameEn: 'Rohit Sharma',
     listingIds: ['p1'],
     rating: 4.8,
     ratingCount: 28,
@@ -61,6 +76,8 @@ const List<OwnerInfo> demoOwners = [
     verified: true,
     about:
         'नमस्कार! मैं रोहित शर्मा हूँ। पांवटा साहिब में परिवारों के लिए फर्निश्ड फ्लैट किराये पर देता हूँ। शांत और सुरक्षित माहौल मेरी पहचान है।',
+    aboutEn:
+        'Hello! I am Rohit Sharma. I rent out furnished flats for families in Paonta Sahib. A calm and safe environment is my identity.',
   ),
 ];
 
@@ -71,6 +88,7 @@ OwnerInfo ownerOf(Listing l) {
   }
   return OwnerInfo(
     name: 'मकान मालिक',
+    nameEn: 'Owner',
     listingIds: [l.id],
     rating: 4.0,
     ratingCount: 1,
@@ -78,6 +96,7 @@ OwnerInfo ownerOf(Listing l) {
     years: 1,
     verified: l.verified,
     about: 'यह मकान मालिक RoomMitra पर नया है।',
+    aboutEn: 'This owner is new on RoomMitra.',
   );
 }
 
@@ -97,9 +116,8 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
   late final OwnerInfo o = ownerOf(widget.listing);
 
   List<Listing> get _ownerListings {
-    final list = sampleListings
-        .where((x) => o.listingIds.contains(x.id))
-        .toList();
+    final list =
+        sampleListings.where((x) => o.listingIds.contains(x.id)).toList();
     return list.isEmpty ? <Listing>[l] : list;
   }
 
@@ -108,7 +126,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
       if (c.name == o.name) return c;
     }
     final n = DateTime.now();
-    final t =
+    final time =
         '${n.hour.toString().padLeft(2, '0')}:${n.minute.toString().padLeft(2, '0')}';
     final c = Conversation(
       id: 'owner_${o.name}',
@@ -116,8 +134,11 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
       role: 'मकान मालिक',
       listingId: l.id,
       msgs: [
-        ChatMsg('नमस्ते! मैं ${o.name} हूँ। बताइए, मैं आपकी क्या मदद कर सकता हूँ?',
-            false, t),
+        ChatMsg(
+            t('नमस्ते! मैं ${o.name} हूँ। बताइए, मैं आपकी क्या मदद कर सकता हूँ?',
+                'Hello! I am ${o.nameEn}. Tell me, how can I help you?'),
+            false,
+            time),
       ],
     );
     conversations.value = [...conversations.value, c];
@@ -127,7 +148,8 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
   void _message() {
     final c = _findOrCreateChat();
     if (c.status == 'blocked') {
-      showMsg(context, 'आपने इस यूज़र को ब्लॉक किया है');
+      showMsg(context,
+          t('आपने इस यूज़र को ब्लॉक किया है', 'You have blocked this user'));
       return;
     }
     Navigator.of(context).push(
@@ -162,8 +184,10 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
             ),
           ),
           IconButton(
-            onPressed: () =>
-                showMsg(context, 'शेयर करने की सुविधा बाद में जुड़ेगी'),
+            onPressed: () => showMsg(
+                context,
+                t('शेयर करने की सुविधा बाद में जुड़ेगी',
+                    'Sharing will be added later')),
             icon: const Icon(Icons.share, color: Colors.white),
           ),
           PopupMenuButton<String>(
@@ -177,10 +201,10 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
                 );
               }
             },
-            itemBuilder: (_) => const [
+            itemBuilder: (_) => [
               PopupMenuItem<String>(
                 value: 'report',
-                child: Text('रिपोर्ट करें'),
+                child: Text(t('रिपोर्ट करें', 'Report')),
               ),
             ],
           ),
@@ -241,7 +265,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      o.name,
+                      o.displayName,
                       style: const TextStyle(
                           fontSize: 21,
                           fontWeight: FontWeight.w800,
@@ -253,8 +277,9 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
                         Flexible(
                           child: Text(
                             o.verified
-                                ? 'मकान मालिक (Verified)'
-                                : 'मकान मालिक',
+                                ? t('मकान मालिक (Verified)',
+                                    'Owner (Verified)')
+                                : t('मकान मालिक', 'Owner'),
                             style: const TextStyle(
                                 fontSize: 13.5,
                                 fontWeight: FontWeight.w700,
@@ -276,7 +301,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
                         const SizedBox(width: 3),
                         Expanded(
                           child: Text(
-                            '${cityHindi[l.city] ?? l.city}, हिमाचल प्रदेश',
+                            '${cityName(l.city)}, ${t('हिमाचल प्रदेश', 'Himachal Pradesh')}',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
@@ -293,7 +318,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
                         const SizedBox(width: 3),
                         Flexible(
                           child: Text(
-                            '${o.rating} (${o.ratingCount} रेटिंग, डेमो)',
+                            '${o.rating} (${o.ratingCount} ${t('रेटिंग, डेमो', 'ratings, demo')})',
                             style: const TextStyle(
                                 fontSize: 13, color: AppColors.text),
                           ),
@@ -314,7 +339,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
                   child: OutlinedButton.icon(
                     onPressed: _message,
                     icon: const Icon(Icons.chat, size: 20),
-                    label: const Text('संदेश भेजें'),
+                    label: Text(t('संदेश भेजें', 'Message')),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.primary,
                       side: const BorderSide(
@@ -334,7 +359,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
                   child: ElevatedButton.icon(
                     onPressed: () => contactOwner(context, l, whatsapp: false),
                     icon: const Icon(Icons.call, size: 20),
-                    label: const Text('कॉल करें'),
+                    label: Text(t('कॉल करें', 'Call')),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
@@ -391,21 +416,27 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
       ),
       child: Row(
         children: [
-          _statCell(Icons.home, '${o.listingIds.length}', 'कुल कमरे'),
+          _statCell(Icons.home, '${o.listingIds.length}',
+              t('कुल कमरे', 'Total rooms')),
           divider,
-          _statCell(Icons.person, '${o.tenants}', 'कुल किरायेदार'),
+          _statCell(Icons.person, '${o.tenants}',
+              t('कुल किरायेदार', 'Total tenants')),
           divider,
-          _statCell(Icons.calendar_month, '${o.years} साल', 'से RoomMitra पर'),
+          _statCell(Icons.calendar_month, '${o.years} ${t('साल', 'yrs')}',
+              t('से RoomMitra पर', 'on RoomMitra')),
           divider,
           _statCell(
-              Icons.verified, o.verified ? 'हाँ' : 'नहीं', 'एडमिन सत्यापित'),
+              Icons.verified,
+              o.verified ? t('हाँ', 'Yes') : t('नहीं', 'No'),
+              t('एडमिन सत्यापित', 'Admin verified')),
         ],
       ),
     );
   }
 
   Widget _aboutBlock() {
-    final long = o.about.length > 120;
+    final about = o.displayAbout;
+    final long = about.length > 120;
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -416,13 +447,14 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.account_circle, color: AppColors.primary, size: 24),
-              SizedBox(width: 8),
+              const Icon(Icons.account_circle,
+                  color: AppColors.primary, size: 24),
+              const SizedBox(width: 8),
               Text(
-                'मेरे बारे में',
-                style: TextStyle(
+                t('मेरे बारे में', 'About me'),
+                style: const TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w800,
                     color: AppColors.text),
@@ -431,7 +463,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            o.about,
+            about,
             maxLines: (_aboutOpen || !long) ? null : 3,
             overflow: (_aboutOpen || !long)
                 ? TextOverflow.visible
@@ -448,7 +480,9 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      _aboutOpen ? 'कम पढ़ें' : 'और जानें',
+                      _aboutOpen
+                          ? t('कम पढ़ें', 'Read less')
+                          : t('और जानें', 'Read more'),
                       style: const TextStyle(
                           color: AppColors.primary,
                           fontWeight: FontWeight.w700,
@@ -510,13 +544,13 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.shield, color: AppColors.primary, size: 24),
-              SizedBox(width: 8),
+              const Icon(Icons.shield, color: AppColors.primary, size: 24),
+              const SizedBox(width: 8),
               Text(
-                'वेरिफिकेशन',
-                style: TextStyle(
+                t('वेरिफिकेशन', 'Verification'),
+                style: const TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w800,
                     color: AppColors.text),
@@ -528,15 +562,17 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
             spacing: 8,
             runSpacing: 8,
             children: [
-              _checkChip('एडमिन द्वारा सत्यापित', o.verified),
-              _checkChip('मोबाइल नंबर', true),
-              _checkChip('प्रोफाइल फोटो', false),
+              _checkChip(
+                  t('एडमिन द्वारा सत्यापित', 'Verified by admin'), o.verified),
+              _checkChip(t('मोबाइल नंबर', 'Mobile number'), true),
+              _checkChip(t('प्रोफाइल फोटो', 'Profile photo'), false),
             ],
           ),
           const SizedBox(height: 10),
-          const Text(
-            'Verified बैज एडमिन की जाँच के बाद ही मिलता है।',
-            style: TextStyle(fontSize: 12, color: AppColors.muted),
+          Text(
+            t('Verified बैज एडमिन की जाँच के बाद ही मिलता है।',
+                'The Verified badge is given only after admin review.'),
+            style: const TextStyle(fontSize: 12, color: AppColors.muted),
           ),
         ],
       ),
@@ -637,7 +673,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
                   ),
                   const SizedBox(height: 5),
                   Text(
-                    '₹${inr(x.price)}/माह',
+                    '₹${inr(x.price)}${t('/माह', '/month')}',
                     style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w800,
@@ -649,7 +685,8 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
                     runSpacing: 4,
                     children: [
                       _stat(Icons.home_outlined, x.typeLabel),
-                      _stat(Icons.square_foot, '${x.sqft} sq ft'),
+                      _stat(Icons.square_foot,
+                          '${x.sqft} ${t('वर्ग फुट', 'sq ft')}'),
                       _stat(Icons.apartment, x.floor),
                     ],
                   ),
@@ -687,16 +724,18 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'क्या आप भी किराये के कमरे की तलाश में हैं?',
-                  style: TextStyle(
+                Text(
+                  t('क्या आप भी किराये के कमरे की तलाश में हैं?',
+                      'Are you also looking for a room to rent?'),
+                  style: const TextStyle(
                       fontSize: 13.5,
                       fontWeight: FontWeight.w800,
                       color: AppColors.text),
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '${o.name} से सीधे संपर्क करें और अपनी ज़रूरत बताएँ।',
+                  t('${o.name} से सीधे संपर्क करें और अपनी ज़रूरत बताएँ।',
+                      'Contact ${o.nameEn} directly and tell them what you need.'),
                   style: const TextStyle(
                       fontSize: 12, height: 1.3, color: AppColors.text),
                 ),
@@ -707,7 +746,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
           OutlinedButton.icon(
             onPressed: _message,
             icon: const Icon(Icons.chat, size: 16),
-            label: const Text('संदेश'),
+            label: Text(t('संदेश', 'Message')),
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.primary,
               backgroundColor: Colors.white,
@@ -749,17 +788,18 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
                   children: [
                     const Icon(Icons.home, color: AppColors.primary, size: 22),
                     const SizedBox(width: 8),
-                    const Expanded(
+                    Expanded(
                       child: Text(
-                        'इनके द्वारा दिए गए कमरे',
-                        style: TextStyle(
+                        t('इनके द्वारा दिए गए कमरे', 'Rooms listed by them'),
+                        style: const TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.w800,
                             color: AppColors.text),
                       ),
                     ),
                     Text(
-                      'कुल ${items.length} कमरे',
+                      t('कुल ${items.length} कमरे',
+                          '${items.length} rooms in total'),
                       style: const TextStyle(
                           fontSize: 12.5,
                           fontWeight: FontWeight.w700,
