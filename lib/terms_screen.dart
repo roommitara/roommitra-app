@@ -262,18 +262,18 @@ class _TermsScreenState extends State<TermsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final list = _tab == 0 ? _terms : _privacy;
-    final title = _tab == 0
-        ? t('नियम और शर्तें', 'Terms & Conditions')
-        : t('गोपनीयता नीति', 'Privacy Policy');
-    final sub = _tab == 0
-        ? t('RoomMitra इस्तेमाल करने से पहले ये नियम पढ़ें।',
-            'Please read these terms before using RoomMitra.')
-        : t('आपकी जानकारी हमारे पास कैसे सुरक्षित रहती है।',
-            'How your information is kept safe with us.');
     return ValueListenableBuilder<String>(
-      valueListenable: AppLang,
+      valueListenable: AppLang.notifier,
       builder: (context, _, __) {
+        final list = _tab == 0 ? _terms : _privacy;
+        final title = _tab == 0
+            ? t('नियम और शर्तें', 'Terms & Conditions')
+            : t('गोपनीयता नीति', 'Privacy Policy');
+        final sub = _tab == 0
+            ? t('RoomMitra इस्तेमाल करने से पहले ये नियम पढ़ें।',
+                'Please read these terms before using RoomMitra.')
+            : t('आपकी जानकारी हमारे पास कैसे सुरक्षित रहती है।',
+                'How your information is kept safe with us.');
         return Scaffold(
           backgroundColor: const Color(0xFFF7FCF9),
           body: Column(
