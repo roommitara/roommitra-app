@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'app_shell.dart';
 import 'theme.dart';
 import 'otp_service.dart';
@@ -26,10 +28,14 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _otpSent = false;
   bool _sendingOtp = false;
   bool _verifyingOtp = false;
+  bool _googleBusy = false;
+  bool _navigated = false;
 
   String _sentTo = '';
   String? _phoneError;
   String? _otpRequestId;
+
+  StreamSubscription<AuthState>? _authSub;
 
   @override
   void initState() {
@@ -38,10 +44,18 @@ class _LoginScreenState extends State<LoginScreen> {
     _otpFocus.addListener(() {
       if (mounted) setState(() {});
     });
+
+    // Google लॉगिन से लौटने पर (या किसी भी तरह साइन-इन होने पर) होम खोलना
+    _authSub = Supabase.instance.client.auth.onAuthStateChange.listen((data) {
+      if (data.event == AuthChangeEvent.signedIn && data.session != null) {
+        _goHome();
+      }
+    });
   }
 
   @override
   void dispose() {
+    _authSub?.cancel();
     _timer?.cancel();
     _phone.dispose();
     _phoneFocus.dispose();
@@ -63,6 +77,48 @@ class _LoginScreenState extends State<LoginScreen> {
       Navigator.of(context).pop();
     } else {
       SystemNavigator.pop();
+    }
+  }
+
+  void _goHome() {
+    if (!mounted || _navigated) return;
+    _navigated = true;
+    _timer?.cancel();
+    Navigator.of(context).pushReplacement(
+      PageRouteBuilder(
+        pageBuilder: (_, __, ___) => const AppShell(),
+        transitionsBuilder: (_, animation, __, child) {
+          return FadeTransition(
+            opacity: animation,
+            child: child,
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 500),
+      ),
+    );
+  }
+
+  Future<void> _googleLogin() async {
+    if (_googleBusy || _sendingOtp || _verifyingOtp) return;
+    setState(() => _googleBusy = true);
+    try {
+      await Supabase.instance.client.auth.signInWithOAuth(
+        OAuthProvider.google,
+        redirectTo: 'roommitra://login-callback/',
+        authScreenLaunchMode: LaunchMode.externalApplication,
+      );
+    } on AuthException catch (e) {
+      if (mounted) {
+        _msg(t('Google लॉगिन नहीं हो सका: ${e.message}',
+            'Google login failed: ${e.message}'));
+      }
+    } catch (_) {
+      if (mounted) {
+        _msg(t('Google लॉगिन नहीं खुल सका। इंटरनेट जाँचकर फिर कोशिश करें।',
+            'Could not open Google login. Check your internet and try again.'));
+      }
+    } finally {
+      if (mounted) setState(() => _googleBusy = false);
     }
   }
 
@@ -215,22 +271,8 @@ class _LoginScreenState extends State<LoginScreen> {
         return;
       }
 
-      _timer?.cancel();
-
       _msg(t('OTP सत्यापित हो गया।', 'OTP verified.'));
-
-      Navigator.of(context).pushReplacement(
-        PageRouteBuilder(
-          pageBuilder: (_, __, ___) => const AppShell(),
-          transitionsBuilder: (_, animation, __, child) {
-            return FadeTransition(
-              opacity: animation,
-              child: child,
-            );
-          },
-          transitionDuration: const Duration(milliseconds: 500),
-        ),
-      );
+      _goHome();
     } catch (e) {
       if (mounted) {
         _msg(e.toString().replaceFirst('Exception: ', ''));
@@ -898,12 +940,7 @@ class _LoginScreenState extends State<LoginScreen> {
         width: double.infinity,
         height: 52,
         child: OutlinedButton(
-          onPressed: () => _msg(
-            t(
-              'Google लॉगिन बैकएंड जुड़ने पर चालू होगा',
-              'Google login will work once the backend is connected',
-            ),
-          ),
+          onPressed: _googleBusy ? null : _googleLogin,
           style: OutlinedButton.styleFrom(
             backgroundColor: Colors.white,
             side: const BorderSide(
@@ -914,28 +951,37 @@ class _LoginScreenState extends State<LoginScreen> {
               borderRadius: BorderRadius.circular(12),
             ),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                'G',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w800,
-                  color: Color(0xFF4285F4),
+          child: _googleBusy
+              ? const SizedBox(
+                  width: 22,
+                  height: 22,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.5,
+                    color: AppColors.primary,
+                  ),
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'G',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF4285F4),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      t('Google से जारी रखें', 'Continue with Google'),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.text,
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(width: 12),
-              Text(
-                t('Google से जारी रखें', 'Continue with Google'),
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.text,
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );
