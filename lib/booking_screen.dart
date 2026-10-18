@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'data.dart';
 import 'home_screen.dart' show RoomMitraLogo;
 import 'notifications_screen.dart';
+import 'strings.dart';
 import 'theme.dart';
 
 const List<String> _hiMonths = [
@@ -20,6 +21,21 @@ const List<String> _hiMonths = [
   'दिसंबर',
 ];
 
+const List<String> _enMonths = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
+
 const List<String> _hiDays = [
   'सोमवार',
   'मंगलवार',
@@ -30,6 +46,16 @@ const List<String> _hiDays = [
   'रविवार',
 ];
 
+const List<String> _enDays = [
+  'Mon',
+  'Tue',
+  'Wed',
+  'Thu',
+  'Fri',
+  'Sat',
+  'Sun',
+];
+
 const List<String> _slots = [
   '09:00 AM – 10:00 AM',
   '11:00 AM – 12:00 PM',
@@ -37,6 +63,11 @@ const List<String> _slots = [
   '04:00 PM – 05:00 PM',
   '06:00 PM – 07:00 PM',
 ];
+
+String _monthName(DateTime d) =>
+    t(_hiMonths[d.month - 1], _enMonths[d.month - 1]);
+
+String _dayName(DateTime d) => t(_hiDays[d.weekday - 1], _enDays[d.weekday - 1]);
 
 Widget _topBar(BuildContext context) {
   final top = MediaQuery.of(context).padding.top;
@@ -130,7 +161,7 @@ Widget _listingMiniCard(Listing l, {bool showVerified = true}) {
                 ],
               ),
               const SizedBox(height: 6),
-              Text('₹${inr(l.price)}/माह',
+              Text('₹${inr(l.price)}${t('/माह', '/month')}',
                   style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
@@ -140,8 +171,10 @@ Widget _listingMiniCard(Listing l, {bool showVerified = true}) {
                 spacing: 10,
                 runSpacing: 4,
                 children: [
-                  _mini(Icons.bed_outlined, '${l.rooms} Room'),
-                  _mini(Icons.square_foot, '${l.sqft} sq ft'),
+                  _mini(Icons.bed_outlined,
+                      '${l.rooms} ${t('कमरा', 'Room')}'),
+                  _mini(Icons.square_foot,
+                      '${l.sqft} ${t('वर्ग फुट', 'sq ft')}'),
                   _mini(Icons.apartment, '${l.floor}'),
                 ],
               ),
@@ -154,14 +187,14 @@ Widget _listingMiniCard(Listing l, {bool showVerified = true}) {
                     color: AppColors.tint,
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.verified_user,
+                      const Icon(Icons.verified_user,
                           size: 15, color: AppColors.primary),
-                      SizedBox(width: 5),
-                      Text('सत्यापित प्रॉपर्टी',
-                          style: TextStyle(
+                      const SizedBox(width: 5),
+                      Text(t('सत्यापित प्रॉपर्टी', 'Verified property'),
+                          style: const TextStyle(
                               fontSize: 11.5, color: AppColors.text)),
                     ],
                   ),
@@ -210,7 +243,7 @@ class _BookingScreenState extends State<BookingScreen> {
   }
 
   String _dateText(DateTime d) =>
-      '${d.day} ${_hiMonths[d.month - 1]} ${d.year}, ${_hiDays[d.weekday - 1]}';
+      '${d.day} ${_monthName(d)} ${d.year}, ${_dayName(d)}';
 
   Widget _step(int n, String label, bool done, bool active) {
     final on = done || active;
@@ -262,11 +295,11 @@ class _BookingScreenState extends State<BookingScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _step(1, 'कमरा चुनें', true, false),
+          _step(1, t('कमरा चुनें', 'Choose room'), true, false),
           _line(true),
-          _step(2, 'दिन और समय चुनें', false, true),
+          _step(2, t('दिन और समय चुनें', 'Choose day & time'), false, true),
           _line(false),
-          _step(3, 'कन्फर्मेशन', false, false),
+          _step(3, t('कन्फर्मेशन', 'Confirmation'), false, false),
         ],
       ),
     );
@@ -349,14 +382,14 @@ class _BookingScreenState extends State<BookingScreen> {
                           fontSize: 19,
                           fontWeight: FontWeight.w800,
                           color: sel ? Colors.white : AppColors.text)),
-                  Text(_hiMonths[d.month - 1],
+                  Text(_monthName(d),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                           fontSize: 10.5,
                           fontWeight: FontWeight.w700,
                           color: sel ? Colors.white : AppColors.text)),
-                  Text(_hiDays[d.weekday - 1],
+                  Text(_dayName(d),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -451,23 +484,26 @@ class _BookingScreenState extends State<BookingScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.home, color: AppColors.primary, size: 24),
-              SizedBox(width: 8),
-              Text('आपकी बुकिंग का सारांश',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.text)),
+              const Icon(Icons.home, color: AppColors.primary, size: 24),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(t('आपकी बुकिंग का सारांश', 'Your booking summary'),
+                    style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.text)),
+              ),
             ],
           ),
           const SizedBox(height: 12),
-          _summaryItem(Icons.event, 'तारीख', _dateText(_dates[_day])),
+          _summaryItem(
+              Icons.event, t('तारीख', 'Date'), _dateText(_dates[_day])),
           const SizedBox(height: 10),
-          _summaryItem(Icons.schedule, 'समय', _slots[_slot]),
+          _summaryItem(Icons.schedule, t('समय', 'Time'), _slots[_slot]),
           const SizedBox(height: 10),
-          _summaryItem(Icons.apartment, 'प्रॉपर्टी', l.title),
+          _summaryItem(Icons.apartment, t('प्रॉपर्टी', 'Property'), l.title),
           const SizedBox(height: 12),
           Container(
             width: double.infinity,
@@ -476,14 +512,16 @@ class _BookingScreenState extends State<BookingScreen> {
               color: AppColors.tint,
               borderRadius: BorderRadius.circular(10),
             ),
-            child: const Row(
+            child: Row(
               children: [
-                Icon(Icons.info, size: 20, color: AppColors.primary),
-                SizedBox(width: 8),
+                const Icon(Icons.info, size: 20, color: AppColors.primary),
+                const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'कमरा देखने के बाद ही आप बुकिंग की पुष्टि करेंगे।\nइससे पहले कोई भुगतान नहीं करना होगा।',
-                    style: TextStyle(fontSize: 12, color: AppColors.text),
+                    t('कमरा देखने के बाद ही आप बुकिंग की पुष्टि करेंगे।\nइससे पहले कोई भुगतान नहीं करना होगा।',
+                        'You will confirm the booking only after seeing the room.\nNo payment is needed before that.'),
+                    style:
+                        const TextStyle(fontSize: 12, color: AppColors.text),
                   ),
                 ),
               ],
@@ -496,8 +534,9 @@ class _BookingScreenState extends State<BookingScreen> {
             child: ElevatedButton.icon(
               onPressed: _confirm,
               icon: const Icon(Icons.event_available, size: 20),
-              label: const Text('बुकिंग कन्फर्म करें',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+              label: Text(t('बुकिंग कन्फर्म करें', 'Confirm booking'),
+                  style: const TextStyle(
+                      fontSize: 15, fontWeight: FontWeight.w700)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
@@ -517,11 +556,12 @@ class _BookingScreenState extends State<BookingScreen> {
       0,
       NotifItem(
         kind: NotifKind.booking,
-        title: 'बुकिंग अनुरोध भेजा गया',
-        body: '${l.title} देखने का आपका अनुरोध मकान मालिक को भेज दिया गया है।',
+        title: t('बुकिंग अनुरोध भेजा गया', 'Booking request sent'),
+        body: t('${l.title} देखने का आपका अनुरोध मकान मालिक को भेज दिया गया है।',
+            'Your request to view ${l.title} has been sent to the owner.'),
         extra: '${_dateText(_dates[_day])}, ${_slots[_slot].split(' – ').first}',
         extraIcon: Icons.event,
-        time: 'अभी',
+        time: t('अभी', 'Just now'),
         unread: true,
       ),
     );
@@ -556,15 +596,18 @@ class _BookingScreenState extends State<BookingScreen> {
                           const SizedBox(height: 12),
                           _section(
                             icon: Icons.event,
-                            title: 'कमरा देखने की तारीख चुनें',
-                            sub:
+                            title: t('कमरा देखने की तारीख चुनें',
+                                'Choose a date to see the room'),
+                            sub: t(
                                 'कृपया वह दिन चुनें जब आप कमरे को देखने के लिए आ सकते हैं।',
+                                'Please choose the day you can come to see the room.'),
                             child: _dateRow(),
                           ),
                           _section(
                             icon: Icons.schedule,
-                            title: 'समय चुनें',
-                            sub: 'आप किस समय पर कमरे को देखना चाहेंगे?',
+                            title: t('समय चुनें', 'Choose a time'),
+                            sub: t('आप किस समय पर कमरे को देखना चाहेंगे?',
+                                'At what time would you like to see the room?'),
                             child: _slotWrap(),
                           ),
                           _summary(),
@@ -586,7 +629,7 @@ class BookingSuccessScreen extends StatelessWidget {
   final Listing listing;
   const BookingSuccessScreen({super.key, required this.listing});
 
-  Widget _bullet(String t) {
+  Widget _bullet(String text) {
     return Padding(
       padding: const EdgeInsets.only(top: 4),
       child: Row(
@@ -598,7 +641,7 @@ class BookingSuccessScreen extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           Expanded(
-            child: Text(t,
+            child: Text(text,
                 style: const TextStyle(
                     fontSize: 12.5, height: 1.35, color: AppColors.text)),
           ),
@@ -648,47 +691,53 @@ class BookingSuccessScreen extends StatelessWidget {
                           size: 56, color: AppColors.primary),
                     ),
                     const SizedBox(height: 14),
-                    const Text('बधाई हो!',
-                        style: TextStyle(
+                    Text(t('बधाई हो!', 'Congratulations!'),
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
                             fontSize: 34,
                             fontWeight: FontWeight.w800,
                             color: AppColors.primaryDark)),
                     const SizedBox(height: 4),
-                    const Text('आपका विज़िट अनुरोध भेज दिया गया है!',
+                    Text(
+                        t('आपका विज़िट अनुरोध भेज दिया गया है!',
+                            'Your visit request has been sent!'),
                         textAlign: TextAlign.center,
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontSize: 19,
                             fontWeight: FontWeight.w800,
                             color: AppColors.primary)),
                     const SizedBox(height: 10),
-                    const Text(
-                      'अब आप सीधे मकान मालिक से बात कर सकते हैं। कृपया उनसे संपर्क करें और कमरे की आगे की प्रक्रिया पूरी करें।',
+                    Text(
+                      t('अब आप सीधे मकान मालिक से बात कर सकते हैं। कृपया उनसे संपर्क करें और कमरे की आगे की प्रक्रिया पूरी करें।',
+                          'You can now talk to the owner directly. Please contact them and complete the next steps for the room.'),
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                           fontSize: 14, height: 1.4, color: AppColors.text),
                     ),
                     const SizedBox(height: 16),
                     _box(
                       color: AppColors.tintLight,
-                      child: const Row(
+                      child: Row(
                         children: [
-                          Icon(Icons.shield,
+                          const Icon(Icons.shield,
                               size: 34, color: AppColors.primary),
-                          SizedBox(width: 10),
+                          const SizedBox(width: 10),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                    'RoomMitra पर आपको सुरक्षित और भरोसेमंद लिस्टिंग मिलती है।',
-                                    style: TextStyle(
+                                    t('RoomMitra पर आपको सुरक्षित और भरोसेमंद लिस्टिंग मिलती है।',
+                                        'On RoomMitra you get safe and trusted listings.'),
+                                    style: const TextStyle(
                                         fontSize: 13,
                                         fontWeight: FontWeight.w700,
                                         color: AppColors.text)),
-                                SizedBox(height: 2),
+                                const SizedBox(height: 2),
                                 Text(
-                                    'कृपया बातचीत और लेन-देन हमेशा सीधे मकान मालिक से ही करें।',
-                                    style: TextStyle(
+                                    t('कृपया बातचीत और लेन-देन हमेशा सीधे मकान मालिक से ही करें।',
+                                        'Please always talk and deal directly with the owner.'),
+                                    style: const TextStyle(
                                         fontSize: 11.5,
                                         color: AppColors.muted)),
                               ],
@@ -703,8 +752,8 @@ class BookingSuccessScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('मकान मालिक की जानकारी',
-                              style: TextStyle(
+                          Text(t('मकान मालिक की जानकारी', 'Owner details'),
+                              style: const TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w800,
                                   color: AppColors.text)),
@@ -741,15 +790,17 @@ class BookingSuccessScreen extends StatelessWidget {
                                         borderRadius:
                                             BorderRadius.circular(8),
                                       ),
-                                      child: const Row(
+                                      child: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          Icon(Icons.verified,
+                                          const Icon(Icons.verified,
                                               size: 14,
                                               color: AppColors.primary),
-                                          SizedBox(width: 4),
-                                          Text('वेरिफाइड मालिक',
-                                              style: TextStyle(
+                                          const SizedBox(width: 4),
+                                          Text(
+                                              t('वेरिफाइड मालिक',
+                                                  'Verified owner'),
+                                              style: const TextStyle(
                                                   fontSize: 11.5,
                                                   color: AppColors.text)),
                                         ],
@@ -785,8 +836,8 @@ class BookingSuccessScreen extends StatelessWidget {
                                     onPressed: () => contactOwner(context, l,
                                         whatsapp: false),
                                     icon: const Icon(Icons.phone, size: 18),
-                                    label: const Text('कॉल करें',
-                                        style: TextStyle(
+                                    label: Text(t('कॉल करें', 'Call'),
+                                        style: const TextStyle(
                                             fontSize: 13.5,
                                             fontWeight: FontWeight.w700)),
                                     style: ElevatedButton.styleFrom(
@@ -833,25 +884,28 @@ class BookingSuccessScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Row(
+                          Row(
                             children: [
-                              Icon(Icons.info,
+                              const Icon(Icons.info,
                                   size: 22, color: AppColors.primary),
-                              SizedBox(width: 8),
-                              Text('कुछ जरूरी बातें',
-                                  style: TextStyle(
+                              const SizedBox(width: 8),
+                              Text(t('कुछ जरूरी बातें', 'Some important points'),
+                                  style: const TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w800,
                                       color: AppColors.text)),
                             ],
                           ),
                           const SizedBox(height: 4),
-                          _bullet(
-                              'मकान मालिक से बात करने से पहले कमरे की सभी जानकारी अच्छी तरह से जांच लें।'),
-                          _bullet(
-                              'किराया और सिक्योरिटी डिपॉज़िट सीधे मकान मालिक को ही दें।'),
-                          _bullet(
-                              'किसी भी तरह की धोखाधड़ी से बचने के लिए सतर्क रहें।'),
+                          _bullet(t(
+                              'मकान मालिक से बात करने से पहले कमरे की सभी जानकारी अच्छी तरह से जांच लें।',
+                              'Before talking to the owner, check all the room details carefully.')),
+                          _bullet(t(
+                              'किराया और सिक्योरिटी डिपॉज़िट सीधे मकान मालिक को ही दें।',
+                              'Pay rent and security deposit directly to the owner only.')),
+                          _bullet(t(
+                              'किसी भी तरह की धोखाधड़ी से बचने के लिए सतर्क रहें।',
+                              'Stay alert to avoid any kind of fraud.')),
                         ],
                       ),
                     ),
@@ -872,7 +926,12 @@ class BookingSuccessScreen extends StatelessWidget {
                                           : Icons.favorite_border,
                                       size: 20),
                                   label: Text(
-                                      fav ? 'पसंदीदा में सेव है' : 'पसंदीदा में सेव करें',
+                                      fav
+                                          ? t('पसंदीदा में सेव है',
+                                              'Saved to favorites')
+                                          : t('पसंदीदा में सेव करें',
+                                              'Save to favorites'),
+                                      textAlign: TextAlign.center,
                                       style: const TextStyle(
                                           fontSize: 13,
                                           fontWeight: FontWeight.w700)),
@@ -896,8 +955,8 @@ class BookingSuccessScreen extends StatelessWidget {
                                   onPressed: () => Navigator.of(context)
                                       .popUntil((r) => r.isFirst),
                                   icon: const Icon(Icons.home, size: 20),
-                                  label: const Text('होम पर जाएं',
-                                      style: TextStyle(
+                                  label: Text(t('होम पर जाएं', 'Go to Home'),
+                                      style: const TextStyle(
                                           fontSize: 13.5,
                                           fontWeight: FontWeight.w700)),
                                   style: ElevatedButton.styleFrom(
