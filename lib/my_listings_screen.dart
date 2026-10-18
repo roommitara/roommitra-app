@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'data.dart';
 import 'home_screen.dart' show RoomMitraLogo;
+import 'strings.dart';
 import 'theme.dart';
 
 /// डेमो: मालिक की अपनी लिस्टिंग (असली डेटा Supabase जुड़ने पर आएगा)
@@ -20,6 +21,10 @@ class MyListing {
   final int views;
   final int inquiries;
 
+  /// English रूप (खाली हो तो मूल टेक्स्ट ही दिखता है)
+  String titleEn;
+  String descEn;
+
   MyListing({
     required this.id,
     required this.title,
@@ -34,7 +39,16 @@ class MyListing {
     required this.status,
     required this.views,
     required this.inquiries,
+    this.titleEn = '',
+    this.descEn = '',
   });
+
+  /// चुनी हुई भाषा में टाइटल
+  String get displayTitle =>
+      (AppLang.isHindi || titleEn.isEmpty) ? title : titleEn;
+
+  /// चुनी हुई भाषा में विवरण
+  String get displayDesc => (AppLang.isHindi || descEn.isEmpty) ? desc : descEn;
 }
 
 final ValueNotifier<List<MyListing>> myListings =
@@ -42,12 +56,15 @@ final ValueNotifier<List<MyListing>> myListings =
   MyListing(
     id: 'm1',
     title: '1BHK रूम (फर्निश्ड)',
+    titleEn: '1BHK Room (Furnished)',
     area: 'Rani Tal, Nahan',
     price: 6000,
     typeLabel: '1BHK',
     sqft: 450,
     floor: '2nd Floor',
     desc: 'पूरी तरह से फर्निश्ड रूम, अलमारी, वाई-फाई, पार्किंग की सुविधा। शांत और सुरक्षित लोकेशन।',
+    descEn:
+        'Fully furnished room with wardrobe, WiFi and parking. Quiet and safe location.',
     image: 'assets/room1.jpg',
     photos: 8,
     status: 'active',
@@ -57,12 +74,15 @@ final ValueNotifier<List<MyListing>> myListings =
   MyListing(
     id: 'm2',
     title: 'PG (लड़कों के लिए)',
+    titleEn: 'PG (for boys)',
     area: 'Jamta Road, Nahan',
     price: 3500,
     typeLabel: 'Bed (Sharing)',
     sqft: 300,
     floor: '1st Floor',
     desc: 'साफ-सुथरा PG, 24x7 पानी, वाई-फाई, खाना-रहना की सुविधा। कॉलेज और ऑफिस के पास।',
+    descEn:
+        'Clean PG with 24x7 water, WiFi, and food and stay facility. Close to college and offices.',
     image: 'assets/room2.jpg',
     photos: 6,
     status: 'active',
@@ -72,12 +92,15 @@ final ValueNotifier<List<MyListing>> myListings =
   MyListing(
     id: 'm3',
     title: '1RK रूम (सेमी फर्निश्ड)',
+    titleEn: '1RK Room (Semi-furnished)',
     area: 'Sabzi Mandi, Nahan',
     price: 4500,
     typeLabel: '1RK',
     sqft: 250,
     floor: '1st Floor',
     desc: 'सेमी फर्निश्ड रूम, किचन, बाथरूम, बालकनी। बजट फ्रेंडली और अच्छी लोकेशन।',
+    descEn:
+        'Semi-furnished room with kitchen, bathroom and balcony. Budget friendly with a good location.',
     image: 'assets/room1.jpg',
     photos: 5,
     status: 'pending',
@@ -150,21 +173,22 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
             child: const Icon(Icons.person, color: Colors.white, size: 34),
           ),
           const SizedBox(width: 12),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'नमस्ते, मकान मालिक',
-                  style: TextStyle(
+                  t('नमस्ते, मकान मालिक', 'Hello, house owner'),
+                  style: const TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.w800,
                       color: AppColors.text),
                 ),
-                SizedBox(height: 3),
+                const SizedBox(height: 3),
                 Text(
-                  'आपका मालिक डैशबोर्ड',
-                  style: TextStyle(fontSize: 12.5, color: AppColors.text),
+                  t('आपका मालिक डैशबोर्ड', 'Your owner dashboard'),
+                  style:
+                      const TextStyle(fontSize: 12.5, color: AppColors.text),
                 ),
               ],
             ),
@@ -213,13 +237,15 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
     final inq = items.fold<int>(0, (s, m) => s + m.inquiries);
     return Row(
       children: [
-        _statTile(Icons.home, '${items.length}', 'कुल लिस्टिंग'),
+        _statTile(Icons.home, '${items.length}',
+            t('कुल लिस्टिंग', 'Total listings')),
         const SizedBox(width: 8),
-        _statTile(Icons.check_circle_outline, '$active', 'सक्रिय'),
+        _statTile(
+            Icons.check_circle_outline, '$active', t('सक्रिय', 'Active')),
         const SizedBox(width: 8),
-        _statTile(Icons.visibility, '$views', 'कुल व्यूज़'),
+        _statTile(Icons.visibility, '$views', t('कुल व्यूज़', 'Total views')),
         const SizedBox(width: 8),
-        _statTile(Icons.chat_bubble_outline, '$inq', 'पूछताछ'),
+        _statTile(Icons.chat_bubble_outline, '$inq', t('पूछताछ', 'Inquiries')),
       ],
     );
   }
@@ -229,13 +255,13 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
     String text;
     if (status == 'active') {
       bg = AppColors.primary;
-      text = 'सक्रिय';
+      text = t('सक्रिय', 'Active');
     } else if (status == 'inactive') {
       bg = AppColors.muted;
-      text = 'निष्क्रिय';
+      text = t('निष्क्रिय', 'Inactive');
     } else {
       bg = const Color(0xFF8A5A00);
-      text = 'अप्रूवल के लिए लंबित';
+      text = t('अप्रूवल के लिए लंबित', 'Pending approval');
     }
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -268,20 +294,21 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        title: const Text('लिस्टिंग हटाएं?'),
+        title: Text(t('लिस्टिंग हटाएं?', 'Delete listing?')),
         content: Text(
-          '"${m.title}" हमेशा के लिए हट जाएगी। यह वापस नहीं आएगी।',
+          t('"${m.displayTitle}" हमेशा के लिए हट जाएगी। यह वापस नहीं आएगी।',
+              '"${m.displayTitle}" will be deleted permanently. It cannot be restored.'),
           style: const TextStyle(height: 1.4),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('रहने दें'),
+            child: Text(t('रहने दें', 'Keep it')),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('हटाएं',
-                style: TextStyle(color: AppColors.danger)),
+            child: Text(t('हटाएं', 'Delete'),
+                style: const TextStyle(color: AppColors.danger)),
           ),
         ],
       ),
@@ -289,7 +316,9 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
     if (ok == true) {
       myListings.value =
           myListings.value.where((x) => x.id != m.id).toList();
-      if (mounted) showMsg(context, 'लिस्टिंग हटा दी गई');
+      if (mounted) {
+        showMsg(context, t('लिस्टिंग हटा दी गई', 'Listing deleted'));
+      }
     }
   }
 
@@ -368,7 +397,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
                                   size: 13, color: Colors.white),
                               const SizedBox(width: 4),
                               Text(
-                                '${m.photos} फोटो',
+                                t('${m.photos} फोटो', '${m.photos} photos'),
                                 style: const TextStyle(
                                     fontSize: 11,
                                     color: Colors.white,
@@ -388,7 +417,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      m.title,
+                      m.displayTitle,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
@@ -437,7 +466,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            '₹${inr(m.price)}/माह',
+                            '₹${inr(m.price)}${t('/माह', '/month')}',
                             style: const TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w800,
@@ -458,20 +487,25 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
             runSpacing: 8,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              _actionBtn(Icons.edit, 'बदलें', () {
+              _actionBtn(Icons.edit, t('बदलें', 'Edit'), () {
                 Navigator.of(context).push(
                   MaterialPageRoute<void>(
                     builder: (_) => EditListingScreen(item: m),
                   ),
                 );
               }),
-              _actionBtn(Icons.photo_library, 'फोटो', () {
-                showMsg(context, 'फोटो अपडेट की सुविधा Supabase जुड़ने पर आएगी');
+              _actionBtn(Icons.photo_library, t('फोटो', 'Photos'), () {
+                showMsg(
+                    context,
+                    t('फोटो अपडेट की सुविधा Supabase जुड़ने पर आएगी',
+                        'Photo update will be available once Supabase is connected'));
               }),
               GestureDetector(
                 onTap: pending
-                    ? () => showMsg(context,
-                        'एडमिन के approve करने के बाद ही लिस्टिंग सक्रिय होगी')
+                    ? () => showMsg(
+                        context,
+                        t('एडमिन के approve करने के बाद ही लिस्टिंग सक्रिय होगी',
+                            'The listing will become active only after the admin approves it'))
                     : null,
                 child: Container(
                   height: 40,
@@ -484,7 +518,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        active ? 'सक्रिय' : 'निष्क्रिय',
+                        active ? t('सक्रिय', 'Active') : t('निष्क्रिय', 'Inactive'),
                         style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w700,
@@ -501,7 +535,8 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
                   ),
                 ),
               ),
-              _actionBtn(Icons.delete_outline, 'हटाएं', () => _confirmDelete(m),
+              _actionBtn(
+                  Icons.delete_outline, t('हटाएं', 'Delete'), () => _confirmDelete(m),
                   color: AppColors.danger),
             ],
           ),
@@ -511,24 +546,26 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
   }
 
   Widget _empty() {
-    return const Padding(
-      padding: EdgeInsets.fromLTRB(24, 40, 24, 40),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 40, 24, 40),
       child: Column(
         children: [
-          Icon(Icons.home_work_outlined, size: 64, color: AppColors.muted),
-          SizedBox(height: 12),
+          const Icon(Icons.home_work_outlined,
+              size: 64, color: AppColors.muted),
+          const SizedBox(height: 12),
           Text(
-            'अभी कोई लिस्टिंग नहीं है',
-            style: TextStyle(
+            t('अभी कोई लिस्टिंग नहीं है', 'No listings yet'),
+            style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w800,
                 color: AppColors.text),
           ),
-          SizedBox(height: 6),
+          const SizedBox(height: 6),
           Text(
-            'नीचे के बटन से अपना पहला कमरा जोड़ें।',
+            t('नीचे के बटन से अपना पहला कमरा जोड़ें।',
+                'Add your first room using the button below.'),
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 14, color: AppColors.muted),
+            style: const TextStyle(fontSize: 14, color: AppColors.muted),
           ),
         ],
       ),
@@ -537,6 +574,13 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    return ValueListenableBuilder<String>(
+      valueListenable: AppLang.notifier,
+      builder: (context, lang, _) => _buildBody(context),
+    );
+  }
+
+  Widget _buildBody(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF7FCF9),
       body: Column(
@@ -560,7 +604,8 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
                             color: AppColors.primary, size: 22),
                         const SizedBox(width: 8),
                         Text(
-                          'मेरी लिस्टिंग (${items.length})',
+                          t('मेरी लिस्टिंग (${items.length})',
+                              'My listings (${items.length})'),
                           style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w800,
@@ -597,7 +642,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
                   widget.onAdd();
                 },
                 icon: const Icon(Icons.add_circle_outline, size: 22),
-                label: const Text('नई लिस्टिंग जोड़ें'),
+                label: Text(t('नई लिस्टिंग जोड़ें', 'Add new listing')),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
@@ -639,12 +684,12 @@ class _EditListingScreenState extends State<EditListingScreen> {
   void initState() {
     super.initState();
     final m = widget.item;
-    _title = TextEditingController(text: m.title);
+    _title = TextEditingController(text: m.displayTitle);
     _area = TextEditingController(text: m.area);
     _rent = TextEditingController(text: '${m.price}');
     _sqft = TextEditingController(text: '${m.sqft}');
     _floor = TextEditingController(text: m.floor);
-    _desc = TextEditingController(text: m.desc);
+    _desc = TextEditingController(text: m.displayDesc);
   }
 
   @override
@@ -658,30 +703,38 @@ class _EditListingScreenState extends State<EditListingScreen> {
   void _save() {
     final rent = int.tryParse(_rent.text.trim()) ?? 0;
     if (_title.text.trim().length < 3) {
-      showMsg(context, 'लिस्टिंग का शीर्षक लिखें');
+      showMsg(context, t('लिस्टिंग का शीर्षक लिखें', 'Enter the listing title'));
       return;
     }
     if (_area.text.trim().isEmpty) {
-      showMsg(context, 'इलाका/एरिया लिखें');
+      showMsg(context, t('इलाका/एरिया लिखें', 'Enter the area/locality'));
       return;
     }
     if (rent < 500) {
-      showMsg(context, 'सही किराया लिखें (कम से कम ₹500)');
+      showMsg(
+          context,
+          t('सही किराया लिखें (कम से कम ₹500)',
+              'Enter a valid rent (at least ₹500)'));
       return;
     }
     if (_desc.text.trim().length < 10) {
-      showMsg(context, 'विवरण कम से कम 10 अक्षर का लिखें');
+      showMsg(
+          context,
+          t('विवरण कम से कम 10 अक्षर का लिखें',
+              'Write a description of at least 10 characters'));
       return;
     }
     final m = widget.item;
     m.title = _title.text.trim();
+    m.titleEn = '';
     m.area = _area.text.trim();
     m.price = rent;
     m.sqft = int.tryParse(_sqft.text.trim()) ?? m.sqft;
     m.floor = _floor.text.trim().isEmpty ? m.floor : _floor.text.trim();
     m.desc = _desc.text.trim();
+    m.descEn = '';
     _refresh();
-    showMsg(context, 'बदलाव सेव हो गए');
+    showMsg(context, t('बदलाव सेव हो गए', 'Changes saved'));
     Navigator.of(context).pop();
   }
 
@@ -741,6 +794,13 @@ class _EditListingScreenState extends State<EditListingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    return ValueListenableBuilder<String>(
+      valueListenable: AppLang.notifier,
+      builder: (context, lang, _) => _buildBody(context),
+    );
+  }
+
+  Widget _buildBody(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF7FCF9),
       body: Column(
@@ -761,13 +821,14 @@ class _EditListingScreenState extends State<EditListingScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Row(
+                    Row(
                       children: [
-                        Icon(Icons.edit, color: AppColors.primary, size: 22),
-                        SizedBox(width: 8),
+                        const Icon(Icons.edit,
+                            color: AppColors.primary, size: 22),
+                        const SizedBox(width: 8),
                         Text(
-                          'लिस्टिंग बदलें',
-                          style: TextStyle(
+                          t('लिस्टिंग बदलें', 'Edit listing'),
+                          style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w800,
                               color: AppColors.text),
@@ -775,18 +836,21 @@ class _EditListingScreenState extends State<EditListingScreen> {
                       ],
                     ),
                     const SizedBox(height: 14),
-                    _field('शीर्षक', _title),
-                    _field('इलाका/एरिया', _area, maxLength: 60),
-                    _field('किराया (₹ प्रति माह)', _rent,
+                    _field(t('शीर्षक', 'Title'), _title),
+                    _field(t('इलाका/एरिया', 'Area/Locality'), _area,
+                        maxLength: 60),
+                    _field(t('किराया (₹ प्रति माह)', 'Rent (₹ per month)'),
+                        _rent,
                         keyboard: TextInputType.number,
                         maxLength: 6,
                         digitsOnly: true),
-                    _field('एरिया (sq ft)', _sqft,
+                    _field(t('एरिया (sq ft)', 'Area (sq ft)'), _sqft,
                         keyboard: TextInputType.number,
                         maxLength: 5,
                         digitsOnly: true),
-                    _field('मंज़िल', _floor, maxLength: 20),
-                    _field('विवरण', _desc, maxLength: 500, maxLines: 4),
+                    _field(t('मंज़िल', 'Floor'), _floor, maxLength: 20),
+                    _field(t('विवरण', 'Description'), _desc,
+                        maxLength: 500, maxLines: 4),
                   ],
                 ),
               ),
@@ -810,7 +874,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
               child: ElevatedButton.icon(
                 onPressed: _save,
                 icon: const Icon(Icons.check, size: 22),
-                label: const Text('बदलाव सेव करें'),
+                label: Text(t('बदलाव सेव करें', 'Save changes')),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
