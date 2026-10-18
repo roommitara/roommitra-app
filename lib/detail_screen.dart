@@ -5,6 +5,7 @@ import 'home_screen.dart' show RoomMitraLogo;
 import 'booking_screen.dart';
 import 'owner_profile_screen.dart';
 import 'report_screen.dart';
+import 'strings.dart';
 import 'theme.dart';
 
 /// किसी कमरे की सभी फोटो (डेमो में असली फोटो + नाहन की नमूना फोटो)
@@ -110,7 +111,7 @@ class _DetailScreenState extends State<DetailScreen> {
         Uri.parse('https://www.google.com/maps/search/?api=1&query=$q');
     final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
     if (!ok && mounted) {
-      showMsg(context, 'मैप नहीं खुल सका');
+      showMsg(context, t('मैप नहीं खुल सका', 'Could not open the map'));
     }
   }
 
@@ -132,8 +133,10 @@ class _DetailScreenState extends State<DetailScreen> {
           },
         ),
         IconButton(
-          onPressed: () =>
-              showMsg(context, 'शेयर करने की सुविधा बाद में जुड़ेगी'),
+          onPressed: () => showMsg(
+              context,
+              t('शेयर करने की सुविधा बाद में जुड़ेगी',
+                  'Share option will be added later')),
           icon: const Icon(Icons.share, color: Colors.white),
         ),
         PopupMenuButton<String>(
@@ -147,10 +150,11 @@ class _DetailScreenState extends State<DetailScreen> {
               );
             }
           },
-          itemBuilder: (_) => const [
+          itemBuilder: (_) => [
             PopupMenuItem<String>(
               value: 'report',
-              child: Text('नकली लिस्टिंग रिपोर्ट करें'),
+              child: Text(
+                  t('नकली लिस्टिंग रिपोर्ट करें', 'Report fake listing')),
             ),
           ],
         ),
@@ -250,13 +254,15 @@ class _DetailScreenState extends State<DetailScreen> {
                   color: AppColors.primaryDark,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Column(
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.photo_library, color: Colors.white, size: 20),
-                    SizedBox(height: 2),
-                    Text('सभी फोटो',
-                        style: TextStyle(color: Colors.white, fontSize: 11)),
+                    const Icon(Icons.photo_library,
+                        color: Colors.white, size: 20),
+                    const SizedBox(height: 2),
+                    Text(t('सभी फोटो', 'All photos'),
+                        style: const TextStyle(
+                            color: Colors.white, fontSize: 11)),
                   ],
                 ),
               ),
@@ -313,7 +319,7 @@ class _DetailScreenState extends State<DetailScreen> {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
-                '₹${inr(l.price)}/माह',
+                '₹${inr(l.price)}${t('/माह', '/month')}',
                 style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
@@ -383,9 +389,9 @@ class _DetailScreenState extends State<DetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'विवरण',
-          style: TextStyle(
+        Text(
+          t('विवरण', 'Description'),
+          style: const TextStyle(
               fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.text),
         ),
         const SizedBox(height: 6),
@@ -407,7 +413,9 @@ class _DetailScreenState extends State<DetailScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    _expanded ? 'कम पढ़ें' : 'और पढ़ें',
+                    _expanded
+                        ? t('कम पढ़ें', 'Read less')
+                        : t('और पढ़ें', 'Read more'),
                     style: const TextStyle(
                         color: AppColors.primary,
                         fontWeight: FontWeight.w700,
@@ -441,9 +449,9 @@ class _DetailScreenState extends State<DetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'सुविधाएँ',
-            style: TextStyle(
+          Text(
+            t('सुविधाएँ', 'Amenities'),
+            style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w800,
                 color: AppColors.text),
@@ -518,8 +526,9 @@ class _DetailScreenState extends State<DetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('मकान मालिक',
-                      style: TextStyle(fontSize: 12, color: AppColors.muted)),
+                  Text(t('मकान मालिक', 'House owner'),
+                      style: const TextStyle(
+                          fontSize: 12, color: AppColors.muted)),
                   Text(
                     o.name,
                     style: const TextStyle(
@@ -561,7 +570,7 @@ class _DetailScreenState extends State<DetailScreen> {
                   children: [
                     const Icon(Icons.star, size: 16, color: AppColors.primary),
                     const SizedBox(width: 4),
-                    Text('${o.rating} (डेमो)',
+                    Text('${o.rating} ${t('(डेमो)', '(demo)')}',
                         style: const TextStyle(
                             fontSize: 12.5, color: AppColors.text)),
                   ],
@@ -572,7 +581,7 @@ class _DetailScreenState extends State<DetailScreen> {
                     const Icon(Icons.calendar_month,
                         size: 16, color: AppColors.primary),
                     const SizedBox(width: 4),
-                    Text('${o.years}+ साल',
+                    Text(t('${o.years}+ साल', '${o.years}+ years'),
                         style: const TextStyle(
                             fontSize: 12.5, color: AppColors.text)),
                   ],
@@ -610,8 +619,8 @@ class _DetailScreenState extends State<DetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('लोकेशन',
-                    style: TextStyle(
+                Text(t('लोकेशन', 'Location'),
+                    style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w800,
                         color: AppColors.text)),
@@ -629,9 +638,9 @@ class _DetailScreenState extends State<DetailScreen> {
                       color: AppColors.tint,
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Text(
-                      'Google Maps पर देखें',
-                      style: TextStyle(
+                    child: Text(
+                      t('Google Maps पर देखें', 'View on Google Maps'),
+                      style: const TextStyle(
                           fontSize: 12.5,
                           fontWeight: FontWeight.w700,
                           color: AppColors.primary),
@@ -653,24 +662,27 @@ class _DetailScreenState extends State<DetailScreen> {
         color: AppColors.tint,
         borderRadius: BorderRadius.circular(16),
       ),
-      child: const Row(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.shield, color: AppColors.primary, size: 28),
-          SizedBox(width: 12),
+          const Icon(Icons.shield, color: AppColors.primary, size: 28),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('सुरक्षित किराया अनुभव',
-                    style: TextStyle(
+                Text(t('सुरक्षित किराया अनुभव', 'Safe renting experience'),
+                    style: const TextStyle(
                         fontSize: 14.5,
                         fontWeight: FontWeight.w800,
                         color: AppColors.text)),
-                SizedBox(height: 2),
+                const SizedBox(height: 2),
                 Text(
-                  'किराया और डिपॉजिट सीधे मालिक से तय करें। एडवांस देने से पहले कमरा ज़रूर देखें।',
-                  style: TextStyle(
+                  t(
+                    'किराया और डिपॉजिट सीधे मालिक से तय करें। एडवांस देने से पहले कमरा ज़रूर देखें।',
+                    'Fix the rent and deposit directly with the owner. Always see the room before paying any advance.',
+                  ),
+                  style: const TextStyle(
                       fontSize: 12.5, height: 1.4, color: AppColors.text),
                 ),
               ],
@@ -705,7 +717,7 @@ class _DetailScreenState extends State<DetailScreen> {
                 ),
               ),
               icon: const Icon(Icons.calendar_month, size: 20),
-              label: const Text('विज़िट का समय चुनें'),
+              label: Text(t('विज़िट का समय चुनें', 'Choose visit time')),
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.primary,
                 side: const BorderSide(color: AppColors.primary, width: 1.2),
@@ -725,7 +737,7 @@ class _DetailScreenState extends State<DetailScreen> {
                   child: OutlinedButton.icon(
                     onPressed: () => contactOwner(context, l, whatsapp: true),
                     icon: const Icon(Icons.chat, size: 20),
-                    label: const Text('WhatsApp करें'),
+                    label: Text(t('WhatsApp करें', 'WhatsApp')),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.primary,
                       side: const BorderSide(
@@ -745,7 +757,7 @@ class _DetailScreenState extends State<DetailScreen> {
                   child: ElevatedButton.icon(
                     onPressed: () => contactOwner(context, l, whatsapp: false),
                     icon: const Icon(Icons.call, size: 20),
-                    label: const Text('कॉल करें'),
+                    label: Text(t('कॉल करें', 'Call')),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
@@ -766,47 +778,52 @@ class _DetailScreenState extends State<DetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Column(
-        children: [
-          _topBar(),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _hero(),
-                  const SizedBox(height: 10),
-                  _thumbs(),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _titleBlock(),
-                        const SizedBox(height: 14),
-                        _statsRow(),
-                        const SizedBox(height: 16),
-                        _descBlock(),
-                        const SizedBox(height: 16),
-                        _amenitiesBlock(),
-                        const SizedBox(height: 16),
-                        _ownerBlock(),
-                        const SizedBox(height: 16),
-                        _locationBlock(),
-                        const SizedBox(height: 16),
-                        _safetyNote(),
-                      ],
-                    ),
+    return ValueListenableBuilder<String>(
+      valueListenable: AppLang.notifier,
+      builder: (context, lang, _) {
+        return Scaffold(
+          backgroundColor: Colors.white,
+          body: Column(
+            children: [
+              _topBar(),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _hero(),
+                      const SizedBox(height: 10),
+                      _thumbs(),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _titleBlock(),
+                            const SizedBox(height: 14),
+                            _statsRow(),
+                            const SizedBox(height: 16),
+                            _descBlock(),
+                            const SizedBox(height: 16),
+                            _amenitiesBlock(),
+                            const SizedBox(height: 16),
+                            _ownerBlock(),
+                            const SizedBox(height: 16),
+                            _locationBlock(),
+                            const SizedBox(height: 16),
+                            _safetyNote(),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
+              _bottomBar(),
+            ],
           ),
-          _bottomBar(),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -823,6 +840,13 @@ class PhotoGalleryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return ValueListenableBuilder<String>(
+      valueListenable: AppLang.notifier,
+      builder: (context, lang, _) => _body(context),
+    );
+  }
+
+  Widget _body(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF7FCF9),
       body: Column(
@@ -858,7 +882,7 @@ class PhotoGalleryScreen extends StatelessWidget {
                             color: AppColors.text),
                       ),
                       Text(
-                        '₹${inr(listing.price)}/माह',
+                        '₹${inr(listing.price)}${t('/माह', '/month')}',
                         style: const TextStyle(
                             fontSize: 13.5,
                             fontWeight: FontWeight.w700,
@@ -877,10 +901,10 @@ class PhotoGalleryScreen extends StatelessWidget {
                 const Icon(Icons.photo_library,
                     color: AppColors.primary, size: 22),
                 const SizedBox(width: 8),
-                const Expanded(
+                Expanded(
                   child: Text(
-                    'फोटो गैलरी',
-                    style: TextStyle(
+                    t('फोटो गैलरी', 'Photo gallery'),
+                    style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w800,
                         color: AppColors.text),
@@ -894,7 +918,7 @@ class PhotoGalleryScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: Text(
-                    '${images.length} तस्वीरें',
+                    t('${images.length} तस्वीरें', '${images.length} photos'),
                     style: const TextStyle(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w700,
@@ -966,7 +990,7 @@ class PhotoGalleryScreen extends StatelessWidget {
               child: ElevatedButton.icon(
                 onPressed: () => contactOwner(context, listing, whatsapp: false),
                 icon: const Icon(Icons.call, size: 20),
-                label: const Text('मालिक को कॉल करें'),
+                label: Text(t('मालिक को कॉल करें', 'Call owner')),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
