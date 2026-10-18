@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'data.dart';
 import 'detail_screen.dart';
 import 'home_screen.dart' show RoomMitraLogo;
+import 'strings.dart';
 import 'theme.dart';
 
 class ChatMsg {
@@ -32,6 +33,13 @@ class Conversation {
   });
 
   ChatMsg get last => msgs.last;
+
+  String get roleLabel {
+    if (role == 'मकान मालिक' || role == 'owner') {
+      return t('मकान मालिक', 'Owner');
+    }
+    return t('किरायेदार', 'Tenant');
+  }
 }
 
 /// डेमो चैट (असली चैट Supabase जुड़ने पर आएगी)
@@ -196,12 +204,16 @@ class _MessagesScreenState extends State<MessagesScreen> {
               Icon(icon,
                   size: 20, color: sel ? Colors.white : AppColors.primary),
               const SizedBox(width: 6),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                  color: sel ? Colors.white : AppColors.primary,
+              Flexible(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: sel ? Colors.white : AppColors.primary,
+                  ),
                 ),
               ),
               if (badge > 0) ...[
@@ -239,9 +251,10 @@ class _MessagesScreenState extends State<MessagesScreen> {
       ),
       child: Row(
         children: [
-          _tabBtn(0, Icons.chat_bubble_outline, 'संदेश', badge: unread),
-          _tabBtn(1, Icons.archive_outlined, 'आर्काइव'),
-          _tabBtn(2, Icons.block, 'ब्लॉक्ड'),
+          _tabBtn(0, Icons.chat_bubble_outline, t('संदेश', 'Messages'),
+              badge: unread),
+          _tabBtn(1, Icons.archive_outlined, t('आर्काइव', 'Archive')),
+          _tabBtn(2, Icons.block, t('ब्लॉक्ड', 'Blocked')),
         ],
       ),
     );
@@ -265,11 +278,12 @@ class _MessagesScreenState extends State<MessagesScreen> {
               controller: _q,
               onChanged: (_) => setState(() {}),
               style: const TextStyle(fontSize: 14.5, color: AppColors.text),
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 border: InputBorder.none,
                 isDense: true,
-                hintText: 'किसी से चैट खोजें...',
-                hintStyle: TextStyle(fontSize: 14.5, color: AppColors.muted),
+                hintText: t('किसी से चैट खोजें...', 'Search chats...'),
+                hintStyle:
+                    const TextStyle(fontSize: 14.5, color: AppColors.muted),
               ),
             ),
           ),
@@ -338,7 +352,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
-                          c.role,
+                          c.roleLabel,
                           style: const TextStyle(
                               fontSize: 10.5,
                               fontWeight: FontWeight.w700,
@@ -350,8 +364,10 @@ class _MessagesScreenState extends State<MessagesScreen> {
                   const SizedBox(height: 4),
                   Text(
                     last.mine
-                        ? 'आप: ${last.text}'
-                        : (last.location ? 'लोकेशन भेजी गई' : last.text),
+                        ? '${t('आप', 'You')}: ${last.text}'
+                        : (last.location
+                            ? t('लोकेशन भेजी गई', 'Location shared')
+                            : last.text),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
@@ -367,7 +383,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                           size: 16, color: AppColors.primary),
                       const SizedBox(width: 4),
                       Text(
-                        'आज ${last.time}',
+                        '${t('आज', 'Today')} ${last.time}',
                         style: const TextStyle(
                             fontSize: 11.5, color: AppColors.muted),
                       ),
@@ -409,9 +425,9 @@ class _MessagesScreenState extends State<MessagesScreen> {
       Icons.block,
     ];
     final texts = [
-      'अभी कोई संदेश नहीं है',
-      'आर्काइव खाली है',
-      'कोई ब्लॉक किया हुआ यूज़र नहीं है',
+      t('अभी कोई संदेश नहीं है', 'No messages yet'),
+      t('आर्काइव खाली है', 'Archive is empty'),
+      t('कोई ब्लॉक किया हुआ यूज़र नहीं है', 'No blocked users'),
     ];
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 48, 24, 24),
@@ -511,10 +527,10 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _send(String text, {bool location = false}) {
-    final t = text.trim();
-    if (t.isEmpty) return;
+    final txt = text.trim();
+    if (txt.isEmpty) return;
     setState(() {
-      c.msgs.add(ChatMsg(t, true, _nowTime(), location: location));
+      c.msgs.add(ChatMsg(txt, true, _nowTime(), location: location));
     });
     _refreshConv();
     _ctrl.clear();
@@ -523,25 +539,25 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void _onMenu(String v) {
     final messenger = ScaffoldMessenger.of(context);
-    void toast(String t) {
+    void toast(String msg) {
       messenger.hideCurrentSnackBar();
-      messenger.showSnackBar(SnackBar(content: Text(t)));
+      messenger.showSnackBar(SnackBar(content: Text(msg)));
     }
 
     if (v == 'archive') {
       c.status = 'archive';
       _refreshConv();
       Navigator.of(context).pop();
-      toast('चैट आर्काइव में चली गई');
+      toast(t('चैट आर्काइव में चली गई', 'Chat moved to archive'));
     } else if (v == 'block') {
       c.status = 'blocked';
       _refreshConv();
       Navigator.of(context).pop();
-      toast('${c.name} को ब्लॉक कर दिया गया');
+      toast(t('${c.name} को ब्लॉक कर दिया गया', '${c.name} has been blocked'));
     } else if (v == 'restore') {
       setState(() => c.status = 'inbox');
       _refreshConv();
-      toast('चैट इनबॉक्स में वापस आ गई');
+      toast(t('चैट इनबॉक्स में वापस आ गई', 'Chat moved back to inbox'));
     }
   }
 
@@ -549,18 +565,19 @@ class _ChatScreenState extends State<ChatScreen> {
     final l = _listingOf(c.listingId);
     final items = <PopupMenuEntry<String>>[];
     if (c.status == 'inbox') {
-      items.add(const PopupMenuItem<String>(
-          value: 'archive', child: Text('आर्काइव करें')));
-      items.add(const PopupMenuItem<String>(
-          value: 'block', child: Text('ब्लॉक करें')));
+      items.add(PopupMenuItem<String>(
+          value: 'archive', child: Text(t('आर्काइव करें', 'Archive'))));
+      items.add(PopupMenuItem<String>(
+          value: 'block', child: Text(t('ब्लॉक करें', 'Block'))));
     } else if (c.status == 'archive') {
-      items.add(const PopupMenuItem<String>(
-          value: 'restore', child: Text('इनबॉक्स में लाएं')));
-      items.add(const PopupMenuItem<String>(
-          value: 'block', child: Text('ब्लॉक करें')));
+      items.add(PopupMenuItem<String>(
+          value: 'restore',
+          child: Text(t('इनबॉक्स में लाएं', 'Move to inbox'))));
+      items.add(PopupMenuItem<String>(
+          value: 'block', child: Text(t('ब्लॉक करें', 'Block'))));
     } else {
-      items.add(const PopupMenuItem<String>(
-          value: 'restore', child: Text('अनब्लॉक करें')));
+      items.add(PopupMenuItem<String>(
+          value: 'restore', child: Text(t('अनब्लॉक करें', 'Unblock'))));
     }
     return Container(
       decoration: const BoxDecoration(
@@ -602,7 +619,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       color: Colors.white),
                 ),
                 Text(
-                  '${c.role} · ${l.typeLabel}',
+                  '${c.roleLabel} · ${l.typeLabel}',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style:
@@ -612,8 +629,10 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           ),
           IconButton(
-            onPressed: () => showMsg(context,
-                'कॉल की सुविधा Supabase जुड़ने पर आएगी। अभी कमरे की डिटेल से कॉल करें'),
+            onPressed: () => showMsg(
+                context,
+                t('कॉल की सुविधा Supabase जुड़ने पर आएगी। अभी कमरे की डिटेल से कॉल करें',
+                    'Calling will come once Supabase is connected. For now, call from the room details')),
             icon: const Icon(Icons.call, color: Colors.white),
           ),
           PopupMenuButton<String>(
@@ -640,7 +659,8 @@ class _ChatScreenState extends State<ChatScreen> {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(10),
-            child: Image.asset(l.image, width: 66, height: 56, fit: BoxFit.cover),
+            child:
+                Image.asset(l.image, width: 66, height: 56, fit: BoxFit.cover),
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -665,7 +685,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '₹${inr(l.price)}/माह',
+                  '₹${inr(l.price)}${t('/माह', '/month')}',
                   style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w800,
@@ -688,15 +708,15 @@ class _ChatScreenState extends State<ChatScreen> {
                 color: AppColors.tint,
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('विवरण देखें',
-                      style: TextStyle(
+                  Text(t('विवरण देखें', 'View details'),
+                      style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
                           color: AppColors.primary)),
-                  Icon(Icons.chevron_right,
+                  const Icon(Icons.chevron_right,
                       size: 16, color: AppColors.primary),
                 ],
               ),
@@ -739,7 +759,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   const SizedBox(width: 6),
                   Flexible(
                     child: Text(
-                      'लोकेशन: ${m.text}',
+                      '${t('लोकेशन', 'Location')}: ${m.text}',
                       style: const TextStyle(
                           fontSize: 14.5,
                           height: 1.4,
@@ -815,15 +835,17 @@ class _ChatScreenState extends State<ChatScreen> {
           children: [
             const Icon(Icons.block, color: AppColors.danger, size: 22),
             const SizedBox(width: 10),
-            const Expanded(
+            Expanded(
               child: Text(
-                'आपने इस यूज़र को ब्लॉक किया है',
-                style: TextStyle(fontSize: 13.5, color: AppColors.text),
+                t('आपने इस यूज़र को ब्लॉक किया है',
+                    'You have blocked this user'),
+                style:
+                    const TextStyle(fontSize: 13.5, color: AppColors.text),
               ),
             ),
             TextButton(
               onPressed: () => _onMenu('restore'),
-              child: const Text('अनब्लॉक करें'),
+              child: Text(t('अनब्लॉक करें', 'Unblock')),
             ),
           ],
         ),
@@ -840,15 +862,23 @@ class _ChatScreenState extends State<ChatScreen> {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                _quickBtn(Icons.location_on, 'लोकेशन शेयर करें',
+                _quickBtn(Icons.location_on,
+                    t('लोकेशन शेयर करें', 'Share location'),
                     () => _send(l.area, location: true)),
                 _quickBtn(
                     Icons.call,
-                    'कॉल करें',
-                    () => showMsg(context,
-                        'कॉल करने के लिए कमरे की डिटेल स्क्रीन में "कॉल करें" दबाएँ')),
-                _quickBtn(Icons.image, 'फोटो भेजें',
-                    () => showMsg(context, 'फोटो भेजना Supabase जुड़ने पर आएगा')),
+                    t('कॉल करें', 'Call'),
+                    () => showMsg(
+                        context,
+                        t('कॉल करने के लिए कमरे की डिटेल स्क्रीन में "कॉल करें" दबाएँ',
+                            'To call, tap "Call" on the room details screen'))),
+                _quickBtn(
+                    Icons.image,
+                    t('फोटो भेजें', 'Send photo'),
+                    () => showMsg(
+                        context,
+                        t('फोटो भेजना Supabase जुड़ने पर आएगा',
+                            'Sending photos will come once Supabase is connected'))),
               ],
             ),
           ),
@@ -870,12 +900,12 @@ class _ChatScreenState extends State<ChatScreen> {
                     textInputAction: TextInputAction.send,
                     style:
                         const TextStyle(fontSize: 14.5, color: AppColors.text),
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       border: InputBorder.none,
                       isDense: true,
-                      hintText: 'यहाँ संदेश लिखें...',
-                      hintStyle:
-                          TextStyle(fontSize: 14.5, color: AppColors.muted),
+                      hintText: t('यहाँ संदेश लिखें...', 'Type a message...'),
+                      hintStyle: const TextStyle(
+                          fontSize: 14.5, color: AppColors.muted),
                     ),
                   ),
                 ),
