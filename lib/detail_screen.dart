@@ -188,8 +188,7 @@ class _DetailScreenState extends State<DetailScreen> {
           itemBuilder: (_) => [
             PopupMenuItem<String>(
               value: 'report',
-              child: Text(
-                  t('नकली लिस्टिंग रिपोर्ट करें', 'Report fake listing')),
+              child: Text(t('कमरा रिपोर्ट करें', 'Report room')),
             ),
           ],
         ),
