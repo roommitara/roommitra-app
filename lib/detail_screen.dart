@@ -8,8 +8,13 @@ import 'report_screen.dart';
 import 'strings.dart';
 import 'theme.dart';
 
-/// किसी कमरे की सभी फोटो (डेमो में असली फोटो + नाहन की नमूना फोटो)
+/// Supabase से आया असली कमरा है या डेमो कमरा?
+bool _isRealListing(Listing l) => l.ownerId.isNotEmpty;
+
+/// किसी कमरे की सभी फोटो। असली कमरे की अपनी फोटो, डेमो में नमूना फोटो।
 List<String> galleryOf(Listing l) {
+  if (l.photoUrls.isNotEmpty) return List<String>.from(l.photoUrls);
+  if (_isRealListing(l)) return <String>[l.image];
   final all = <String>[
     l.image,
     'assets/nahan1.jpg',
@@ -19,6 +24,36 @@ List<String> galleryOf(Listing l) {
   ];
   final seen = <String>{};
   return all.where((p) => seen.add(p)).toList();
+}
+
+/// फोटो का पता http से शुरू हो तो इंटरनेट से, वरना ऐप की asset फोटो
+Widget _galleryImage(String path, {BoxFit fit = BoxFit.cover}) {
+  if (path.startsWith('http')) {
+    return Image.network(
+      path,
+      fit: fit,
+      errorBuilder: (_, __, ___) => Container(
+        color: AppColors.tint,
+        child: const Center(
+          child: Icon(Icons.image_not_supported_outlined,
+              color: AppColors.muted, size: 32),
+        ),
+      ),
+    );
+  }
+  return Image.asset(path, fit: fit);
+}
+
+/// मालिक से संपर्क: असली कमरों में नंबर अभी नहीं जुड़ा, इसलिए साफ़ संदेश
+void _contactFor(BuildContext context, Listing l, {required bool whatsapp}) {
+  if (_isRealListing(l)) {
+    showMsg(
+        context,
+        t('मालिक से सीधे संपर्क की सुविधा अगले अपडेट में जुड़ेगी।',
+            'Direct contact with the owner will be added in the next update.'));
+    return;
+  }
+  contactOwner(context, l, whatsapp: whatsapp);
 }
 
 class _Cell {
@@ -174,7 +209,7 @@ class _DetailScreenState extends State<DetailScreen> {
             onPageChanged: (i) => setState(() => _page = i),
             itemBuilder: (context, i) => GestureDetector(
               onTap: () => _openViewer(i),
-              child: Image.asset(_images[i], fit: BoxFit.cover),
+              child: _galleryImage(_images[i], fit: BoxFit.cover),
             ),
           ),
           Positioned(
@@ -286,7 +321,7 @@ class _DetailScreenState extends State<DetailScreen> {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8),
-                child: Image.asset(_images[i], fit: BoxFit.cover),
+                child: _galleryImage(_images[i], fit: BoxFit.cover),
               ),
             ),
           );
@@ -347,11 +382,13 @@ class _DetailScreenState extends State<DetailScreen> {
 
   Widget _statsRow() {
     final cells = <_Cell>[
-      _Cell(Icons.home_outlined, l.typeLabel),
-      _Cell(Icons.bathtub_outlined, l.bathLabel),
-      _Cell(Icons.square_foot, '${l.sqft} sq ft'),
-      _Cell(Icons.apartment, l.floor),
+      if (l.typeLabel.isNotEmpty) _Cell(Icons.home_outlined, l.typeLabel),
+      if (l.bathLabel.isNotEmpty)
+        _Cell(Icons.bathtub_outlined, l.bathLabel),
+      if (l.sqft > 0) _Cell(Icons.square_foot, '${l.sqft} sq ft'),
+      if (l.floor.isNotEmpty) _Cell(Icons.apartment, l.floor),
     ];
+    if (cells.isEmpty) return const SizedBox.shrink();
     final children = <Widget>[];
     for (var i = 0; i < cells.length; i++) {
       if (i > 0) {
@@ -385,6 +422,7 @@ class _DetailScreenState extends State<DetailScreen> {
   }
 
   Widget _descBlock() {
+    if (l.desc.isEmpty) return const SizedBox.shrink();
     final long = l.desc.length > 90;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -499,7 +537,56 @@ class _DetailScreenState extends State<DetailScreen> {
     );
   }
 
+  /// असली कमरे के लिए सादा मालिक-ब्लॉक (डेमो नाम/रेटिंग नहीं दिखानी)
+  Widget _realOwnerBlock() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 56,
+            height: 56,
+            decoration: const BoxDecoration(
+              color: AppColors.tint,
+              shape: BoxShape.circle,
+            ),
+            child:
+                const Icon(Icons.person, size: 32, color: AppColors.primary),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  t('मकान मालिक', 'House owner'),
+                  style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.text),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  t('RoomMitra पर लिस्ट किया गया',
+                      'Listed on RoomMitra'),
+                  style: const TextStyle(
+                      fontSize: 12.5, color: AppColors.muted),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _ownerBlock() {
+    if (_isRealListing(l)) return _realOwnerBlock();
     final o = ownerOf(l);
     return GestureDetector(
       onTap: _openOwner,
@@ -735,7 +822,7 @@ class _DetailScreenState extends State<DetailScreen> {
                 child: SizedBox(
                   height: 50,
                   child: OutlinedButton.icon(
-                    onPressed: () => contactOwner(context, l, whatsapp: true),
+                    onPressed: () => _contactFor(context, l, whatsapp: true),
                     icon: const Icon(Icons.chat, size: 20),
                     label: Text(t('WhatsApp करें', 'WhatsApp')),
                     style: OutlinedButton.styleFrom(
@@ -755,7 +842,7 @@ class _DetailScreenState extends State<DetailScreen> {
                 child: SizedBox(
                   height: 50,
                   child: ElevatedButton.icon(
-                    onPressed: () => contactOwner(context, l, whatsapp: false),
+                    onPressed: () => _contactFor(context, l, whatsapp: false),
                     icon: const Icon(Icons.call, size: 20),
                     label: Text(t('कॉल करें', 'Call')),
                     style: ElevatedButton.styleFrom(
@@ -864,8 +951,12 @@ class PhotoGalleryScreen extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(10),
-                  child: Image.asset(listing.image,
-                      width: 64, height: 52, fit: BoxFit.cover),
+                  child: ListingImage(
+                    listing: listing,
+                    width: 64,
+                    height: 52,
+                    fit: BoxFit.cover,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -953,7 +1044,7 @@ class PhotoGalleryScreen extends StatelessWidget {
                     child: Stack(
                       fit: StackFit.expand,
                       children: [
-                        Image.asset(images[i], fit: BoxFit.cover),
+                        _galleryImage(images[i], fit: BoxFit.cover),
                         Positioned(
                           left: 6,
                           bottom: 6,
@@ -988,7 +1079,7 @@ class PhotoGalleryScreen extends StatelessWidget {
               width: double.infinity,
               height: 50,
               child: ElevatedButton.icon(
-                onPressed: () => contactOwner(context, listing, whatsapp: false),
+                onPressed: () => _contactFor(context, listing, whatsapp: false),
                 icon: const Icon(Icons.call, size: 20),
                 label: Text(t('मालिक को कॉल करें', 'Call owner')),
                 style: ElevatedButton.styleFrom(
@@ -1055,7 +1146,7 @@ class _PhotoViewerState extends State<_PhotoViewer> {
           minScale: 1,
           maxScale: 4,
           child: Center(
-            child: Image.asset(widget.images[i], fit: BoxFit.contain),
+            child: _galleryImage(widget.images[i], fit: BoxFit.contain),
           ),
         ),
       ),
