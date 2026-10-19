@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'data.dart';
 import 'home_screen.dart' show RoomMitraLogo;
 import 'booking_screen.dart';
+import 'owner_contact.dart';
 import 'owner_profile_screen.dart';
 import 'report_screen.dart';
 import 'strings.dart';
@@ -44,13 +45,11 @@ Widget _galleryImage(String path, {BoxFit fit = BoxFit.cover}) {
   return Image.asset(path, fit: fit);
 }
 
-/// मालिक से संपर्क: असली कमरों में नंबर अभी नहीं जुड़ा, इसलिए साफ़ संदेश
+/// मालिक से संपर्क: असली कमरे में नंबर Supabase से (लॉगिन के बाद) आता है,
+/// डेमो कमरे में पुराना तरीका
 void _contactFor(BuildContext context, Listing l, {required bool whatsapp}) {
   if (_isRealListing(l)) {
-    showMsg(
-        context,
-        t('मालिक से सीधे संपर्क की सुविधा अगले अपडेट में जुड़ेगी।',
-            'Direct contact with the owner will be added in the next update.'));
+    contactRealOwner(context, l, whatsapp: whatsapp);
     return;
   }
   contactOwner(context, l, whatsapp: whatsapp);
