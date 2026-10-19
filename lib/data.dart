@@ -20,6 +20,56 @@ const Map<String, String> cityHindi = {
 /// शहर का नाम चुनी हुई भाषा में: हिंदी में नाहन, English में Nahan
 String cityName(String c) => AppLang.isHindi ? (cityHindi[c] ?? c) : c;
 
+/// लिस्टिंग की श्रेणी (category)। code ही Supabase के room_listings.kind में सेव होता है।
+class ListingCategory {
+  final String code;
+  final String _hi;
+  final String _en;
+  final IconData icon;
+  const ListingCategory(this.code, this._hi, this._en, this.icon);
+
+  /// चुनी हुई भाषा में नाम
+  String get label => t(_hi, _en);
+}
+
+const List<ListingCategory> listingCategories = [
+  ListingCategory('pg_hostel', 'PG / हॉस्टल', 'PG / Hostel', Icons.home_rounded),
+  ListingCategory('single_room', 'सिंगल रूम', 'Single Room', Icons.single_bed),
+  ListingCategory('double_room', 'डबल रूम', 'Double Room', Icons.king_bed),
+  ListingCategory('flat', 'फ्लैट', 'Flat', Icons.apartment),
+  ListingCategory('shop', 'दुकान', 'Shop', Icons.storefront),
+  ListingCategory('sharing', 'शेयरिंग (रूम पार्टनर)', 'Sharing (room partner)',
+      Icons.people),
+  ListingCategory('girls_boys', 'लड़कियाँ / लड़के', 'Girls / Boys', Icons.groups),
+];
+
+/// श्रेणी का नाम (code से)। पुराने डेमो कमरों की हिंदी values वैसी ही वापस आती हैं।
+String categoryLabel(String code) {
+  for (final c in listingCategories) {
+    if (c.code == code) return c.label;
+  }
+  return code;
+}
+
+/// Supabase के room_type की जाँच (CHECK) के हिसाब से सही वैल्यू:
+/// single_room, shared_room, 1rk, 1bhk, 2bhk, 3bhk_plus, pg_bed, other
+String roomTypeFor(String code, int rooms) {
+  switch (code) {
+    case 'pg_hostel':
+      return 'pg_bed';
+    case 'single_room':
+      return 'single_room';
+    case 'sharing':
+      return 'shared_room';
+    case 'flat':
+      if (rooms <= 1) return '1bhk';
+      if (rooms == 2) return '2bhk';
+      return '3bhk_plus';
+    default:
+      return 'other';
+  }
+}
+
 class Amenity {
   final String id;
   final String _hi;
@@ -66,7 +116,7 @@ class Listing {
   final String area;
   final String city;
   final String type; // PG, 1RK, 1BHK, 2BHK, 3BHK+
-  final String kind; // PG, फ्लैट, रूम, हॉस्टल
+  final String kind; // श्रेणी: pg_hostel, single_room... (डेमो में: PG, फ्लैट, रूम, हॉस्टल)
   final int rooms;
   final int price;
   final String typeLabel;
@@ -163,24 +213,39 @@ class Listing {
     final city = (r['city'] ?? '').toString();
     final locality = (r['locality'] ?? '').toString();
     final rent = r['monthly_rent'];
+    final roomsRaw = r['rooms'];
+    final bathRaw = r['bathrooms'];
+    final sqftRaw = r['sqft'];
+    final latRaw = r['lat'];
+    final lngRaw = r['lng'];
+    final kindRaw = (r['kind'] ?? '').toString();
+    final bath = bathRaw is num ? bathRaw.toInt() : 0;
     return Listing(
       id: r['id'].toString(),
       title: (r['title'] ?? '').toString(),
       area: locality.isEmpty ? city : '$locality, $city',
       city: city,
-      type: 'Room',
-      kind: 'रूम',
-      rooms: 1,
+      type: (r['room_type'] ?? 'Room').toString(),
+      kind: kindRaw.isEmpty ? 'रूम' : kindRaw,
+      rooms: roomsRaw is num ? roomsRaw.toInt() : 1,
       price: rent is num ? rent.toInt() : 0,
       typeLabel: 'Room',
-      bathLabel: '',
-      sqft: 0,
-      floor: '',
+      bathLabel: bath > 0 ? '$bath Bathroom' : '',
+      sqft: sqftRaw is num ? sqftRaw.toInt() : 0,
+      floor: (r['floor_label'] ?? '').toString(),
       desc: (r['description'] ?? '').toString(),
       amenities: am,
       image: 'assets/room1.jpg',
       photos: urls.isEmpty ? 1 : urls.length,
+      verified: r['verified'] == true,
+      directOwner: r['direct_owner'] == true,
+      safeWomen: r['safe_women'] == true,
+      girlsOnly: r['girls_only'] == true,
+      immediate: r['immediate'] == true,
+      commercial: r['commercial'] == true,
       order: index,
+      lat: latRaw is num ? latRaw.toDouble() : null,
+      lng: lngRaw is num ? lngRaw.toDouble() : null,
       locality: locality,
       ownerId: (r['owner_id'] ?? '').toString(),
       status: (r['status'] ?? '').toString(),
@@ -205,7 +270,7 @@ class Listing {
       case 'हॉस्टल':
         return t('हॉस्टल', 'Hostel');
       default:
-        return kind;
+        return categoryLabel(kind);
     }
   }
 
@@ -375,8 +440,11 @@ class ListingsStore extends ChangeNotifier {
     try {
       final rows = await Supabase.instance.client
           .from('room_listings')
-          .select(
-              'id, owner_id, title, description, city, locality, monthly_rent, photo_urls, amenities, is_available, status')
+          .select('id, owner_id, title, description, city, locality, '
+              'monthly_rent, photo_urls, amenities, is_available, status, '
+              'room_type, kind, rooms, bathrooms, sqft, floor_label, lat, lng, '
+              'verified, direct_owner, safe_women, girls_only, immediate, '
+              'commercial')
           .eq('status', 'approved')
           .eq('is_available', true);
       final list = <Listing>[];
