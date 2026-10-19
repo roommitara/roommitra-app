@@ -1,9 +1,12 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:video_player/video_player.dart';
 import 'app_shell.dart';
 import 'login_screen.dart';
 import 'onboarding_screen.dart';
 import 'otp_service.dart';
+import 'strings.dart';
 import 'theme.dart';
 
 Future<void> main() async {
@@ -85,34 +88,57 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-  late final Animation<double> _opacity;
+class _SplashScreenState extends State<SplashScreen> {
+  VideoPlayerController? _video;
+  Timer? _guard;
+  bool _ready = false;
+  bool _gone = false;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 3600),
-    );
-    _opacity = TweenSequence<double>([
-      TweenSequenceItem(
-        tween: Tween(begin: 0.0, end: 1.0).chain(CurveTween(curve: Curves.easeIn)),
-        weight: 25,
-      ),
-      TweenSequenceItem(tween: ConstantTween(1.0), weight: 50),
-      TweenSequenceItem(
-        tween: Tween(begin: 1.0, end: 0.0).chain(CurveTween(curve: Curves.easeOut)),
-        weight: 25,
-      ),
-    ]).animate(_controller);
-    _controller.forward().whenComplete(_goNext);
+    // सुरक्षा: कुछ भी अटके तो 15 सेकंड बाद आगे बढ़ जाओ
+    _guard = Timer(const Duration(seconds: 15), _goNext);
+    _startVideo();
+  }
+
+  Future<void> _startVideo() async {
+    try {
+      final c = VideoPlayerController.asset('assets/intro.mp4');
+      _video = c;
+      await c.initialize();
+      if (!mounted || _gone) return;
+      await c.setLooping(false);
+      c.addListener(_onTick);
+      setState(() => _ready = true);
+      await c.play();
+    } catch (_) {
+      // वीडियो न चले तो पुरानी इमेज थोड़ी देर दिखाकर आगे बढ़ो
+      await Future<void>.delayed(const Duration(milliseconds: 1800));
+      _goNext();
+    }
+  }
+
+  void _onTick() {
+    final c = _video;
+    if (c == null) return;
+    final v = c.value;
+    if (v.hasError) {
+      _goNext();
+      return;
+    }
+    if (v.isInitialized &&
+        v.duration > Duration.zero &&
+        v.position >= v.duration) {
+      _goNext();
+    }
   }
 
   void _goNext() {
-    if (!mounted) return;
+    if (_gone || !mounted) return;
+    _gone = true;
+    _guard?.cancel();
+    _video?.pause();
 
     // पहले से लॉगिन है तो सीधे ऐप खोलो
     bool loggedIn = false;
@@ -156,19 +182,58 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   void dispose() {
-    _controller.dispose();
+    _guard?.cancel();
+    _video?.removeListener(_onTick);
+    _video?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final c = _video;
     return Scaffold(
       backgroundColor: Colors.black,
-      body: FadeTransition(
-        opacity: _opacity,
-        child: SizedBox.expand(
-          child: Image.asset('assets/splash.png', fit: BoxFit.cover),
-        ),
+      body: Stack(
+        children: [
+          // वीडियो लोड होने तक पुरानी स्प्लैश इमेज
+          if (!_ready)
+            SizedBox.expand(
+              child: Image.asset('assets/splash.png', fit: BoxFit.cover),
+            ),
+          if (_ready && c != null)
+            Center(
+              child: AspectRatio(
+                aspectRatio: c.value.aspectRatio,
+                child: VideoPlayer(c),
+              ),
+            ),
+          SafeArea(
+            child: Align(
+              alignment: Alignment.topRight,
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: GestureDetector(
+                  onTap: _goNext,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: const Color(0x66000000),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      t('छोड़ें', 'Skip'),
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
