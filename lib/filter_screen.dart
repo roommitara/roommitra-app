@@ -27,13 +27,9 @@ class _FilterScreenState extends State<FilterScreen> {
 
   static const List<int> _distances = [1, 2, 5, 10, 20];
 
-  /// key = असली वैल्यू (listing.kind से मिलती है), value = दिखने वाला नाम
-  List<MapEntry<String, String>> get _kinds => [
-        const MapEntry('PG', 'PG'),
-        MapEntry('फ्लैट', t('फ्लैट', 'Flat')),
-        MapEntry('रूम', t('रूम', 'Room')),
-        MapEntry('हॉस्टल', t('बॉयज/गर्ल्स हॉस्टल', 'Boys/Girls hostel')),
-      ];
+  /// key = श्रेणी का code (room_listings.kind से मिलता है), value = दिखने वाला नाम
+  List<MapEntry<String, String>> get _kinds =>
+      listingCategories.map((c) => MapEntry(c.code, c.label)).toList();
 
   @override
   void initState() {
