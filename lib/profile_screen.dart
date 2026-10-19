@@ -13,6 +13,13 @@ import 'strings.dart';
 import 'terms_screen.dart';
 import 'theme.dart';
 
+// एक जैसा डिज़ाइन (आइकॉन/स्पेसिंग) हर जगह इन्हीं से चलेगा
+const double _kIconSmall = 16; // हेडर कार्ड की लाइनों के आइकॉन
+const double _kIconMenu = 24; // मेनू/सेटिंग की पंक्तियों के आइकॉन
+const double _kIconBox = 46; // मेनू आइकॉन का गोल डिब्बा
+const double _kGap = 12; // कार्ड्स के बीच की दूरी
+const double _kRadius = 16; // कार्ड्स के कोने
+
 class _MenuItem {
   final IconData icon;
   final String title;
@@ -30,16 +37,52 @@ final Map<String, bool> notifPrefs = <String, bool>{
   'offers': false,
 };
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   /// मेरी लिस्टिंग से "नई लिस्टिंग जोड़ें" दबाने पर चलेगा
   final VoidCallback onAdd;
   const ProfileScreen({super.key, required this.onAdd});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  /// एडमिन पैनल सिर्फ तब दिखेगा जब सर्वर का is_admin() true दे
+  bool _isAdmin = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAdmin();
+  }
+
+  Future<void> _checkAdmin() async {
+    try {
+      final res = await Supabase.instance.client.rpc('is_admin');
+      final ok = res == true;
+      if (!mounted) return;
+      if (ok != _isAdmin) setState(() => _isAdmin = ok);
+    } catch (_) {
+      // गड़बड़ हो तो एडमिन पैनल छिपा ही रहेगा
+      if (!mounted) return;
+      if (_isAdmin) setState(() => _isAdmin = false);
+    }
+  }
 
   /// लॉगिन किए हुए फोन के सिर्फ अंक (जैसे 919805793737)
   String _digits() {
     try {
       final raw = Supabase.instance.client.auth.currentUser?.phone ?? '';
       return raw.replaceAll(RegExp(r'\D'), '');
+    } catch (_) {
+      return '';
+    }
+  }
+
+  /// लॉगिन खाते का ईमेल (जैसे Google लॉगिन से), नहीं हो तो खाली
+  String _email() {
+    try {
+      return (Supabase.instance.client.auth.currentUser?.email ?? '').trim();
     } catch (_) {
       return '';
     }
@@ -114,24 +157,95 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _headerCard() {
+  /// प्रोफाइल फोटो की जगह: हरा ग्रेडिएंट गोला, सफेद किनारा और हल्की छाया
+  Widget _avatarPlaceholder() {
+    return Container(
+      width: 72,
+      height: 72,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: const LinearGradient(
+          colors: [AppColors.primary, AppColors.primaryDark],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        border: Border.all(color: Colors.white, width: 3),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withOpacity(0.35),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: const Icon(Icons.person, color: Colors.white, size: 42),
+    );
+  }
+
+  Widget _emailLine(BuildContext context) {
+    final email = _email();
+    if (email.isNotEmpty) {
+      return Row(
+        children: [
+          const Icon(Icons.email, size: _kIconSmall, color: AppColors.primary),
+          const SizedBox(width: 6),
+          Flexible(
+            child: Text(
+              email,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 13, color: AppColors.text),
+            ),
+          ),
+        ],
+      );
+    }
+    return InkWell(
+      onTap: () => showMsg(
+        context,
+        t('ईमेल जोड़ने की सुविधा जल्द आएगी', 'Add email is coming soon'),
+      ),
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 2),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.email, size: _kIconSmall, color: AppColors.primary),
+            const SizedBox(width: 6),
+            Flexible(
+              child: Text(
+                t('ईमेल जोड़ें', 'Add Email'),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.primary,
+                  decoration: TextDecoration.underline,
+                  decorationColor: AppColors.primary,
+                ),
+              ),
+            ),
+            const SizedBox(width: 4),
+            const Icon(Icons.add_circle_outline,
+                size: _kIconSmall, color: AppColors.primary),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _headerCard(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: AppColors.tint,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(_kRadius),
       ),
       child: Row(
         children: [
-          Container(
-            width: 70,
-            height: 70,
-            decoration: const BoxDecoration(
-              color: AppColors.primary,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.person, color: Colors.white, size: 40),
-          ),
+          _avatarPlaceholder(),
           const SizedBox(width: 14),
           Expanded(
             child: Column(
@@ -159,7 +273,7 @@ class ProfileScreen extends StatelessWidget {
                 Row(
                   children: [
                     const Icon(Icons.phone,
-                        size: 16, color: AppColors.primary),
+                        size: _kIconSmall, color: AppColors.primary),
                     const SizedBox(width: 6),
                     Text(_phoneFull(),
                         style: const TextStyle(
@@ -167,20 +281,7 @@ class ProfileScreen extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 4),
-                Row(
-                  children: [
-                    const Icon(Icons.email,
-                        size: 16, color: AppColors.primary),
-                    const SizedBox(width: 6),
-                    Flexible(
-                      child: Text(t('ईमेल जोड़ा नहीं गया', 'Email not added'),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                              fontSize: 13, color: AppColors.text)),
-                    ),
-                  ],
-                ),
+                _emailLine(context),
               ],
             ),
           ),
@@ -221,7 +322,7 @@ class ProfileScreen extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(_kRadius),
         border: Border.all(color: AppColors.border),
       ),
       child: Column(
@@ -239,7 +340,7 @@ class ProfileScreen extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: _kGap),
           Row(
             children: [
               cell(Icons.person, t('पूरा नाम', 'Full name'),
@@ -266,15 +367,15 @@ class ProfileScreen extends StatelessWidget {
         child: Row(
           children: [
             Container(
-              width: 46,
-              height: 46,
+              width: _kIconBox,
+              height: _kIconBox,
               decoration: const BoxDecoration(
                 color: AppColors.tint,
                 shape: BoxShape.circle,
               ),
-              child: Icon(m.icon, color: AppColors.primary, size: 24),
+              child: Icon(m.icon, color: AppColors.primary, size: _kIconMenu),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: _kGap),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -362,7 +463,7 @@ class ProfileScreen extends StatelessWidget {
         () {
           Navigator.of(context).push(
             MaterialPageRoute<void>(
-              builder: (_) => MyListingsScreen(onAdd: onAdd),
+              builder: (_) => MyListingsScreen(onAdd: widget.onAdd),
             ),
           );
         },
@@ -380,19 +481,19 @@ class ProfileScreen extends StatelessWidget {
           );
         },
       ),
-      _MenuItem(
-        Icons.admin_panel_settings,
-        t('एडमिन पैनल', 'Admin panel'),
-        t('डेमो: असली ऐप में सिर्फ एडमिन को दिखेगा',
-            'Demo: in the real app only admins will see this'),
-        () {
-          Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (_) => const AdminScreen(),
-            ),
-          );
-        },
-      ),
+      if (_isAdmin)
+        _MenuItem(
+          Icons.admin_panel_settings,
+          t('एडमिन पैनल', 'Admin panel'),
+          t('सिर्फ एडमिन के लिए', 'For admins only'),
+          () {
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => const AdminScreen(),
+              ),
+            );
+          },
+        ),
       _MenuItem(
         Icons.manage_accounts,
         t('प्रोफाइल अपडेट करें', 'Update profile'),
@@ -478,14 +579,14 @@ class ProfileScreen extends StatelessWidget {
             child: ListView(
               padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
               children: [
-                _headerCard(),
-                const SizedBox(height: 12),
+                _headerCard(context),
+                const SizedBox(height: _kGap),
                 _infoCard(),
-                const SizedBox(height: 12),
+                const SizedBox(height: _kGap),
                 Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(_kRadius),
                     border: Border.all(color: AppColors.border),
                   ),
                   child: Column(
@@ -495,7 +596,7 @@ class ProfileScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: _kGap),
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
@@ -609,7 +710,7 @@ class _NotificationSettingsScreenState
   Widget _row(_PrefItem p, {bool last = false}) {
     final on = notifPrefs[p.key] ?? false;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
         border: last
             ? null
@@ -618,15 +719,15 @@ class _NotificationSettingsScreenState
       child: Row(
         children: [
           Container(
-            width: 44,
-            height: 44,
+            width: _kIconBox,
+            height: _kIconBox,
             decoration: const BoxDecoration(
               color: AppColors.tint,
               shape: BoxShape.circle,
             ),
-            child: Icon(p.icon, color: AppColors.primary, size: 22),
+            child: Icon(p.icon, color: AppColors.primary, size: _kIconMenu),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: _kGap),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -634,7 +735,7 @@ class _NotificationSettingsScreenState
                 Text(
                   p.title,
                   style: const TextStyle(
-                      fontSize: 15,
+                      fontSize: 15.5,
                       fontWeight: FontWeight.w800,
                       color: AppColors.text),
                 ),
@@ -681,7 +782,7 @@ class _NotificationSettingsScreenState
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
                     color: AppColors.tint,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(_kRadius),
                   ),
                   child: Row(
                     children: [
@@ -690,7 +791,7 @@ class _NotificationSettingsScreenState
                         backgroundColor: AppColors.primary,
                         child: Icon(Icons.tune, color: Colors.white, size: 26),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: _kGap),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -715,11 +816,11 @@ class _NotificationSettingsScreenState
                     ],
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: _kGap),
                 Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(_kRadius),
                     border: Border.all(color: AppColors.border),
                   ),
                   child: Column(
@@ -729,7 +830,7 @@ class _NotificationSettingsScreenState
                     ],
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: _kGap),
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
