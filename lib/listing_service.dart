@@ -14,7 +14,7 @@ class ListingService {
   static const String _bucket = 'room-photos';
 
   /// नई लिस्टिंग: पहले फोटो अपलोड, फिर listing (status = pending),
-  /// फिर पूरा पता और फोन room_listing_private में।
+  /// फिर पूरा पता, नाम, फोन और WhatsApp room_listing_private में।
   static Future<void> submit({
     required String category,
     required String roomType,
@@ -32,7 +32,9 @@ class ListingService {
     required bool girlsOnly,
     required bool commercial,
     required String fullAddress,
+    required String ownerName,
     required String phone,
+    required String whatsapp,
     required List<XFile> photos,
   }) async {
     final client = Supabase.instance.client;
@@ -102,13 +104,15 @@ class ListingService {
       throw const ListingError('save');
     }
 
-    // 3) पूरा पता और फोन: सिर्फ मालिक/एडमिन को दिखता है
+    // 3) पूरा पता, नाम, फोन, WhatsApp: सिर्फ मालिक/एडमिन को दिखता है
     try {
       await client.from('room_listing_private').insert({
         'listing_id': listingId,
         'owner_id': uid,
         'full_address': fullAddress,
+        'owner_name': ownerName.isEmpty ? null : ownerName,
         'owner_contact_phone': phone,
+        'owner_whatsapp': whatsapp.isEmpty ? null : whatsapp,
       });
     } catch (_) {
       // अधूरी listing न रहे: listing हटाओ और फोटो भी
