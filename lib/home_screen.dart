@@ -366,10 +366,10 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _banner() {
     return Container(
       clipBehavior: Clip.hardEdge,
-      padding: const EdgeInsets.all(16),
+      constraints: const BoxConstraints(minHeight: 150),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF083F28), Color(0xFF1E6B3F)],
+          colors: [Color(0xFF062F1E), Color(0xFF0B4A2C)],
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
         ),
@@ -377,66 +377,87 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       child: Stack(
         children: [
-          const Positioned(
+          // दाईं तरफ़ घर की फोटो, बाईं ओर धीरे-धीरे गायब होती हुई
+          Positioned(
             right: 0,
             top: 0,
-            child: Icon(Icons.home, size: 90, color: Color(0x22FFFFFF)),
+            bottom: 0,
+            width: 190,
+            child: ShaderMask(
+              blendMode: BlendMode.dstIn,
+              shaderCallback: (rect) => const LinearGradient(
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+                colors: [Color(0x00FFFFFF), Color(0xFFFFFFFF)],
+                stops: [0.0, 0.55],
+              ).createShader(rect),
+              child: Image.asset(
+                'assets/banner_house.jpg',
+                fit: BoxFit.cover,
+                alignment: Alignment.centerRight,
+                errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+              ),
+            ),
           ),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.home_outlined,
-                            color: AppColors.accent, size: 30),
-                        const SizedBox(width: 8),
-                        Flexible(
-                          child: Text(
-                            t('मकान मालिक हैं?', 'Are you a house owner?'),
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w800),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.home_outlined,
+                              color: AppColors.accent, size: 30),
+                          const SizedBox(width: 8),
+                          Flexible(
+                            child: Text(
+                              t('मकान मालिक हैं?', 'Are you a house owner?'),
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w800),
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      t('अपनी प्रॉपर्टी लिस्ट करें और\nसीधे किरायेदार पाएं',
-                          'List your property and\nfind tenants directly'),
-                      style:
-                          const TextStyle(color: Colors.white, fontSize: 13),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              ElevatedButton(
-                onPressed: widget.onListTap,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF7BF03A),
-                  foregroundColor: const Color(0xFF063D24),
-                  shape: const StadiumBorder(),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(t('अब लिस्ट करें', 'List now'),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        t('अपनी प्रॉपर्टी लिस्ट करें और\nसीधे किरायेदार पाएं',
+                            'List your property and\nfind tenants directly'),
                         style: const TextStyle(
-                            fontWeight: FontWeight.w800, fontSize: 13)),
-                    const SizedBox(width: 4),
-                    const Icon(Icons.arrow_forward, size: 16),
-                  ],
+                            color: Colors.white, fontSize: 13, height: 1.35),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(width: 8),
+                ElevatedButton(
+                  onPressed: widget.onListTap,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF7BF03A),
+                    foregroundColor: const Color(0xFF063D24),
+                    elevation: 3,
+                    shape: const StadiumBorder(),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 12),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(t('अब लिस्ट करें', 'List now'),
+                          style: const TextStyle(
+                              fontWeight: FontWeight.w800, fontSize: 13)),
+                      const SizedBox(width: 4),
+                      const Icon(Icons.arrow_forward, size: 16),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -834,7 +855,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               const SizedBox(height: 20),
                               _banner(),
                               const SizedBox(height: 22),
-                              _sectionHeader('Featured Rooms'),
+                              _sectionHeader(t('खास कमरे', 'Featured Rooms')),
                               const SizedBox(height: 8),
                               _roomRow(cardW),
                               const SizedBox(height: 14),
