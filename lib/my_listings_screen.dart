@@ -416,6 +416,39 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
     }
   }
 
+  Future<void> _deleteReal(Listing l) async {
+    final ok = await _confirm(
+        t('लिस्टिंग हटाएं?', 'Delete listing?'),
+        t('"${l.title}" हमेशा के लिए हट जाएगी। यह वापस नहीं आएगी।',
+            '"${l.title}" will be deleted permanently. It cannot be restored.'),
+        t('हाँ, हटाएं', 'Yes, delete'));
+    if (!ok || !mounted) return;
+    setState(() => _busyId = l.id);
+    String? err;
+    try {
+      await Supabase.instance.client
+          .from('room_listings')
+          .delete()
+          .eq('id', l.id);
+    } on PostgrestException catch (e) {
+      err = e.message;
+    } catch (_) {
+      err = t('इंटरनेट जाँचकर फिर कोशिश करें',
+          'Check your internet and try again');
+    }
+    if (err == null) {
+      await myRealListings.load();
+      await listingsStore.load();
+    }
+    if (!mounted) return;
+    setState(() => _busyId = null);
+    showMsg(
+        context,
+        err == null
+            ? t('लिस्टिंग हटा दी गई', 'Listing deleted')
+            : '${t('हट नहीं सकी', 'Could not delete')}: $err');
+  }
+
   Widget _realCard(Listing l) {
     final busy = _busyId == l.id;
     final canMarkRented = l.status == 'approved' && l.isAvailable;
@@ -587,6 +620,9 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
                       Icons.replay,
                       t('फिर से लिस्ट करें', 'List again'),
                       () => _changeRental(l, rented: false)),
+                _actionBtn(Icons.delete_outline, t('हटाएं', 'Delete'),
+                    () => _deleteReal(l),
+                    color: AppColors.danger),
               ],
             ),
         ],
