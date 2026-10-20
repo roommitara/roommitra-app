@@ -32,6 +32,8 @@ class ListingService {
     required bool girlsOnly,
     required bool commercial,
     required String fullAddress,
+    double? lat,
+    double? lng,
     required String ownerName,
     required String phone,
     required String whatsapp,
@@ -89,6 +91,8 @@ class ListingService {
             'suitable_for': suitableFor,
             'girls_only': girlsOnly,
             'commercial': commercial,
+            'lat': lat,
+            'lng': lng,
             'photo_urls': paths,
             'status': 'pending',
           })
