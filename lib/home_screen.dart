@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'data.dart';
 import 'detail_screen.dart';
+import 'location_service.dart';
 import 'messages_screen.dart';
+import 'nearby_rooms.dart';
 import 'notifications_screen.dart';
 import 'strings.dart';
 import 'theme.dart';
@@ -115,6 +117,12 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     if (!listingsStore.loaded) {
       listingsStore.load();
+    }
+    // ऐप खुलते ही लोकेशन की इजाज़त माँगो (सिर्फ पहली बार) और नज़दीकी कमरे निकालो
+    if (NearbyService.instance.status == NearbyStatus.idle) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        NearbyService.instance.refresh(ask: true);
+      });
     }
   }
 
@@ -1032,6 +1040,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               const SizedBox(height: 20),
                               _exploreBanner(),
                               const SizedBox(height: 24),
+                              const NearbyRooms(),
+                              const SizedBox(height: 12),
                               _sectionHeader(t('खास कमरे', 'Featured Rooms')),
                               const SizedBox(height: 12),
                               _roomGrid(cardW),
