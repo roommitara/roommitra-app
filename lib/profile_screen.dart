@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'admin_screen.dart';
+import 'admin_review_screen.dart';
 import 'data.dart';
 import 'help_screen.dart';
 import 'home_screen.dart' show RoomMitraLogo;
@@ -489,7 +489,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           () {
             Navigator.of(context).push(
               MaterialPageRoute<void>(
-                builder: (_) => const AdminScreen(),
+                builder: (_) => const AdminReviewScreen(),
               ),
             );
           },
