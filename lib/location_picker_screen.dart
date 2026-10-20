@@ -70,6 +70,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
   bool _gpsBusy = false;
   bool _revBusy = false;
   bool _saving = false;
+  bool _satellite = false; // सैटेलाइट नक्शा
   List<_Place> _results = [];
   String _city = '';
   String _locality = '';
@@ -404,6 +405,31 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
     );
   }
 
+  Widget _mapBtn(String tag, IconData icon, VoidCallback onTap,
+      {bool active = false}) {
+    return Material(
+      color: active ? AppColors.primary : Colors.white,
+      elevation: 3,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+        child: SizedBox(
+          width: 44,
+          height: 44,
+          child: Icon(icon,
+              size: 24, color: active ? Colors.white : AppColors.primary),
+        ),
+      ),
+    );
+  }
+
+  void _zoomBy(double d) {
+    final cam = _map.camera;
+    final z = (cam.zoom + d).clamp(4.0, 19.0).toDouble();
+    _map.move(cam.center, z);
+  }
+
   Widget _mapArea() {
     return Stack(
       children: [
@@ -426,13 +452,27 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
             },
           ),
           children: [
-            TileLayer(
-              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-              userAgentPackageName: 'com.roommitra.roommitra_app',
-            ),
-            const RichAttributionWidget(
+            if (_satellite)
+              TileLayer(
+                urlTemplate:
+                    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                userAgentPackageName: 'com.roommitra.roommitra_app',
+                maxNativeZoom: 19,
+              )
+            else
+              TileLayer(
+                urlTemplate:
+                    'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+                subdomains: const ['a', 'b', 'c', 'd'],
+                retinaMode: RetinaMode.isHighDensity(context),
+                userAgentPackageName: 'com.roommitra.roommitra_app',
+                maxNativeZoom: 19,
+              ),
+            RichAttributionWidget(
               attributions: [
-                TextSourceAttribution('© OpenStreetMap contributors'),
+                TextSourceAttribution(_satellite
+                    ? 'Imagery © Esri, Maxar, Earthstar Geographics'
+                    : '© OpenStreetMap contributors © CARTO'),
               ],
             ),
           ],
@@ -440,13 +480,34 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
         // बीच में टिका हुआ पिन। नीचे की नोक मैप के ठीक बीच पर रहती है।
         IgnorePointer(
           child: Center(
-            child: Transform.translate(
-              offset: const Offset(0, -24),
-              child: Icon(
-                Icons.location_on,
-                size: 52,
-                color: _chosen ? AppColors.danger : AppColors.muted,
-              ),
+            child: Stack(
+              alignment: Alignment.center,
+              clipBehavior: Clip.none,
+              children: [
+                // ज़मीन पर पड़ने वाली छोटी परछाईं
+                Container(
+                  width: 14,
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: const Color(0x55000000),
+                    borderRadius: BorderRadius.circular(7),
+                  ),
+                ),
+                Transform.translate(
+                  offset: const Offset(0, -26),
+                  child: Icon(
+                    Icons.location_on,
+                    size: 58,
+                    color: _chosen ? AppColors.danger : AppColors.muted,
+                    shadows: const [
+                      Shadow(
+                          color: Color(0x66000000),
+                          blurRadius: 8,
+                          offset: Offset(0, 3)),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -461,26 +522,47 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
             ],
           ),
         ),
+        // दाईं तरफ के बटन: सैटेलाइट, ज़ूम, GPS
         Positioned(
           right: 12,
           bottom: 14,
-          child: FloatingActionButton.small(
-            heroTag: 'gps',
-            backgroundColor: Colors.white,
-            foregroundColor: AppColors.primary,
-            onPressed: _useGps,
-            child: _gpsBusy
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2))
-                : const Icon(Icons.my_location),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _mapBtn('sat', Icons.satellite_alt,
+                  () => setState(() => _satellite = !_satellite),
+                  active: _satellite),
+              const SizedBox(height: 8),
+              _mapBtn('zin', Icons.add, () => _zoomBy(1)),
+              const SizedBox(height: 8),
+              _mapBtn('zout', Icons.remove, () => _zoomBy(-1)),
+              const SizedBox(height: 8),
+              Material(
+                color: Colors.white,
+                elevation: 3,
+                borderRadius: BorderRadius.circular(12),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: _useGps,
+                  child: SizedBox(
+                    width: 44,
+                    height: 44,
+                    child: _gpsBusy
+                        ? const Padding(
+                            padding: EdgeInsets.all(12),
+                            child: CircularProgressIndicator(strokeWidth: 2))
+                        : const Icon(Icons.my_location,
+                            size: 24, color: AppColors.primary),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
         if (!_chosen)
           Positioned(
             left: 12,
-            right: 64,
+            right: 68,
             bottom: 14,
             child: Container(
               padding: const EdgeInsets.all(10),
