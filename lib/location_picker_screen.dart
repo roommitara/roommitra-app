@@ -461,9 +461,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
               )
             else
               TileLayer(
-                urlTemplate:
-                    'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-                subdomains: const ['a', 'b', 'c', 'd'],
+                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                 retinaMode: RetinaMode.isHighDensity(context),
                 userAgentPackageName: 'com.roommitra.roommitra_app',
                 maxNativeZoom: 19,
@@ -472,7 +470,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
               attributions: [
                 TextSourceAttribution(_satellite
                     ? 'Imagery © Esri, Maxar, Earthstar Geographics'
-                    : '© OpenStreetMap contributors © CARTO'),
+                    : '© OpenStreetMap contributors'),
               ],
             ),
           ],
