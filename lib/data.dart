@@ -577,11 +577,73 @@ class AppState extends ChangeNotifier {
 
   bool isFav(String id) => favorites.contains(id);
 
+  static final RegExp _uuid = RegExp(
+      r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$');
+
+  String? _favUser;
+
+  /// साइन-इन उपयोगकर्ता के असली पसंदीदा सर्वर से लाओ
+  Future<void> loadFavorites() async {
+    try {
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user == null) {
+        if (_favUser != null) {
+          favorites.removeWhere(_uuid.hasMatch);
+          _favUser = null;
+          notifyListeners();
+        }
+        return;
+      }
+      final rows = await Supabase.instance.client
+          .from('room_favorites')
+          .select('listing_id')
+          .eq('user_id', user.id);
+      favorites.removeWhere(_uuid.hasMatch);
+      for (final r in rows) {
+        favorites.add(r['listing_id'].toString());
+      }
+      _favUser = user.id;
+      notifyListeners();
+    } catch (_) {
+      // इंटरनेट न हो तो जो है वही रहने दो
+    }
+  }
+
   void toggleFavorite(String id) {
-    if (!favorites.add(id)) {
+    final added = favorites.add(id);
+    if (!added) {
       favorites.remove(id);
     }
     notifyListeners();
+    _saveFavorite(id, added);
+  }
+
+  Future<void> _saveFavorite(String id, bool added) async {
+    if (!_uuid.hasMatch(id)) return; // डेमो कमरे सिर्फ फोन में
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) return;
+    try {
+      if (added) {
+        await Supabase.instance.client
+            .from('room_favorites')
+            .upsert({'user_id': user.id, 'listing_id': id},
+                ignoreDuplicates: true);
+      } else {
+        await Supabase.instance.client
+            .from('room_favorites')
+            .delete()
+            .eq('user_id', user.id)
+            .eq('listing_id', id);
+      }
+    } catch (_) {
+      // सर्वर में सेव न हो पाया तो पलटो, ताकि दिल सच दिखाए
+      if (added) {
+        favorites.remove(id);
+      } else {
+        favorites.add(id);
+      }
+      notifyListeners();
+    }
   }
 }
 

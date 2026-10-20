@@ -18,6 +18,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   @override
   void initState() {
     super.initState();
+    appState.loadFavorites();
     if (!listingsStore.loaded && !listingsStore.loading) {
       listingsStore.load();
     }
