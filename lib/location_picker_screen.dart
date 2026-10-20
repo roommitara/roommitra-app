@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 
 import 'data.dart';
+import 'strings.dart';
 import 'theme.dart';
 
 /// मालिक ने जो जगह चुनी, उसकी जानकारी
@@ -110,7 +111,8 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
   Future<void> _doSearch() async {
     final q = _search.text.trim();
     if (q.length < 3) {
-      _msg('कम से कम 3 अक्षर लिखें');
+      _msg(t('कम से कम 3 अक्षर लिखें',
+          'Type at least 3 letters'));
       return;
     }
     FocusScope.of(context).unfocus();
@@ -128,7 +130,8 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
       final r =
           await http.get(uri, headers: _headers).timeout(const Duration(seconds: 12));
       if (r.statusCode != 200) {
-        _msg('खोज अभी काम नहीं कर रही, थोड़ी देर बाद कोशिश करें');
+        _msg(t('खोज अभी काम नहीं कर रही, थोड़ी देर बाद कोशिश करें',
+          'Search is not working right now, try again later'));
       } else {
         final list = jsonDecode(r.body) as List<dynamic>;
         final out = <_Place>[];
@@ -140,10 +143,12 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
           out.add(_Place('${m['display_name']}', LatLng(lat, lon)));
         }
         if (mounted) setState(() => _results = out);
-        if (out.isEmpty) _msg('कोई जगह नहीं मिली। दूसरा नाम लिखकर देखें');
+        if (out.isEmpty) _msg(t('कोई जगह नहीं मिली। दूसरा नाम लिखकर देखें',
+          'No place found. Try another name'));
       }
     } catch (_) {
-      _msg('इंटरनेट या खोज में दिक्कत है, फिर कोशिश करें');
+      _msg(t('इंटरनेट या खोज में दिक्कत है, फिर कोशिश करें',
+          'Internet or search problem, please try again'));
     } finally {
       if (mounted) setState(() => _searching = false);
     }
@@ -167,7 +172,8 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
     try {
       final enabled = await Geolocator.isLocationServiceEnabled();
       if (!enabled) {
-        _msg('फोन की लोकेशन (GPS) चालू करें');
+        _msg(t('फोन की लोकेशन (GPS) चालू करें',
+          'Turn on your phone location (GPS)'));
         return;
       }
       var perm = await Geolocator.checkPermission();
@@ -175,11 +181,13 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
         perm = await Geolocator.requestPermission();
       }
       if (perm == LocationPermission.denied) {
-        _msg('लोकेशन की इजाज़त नहीं मिली। आप पता खोजकर भी जगह चुन सकते हैं');
+        _msg(t('लोकेशन की इजाज़त नहीं मिली। आप पता खोजकर भी जगह चुन सकते हैं',
+          'Location permission denied. You can also search for the address'));
         return;
       }
       if (perm == LocationPermission.deniedForever) {
-        _msg('लोकेशन की इजाज़त बंद है। फोन की सेटिंग में ऐप को इजाज़त दें');
+        _msg(t('लोकेशन की इजाज़त बंद है। फोन की सेटिंग में ऐप को इजाज़त दें',
+          'Location permission is blocked. Allow it for the app in phone settings'));
         await Geolocator.openAppSettings();
         return;
       }
@@ -199,9 +207,11 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
       _map.move(p, 18);
       _scheduleReverse();
     } on TimeoutException {
-      _msg('GPS से जगह नहीं मिली। खुली जगह में जाकर फिर कोशिश करें');
+      _msg(t('GPS से जगह नहीं मिली। खुली जगह में जाकर फिर कोशिश करें',
+          'Could not get a GPS fix. Go to an open area and try again'));
     } catch (_) {
-      _msg('GPS से लोकेशन नहीं मिल सकी। पता खोजकर या मैप खिसकाकर चुनें');
+      _msg(t('GPS से लोकेशन नहीं मिल सकी। पता खोजकर या मैप खिसकाकर चुनें',
+          'Could not get location from GPS. Search the address or move the map'));
     } finally {
       if (mounted) setState(() => _gpsBusy = false);
     }
@@ -268,7 +278,8 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
   // ----------------------------- पक्का करना -----------------------------
   Future<void> _confirm() async {
     if (!_chosen) {
-      _msg('पहले जगह चुनें: पता खोजें, GPS दबाएँ या मैप खिसकाएँ');
+      _msg(t('पहले जगह चुनें: पता खोजें, GPS दबाएँ या मैप खिसकाएँ',
+          'Choose a place first: search an address, press GPS or move the map'));
       return;
     }
     setState(() => _saving = true);
@@ -284,7 +295,8 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
     if (!mounted) return;
     setState(() => _saving = false);
     if (_address.text.trim().isEmpty) {
-      _msg('पता अपने आप नहीं मिला, कृपया नीचे पता खुद लिखें');
+      _msg(t('पता अपने आप नहीं मिला, कृपया नीचे पता खुद लिखें',
+          'Address not found automatically, please type it below'));
       return;
     }
     Navigator.of(context).pop(
@@ -316,9 +328,9 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
             onPressed: () => Navigator.of(context).pop(),
             icon: const Icon(Icons.arrow_back, color: Colors.white),
           ),
-          const Expanded(
+          Expanded(
             child: Text(
-              'प्रॉपर्टी की लोकेशन',
+              t('प्रॉपर्टी की लोकेशन', 'Property location'),
               style: TextStyle(
                   color: Colors.white,
                   fontSize: 18,
@@ -345,10 +357,11 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
               controller: _search,
               textInputAction: TextInputAction.search,
               onSubmitted: (_) => _doSearch(),
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 border: InputBorder.none,
-                hintText: 'पता या इलाका खोजें (जैसे Rani Tal Nahan)',
-                hintStyle: TextStyle(fontSize: 13.5, color: AppColors.muted),
+                hintText: t('पता या इलाका खोजें (जैसे Rani Tal Nahan)',
+                    'Search address or area (e.g. Rani Tal Nahan)'),
+                hintStyle: const TextStyle(fontSize: 13.5, color: AppColors.muted),
               ),
             ),
           ),
@@ -363,7 +376,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
           else
             TextButton(
               onPressed: _doSearch,
-              child: const Text('खोजें'),
+              child: Text(t('खोजें', 'Search')),
             ),
         ],
       ),
@@ -571,9 +584,10 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                   BoxShadow(color: Color(0x33000000), blurRadius: 6),
                 ],
               ),
-              child: const Text(
-                'पता खोजें, GPS (दाईं तरफ का बटन) दबाएँ, या मैप को खिसकाकर पिन अपने कमरे की जगह पर रखें।',
-                style: TextStyle(fontSize: 12, color: AppColors.text),
+              child: Text(
+                t('पता खोजें, GPS (दाईं तरफ का बटन) दबाएँ, या मैप को खिसकाकर पिन अपने कमरे की जगह पर रखें।',
+                    'Search an address, press GPS (button on the right), or move the map to put the pin on your room.'),
+                style: const TextStyle(fontSize: 12, color: AppColors.text),
               ),
             ),
           ),
@@ -600,7 +614,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
             children: [
               const Icon(Icons.place, size: 18, color: AppColors.primary),
               const SizedBox(width: 6),
-              const Text('पूरा पता',
+              Text(t('पूरा पता', 'Full address'),
                   style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w800,
@@ -621,7 +635,8 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
             onChanged: (_) => _addrEdited = true,
             decoration: InputDecoration(
               isDense: true,
-              hintText: 'जगह चुनने पर पता यहाँ अपने आप आएगा, आप बदल भी सकते हैं',
+              hintText: t('जगह चुनने पर पता यहाँ अपने आप आएगा, आप बदल भी सकते हैं',
+                  'The address will appear here after you choose a place; you can edit it'),
               hintStyle:
                   const TextStyle(fontSize: 12.5, color: AppColors.muted),
               enabledBorder: OutlineInputBorder(
@@ -637,7 +652,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
           if (_chosen) ...[
             const SizedBox(height: 6),
             Text(
-              'इलाका: ${_locality.isEmpty ? '-' : _locality}   शहर: ${_city.isEmpty ? '-' : _city}',
+              '${t('इलाका', 'Area')}: ${_locality.isEmpty ? '-' : _locality}   ${t('शहर', 'City')}: ${_city.isEmpty ? '-' : _city}',
               style: const TextStyle(fontSize: 12, color: AppColors.muted),
             ),
           ],
@@ -654,7 +669,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                       child: CircularProgressIndicator(
                           strokeWidth: 2, color: Colors.white))
                   : const Icon(Icons.check_circle, size: 20),
-              label: const Text('यही लोकेशन पक्की करें',
+              label: Text(t('यही लोकेशन पक्की करें', 'Confirm this location'),
                   style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,

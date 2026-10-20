@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// ऐप की भाषा: 'hi' = हिंदी, 'en' = English
 class AppLang {
@@ -8,6 +9,23 @@ class AppLang {
 
   static void toggle() {
     notifier.value = isHindi ? 'en' : 'hi';
+    _save();
+  }
+
+  /// ऐप खुलते समय पिछली चुनी भाषा वापस लाओ
+  static Future<void> load() async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      final v = p.getString('app_lang');
+      if (v == 'hi' || v == 'en') notifier.value = v!;
+    } catch (_) {}
+  }
+
+  static Future<void> _save() async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      await p.setString('app_lang', notifier.value);
+    } catch (_) {}
   }
 }
 

@@ -11,6 +11,7 @@ import 'theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await AppLang.load();
 
   String? startupError;
   try {

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'data.dart';
 import 'home_screen.dart' show RoomMitraLogo;
+import 'strings.dart';
 import 'theme.dart';
 
 /// ऐप का डाउनलोड लिंक। अभी कोई पक्का लिंक नहीं है।
@@ -11,13 +12,16 @@ const String appShareLink = '';
 
 String inviteMessage() {
   final b = StringBuffer()
-    ..writeln('नमस्ते! मैं RoomMitra ऐप इस्तेमाल कर रहा/रही हूँ।')
-    ..writeln('नाहन और आसपास के शहरों में किराये का कमरा, PG या फ्लैट ढूँढना और')
-    ..writeln('सीधे मकान मालिक से बात करना अब आसान है।');
+    ..writeln(t('नमस्ते! मैं RoomMitra ऐप इस्तेमाल कर रहा/रही हूँ।',
+        'Hello! I am using the RoomMitra app.'))
+    ..writeln(t('नाहन और आसपास के शहरों में किराये का कमरा, PG या फ्लैट ढूँढना और',
+        'Finding a rented room, PG or flat in Nahan and nearby towns, and'))
+    ..writeln(t('सीधे मकान मालिक से बात करना अब आसान है।',
+        'talking directly to the owner is now easy.'));
   if (appShareLink.isNotEmpty) {
     b
       ..writeln()
-      ..writeln('ऐप यहाँ से लो: $appShareLink');
+      ..writeln(t('ऐप यहाँ से लो: $appShareLink', 'Get the app here: $appShareLink'));
   }
   return b.toString().trim();
 }
@@ -31,17 +35,19 @@ class InviteScreen extends StatelessWidget {
     try {
       final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
       if (!ok && context.mounted) {
-        showMsg(context, 'WhatsApp नहीं खुल सका');
+        showMsg(context, t('WhatsApp नहीं खुल सका', 'Could not open WhatsApp'));
       }
     } catch (_) {
-      if (context.mounted) showMsg(context, 'WhatsApp नहीं खुल सका');
+      if (context.mounted) showMsg(context, t('WhatsApp नहीं खुल सका', 'Could not open WhatsApp'));
     }
   }
 
   Future<void> _copy(BuildContext context) async {
     await Clipboard.setData(ClipboardData(text: inviteMessage()));
     if (context.mounted) {
-      showMsg(context, 'मैसेज कॉपी हो गया, अब कहीं भी paste कर सकते हो');
+      showMsg(context,
+          t('मैसेज कॉपी हो गया, अब कहीं भी paste कर सकते हो',
+              'Message copied, you can paste it anywhere'));
     }
   }
 
@@ -80,6 +86,13 @@ class InviteScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return ValueListenableBuilder<String>(
+      valueListenable: AppLang.notifier,
+      builder: (context, _, __) => _page(context),
+    );
+  }
+
+  Widget _page(BuildContext context) {
     final top = MediaQuery.of(context).padding.top;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light
@@ -115,14 +128,15 @@ class InviteScreen extends StatelessWidget {
                           size: 50, color: AppColors.primary),
                     ),
                     const SizedBox(height: 14),
-                    const Text('दोस्तों को बुलाएँ',
+                    Text(t('दोस्तों को बुलाएँ', 'Invite friends'),
                         style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.w800,
                             color: AppColors.text)),
                     const SizedBox(height: 6),
-                    const Text(
-                      'जिसे कमरा चाहिए या जिसे कमरा किराये पर देना है, उसे RoomMitra भेजें।',
+                    Text(
+                      t('जिसे कमरा चाहिए या जिसे कमरा किराये पर देना है, उसे RoomMitra भेजें।',
+                          'Send RoomMitra to anyone who needs a room or wants to rent one out.'),
                       textAlign: TextAlign.center,
                       style: TextStyle(
                           fontSize: 13.5, height: 1.4, color: AppColors.muted),
@@ -139,12 +153,12 @@ class InviteScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Row(
+                          Row(
                             children: [
-                              Icon(Icons.chat_bubble_outline,
+                              const Icon(Icons.chat_bubble_outline,
                                   size: 20, color: AppColors.primary),
-                              SizedBox(width: 8),
-                              Text('भेजा जाने वाला मैसेज',
+                              const SizedBox(width: 8),
+                              Text(t('भेजा जाने वाला मैसेज', 'Message to be sent'),
                                   style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w800,
@@ -159,8 +173,9 @@ class InviteScreen extends StatelessWidget {
                                   color: AppColors.text)),
                           if (appShareLink.isEmpty) ...[
                             const SizedBox(height: 8),
-                            const Text(
-                                'डाउनलोड लिंक अभी नहीं है। ऐप Play Store पर आने के बाद यह मैसेज में जुड़ जाएगा।',
+                            Text(
+                                t('डाउनलोड लिंक अभी नहीं है। ऐप Play Store पर आने के बाद यह मैसेज में जुड़ जाएगा।',
+                                    'No download link yet. It will be added to the message once the app is on the Play Store.'),
                                 style: TextStyle(
                                     fontSize: 11.5, color: AppColors.muted)),
                           ],
@@ -174,7 +189,7 @@ class InviteScreen extends StatelessWidget {
                       child: ElevatedButton.icon(
                         onPressed: () => _whatsapp(context),
                         icon: const Icon(Icons.chat, size: 20),
-                        label: const Text('WhatsApp पर भेजें',
+                        label: Text(t('WhatsApp पर भेजें', 'Send on WhatsApp'),
                             style: TextStyle(
                                 fontSize: 15, fontWeight: FontWeight.w700)),
                         style: ElevatedButton.styleFrom(
@@ -192,7 +207,7 @@ class InviteScreen extends StatelessWidget {
                       child: OutlinedButton.icon(
                         onPressed: () => _copy(context),
                         icon: const Icon(Icons.copy, size: 20),
-                        label: const Text('मैसेज कॉपी करें',
+                        label: Text(t('मैसेज कॉपी करें', 'Copy message'),
                             style: TextStyle(
                                 fontSize: 15, fontWeight: FontWeight.w700)),
                         style: OutlinedButton.styleFrom(
@@ -207,19 +222,22 @@ class InviteScreen extends StatelessWidget {
                     const SizedBox(height: 22),
                     Align(
                       alignment: Alignment.centerLeft,
-                      child: const Text('यह कैसे काम करता है?',
+                      child: Text(t('यह कैसे काम करता है?', 'How does it work?'),
                           style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w800,
                               color: AppColors.text)),
                     ),
                     const SizedBox(height: 12),
-                    _step(Icons.send, 'मैसेज भेजें',
-                        'WhatsApp या किसी भी ऐप से दोस्त को भेजें।'),
-                    _step(Icons.download, 'दोस्त ऐप इंस्टॉल करे',
-                        'वह RoomMitra डाउनलोड करके लॉगिन करे।'),
-                    _step(Icons.home_work, 'कमरा ढूँढे या लिस्ट करे',
-                        'सीधे मकान मालिक से बात, कोई दलाल नहीं।'),
+                    _step(Icons.send, t('मैसेज भेजें', 'Send the message'),
+                        t('WhatsApp या किसी भी ऐप से दोस्त को भेजें।',
+                            'Send it to a friend via WhatsApp or any app.')),
+                    _step(Icons.download, t('दोस्त ऐप इंस्टॉल करे', 'Friend installs the app'),
+                        t('वह RoomMitra डाउनलोड करके लॉगिन करे।',
+                            'They download RoomMitra and log in.')),
+                    _step(Icons.home_work, t('कमरा ढूँढे या लिस्ट करे', 'Find or list a room'),
+                        t('सीधे मकान मालिक से बात, कोई दलाल नहीं।',
+                            'Talk directly to the owner, no broker.')),
                   ],
                 ),
               ),

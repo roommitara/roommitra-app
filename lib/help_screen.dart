@@ -62,8 +62,8 @@ const List<_Faq> _faqs = [
     'owner',
     'अपना कमरा कैसे लिस्ट करूँ?',
     'How do I list my room?',
-    'नीचे बीच के "लिस्ट करें" बटन को दबाएँ। 6 आसान चरणों में कमरे की जानकारी, किराया, फोटो (कम से कम 5), सुविधाएँ और पता भरें। लिस्टिंग बिल्कुल फ्री है।',
-    'Tap the "List" button in the middle at the bottom. In 6 easy steps, fill in the room details, rent, photos (at least 5), amenities and address. Listing is completely free.',
+    'नीचे बीच के "लिस्ट करें" बटन को दबाएँ। 7 आसान चरणों में कमरे की जानकारी, किराया, फोटो (कम से कम 8), सुविधाएँ, पता और मैप पिन भरें। लिस्टिंग बिल्कुल फ्री है।',
+    'Tap the "List" button in the middle at the bottom. In 7 easy steps, fill in the room details, rent, photos (at least 8), amenities, address and map pin. Listing is completely free.',
   ),
   _Faq(
     'owner',
@@ -97,8 +97,8 @@ const List<_Faq> _faqs = [
     'safety',
     'फर्जी लिस्टिंग की रिपोर्ट कैसे करूँ?',
     'How do I report a fake listing?',
-    'कमरे की डिटेल स्क्रीन में ऊपर तीन बिंदुओं वाले मेन्यू से "नकली लिस्टिंग रिपोर्ट करें" चुनें। श्रेणी चुनकर रिपोर्ट भेजें। हमारी टीम जाँच करती है और गलत लिस्टिंग हटाती है।',
-    'On the room details screen, open the three-dot menu at the top and choose "Report fake listing". Pick a category and send the report. Our team reviews it and removes wrong listings.',
+    'कमरे की डिटेल स्क्रीन में ऊपर तीन बिंदुओं वाले मेन्यू से "कमरा रिपोर्ट करें" चुनें। श्रेणी चुनकर रिपोर्ट भेजें। हमारी टीम जाँच करती है और गलत लिस्टिंग हटाती है।',
+    'On the room details screen, open the three-dot menu at the top and choose "Report room". Pick a category and send the report. Our team reviews it and removes wrong listings.',
   ),
   _Faq(
     'safety',
