@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'data.dart';
+import 'guide_video.dart';
 import 'home_screen.dart' show RoomMitraLogo;
 import 'listing_service.dart';
+import 'listing_success_screen.dart';
+import 'location_picker_screen.dart';
 import 'strings.dart';
 import 'theme.dart';
 
@@ -20,18 +23,19 @@ class AddListingScreen extends StatefulWidget {
 }
 
 class _AddListingScreenState extends State<AddListingScreen> {
-  static const int _lastStep = 5;
+  static const int _lastStep = 6;
 
   // steps फ़ाइल (extension) में static नहीं दिखते, इसलिए ये getter हैं
   int get _minPhotos => 8;
   int get _maxPhotos => 12;
 
   List<String> get _stepLabels => [
-        t('लिस्टिंग की\nजानकारी', 'Listing\ndetails'),
-        t('किराया &\nडिपॉजिट', 'Rent &\ndeposit'),
-        t('फोटो\nअपलोड', 'Photo\nupload'),
-        t('सुविधाएँ &\nसंपर्क', 'Amenities &\ncontact'),
-        t('लोकेशन', 'Location'),
+        t('जानकारी', 'Details'),
+        t('किराया', 'Rent'),
+        t('फोटो', 'Photos'),
+        t('सुविधाएँ', 'Amenities'),
+        t('पता', 'Address'),
+        t('मैप पिन', 'Map pin'),
         t('समाप्त', 'Finish'),
       ];
 
@@ -55,6 +59,7 @@ class _AddListingScreenState extends State<AddListingScreen> {
   String _city = 'Nahan';
   int _rooms = 1;
   bool _submitting = false;
+  LocationResult? _loc; // मैप पर लगाया गया पिन
 
   final _title = TextEditingController();
   final _area = TextEditingController();
@@ -152,6 +157,11 @@ class _AddListingScreenState extends State<AddListingScreen> {
       if (_address.text.trim().length < 5) {
         return t('पूरा पता लिखें', 'Enter the full address');
       }
+    } else if (s == 5) {
+      if (_loc == null) {
+        return t('नक्शे पर अपनी प्रॉपर्टी का पिन लगाएँ',
+            'Place your property pin on the map');
+      }
     }
     return null;
   }
@@ -200,7 +210,7 @@ class _AddListingScreenState extends State<AddListingScreen> {
   Future<void> _submit() async {
     if (_submitting) return;
     // सभी स्टेप दोबारा जाँचो, कोई गड़बड़ हो तो उसी स्टेप पर ले जाओ
-    for (var s = 0; s <= 4; s++) {
+    for (var s = 0; s <= 5; s++) {
       final err = _validate(s);
       if (err != null) {
         _goStep(s);
@@ -234,6 +244,8 @@ class _AddListingScreenState extends State<AddListingScreen> {
         girlsOnly: _category == 'girls_boys' && _gender == 'female',
         commercial: _category == 'shop',
         fullAddress: address,
+        lat: _loc!.lat,
+        lng: _loc!.lng,
         ownerName: _name.text.trim(),
         phone: _phone.text.trim(),
         whatsapp: _whatsapp.text.trim(),
@@ -248,35 +260,8 @@ class _AddListingScreenState extends State<AddListingScreen> {
 
     if (!mounted) return;
     setState(() => _submitting = false);
-    await showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        title: Row(
-          children: [
-            const Icon(Icons.check_circle, color: AppColors.primary, size: 28),
-            const SizedBox(width: 8),
-            Expanded(
-                child: Text(t('लिस्टिंग भेज दी गई!', 'Listing submitted!'))),
-          ],
-        ),
-        content: Text(
-          t(
-            'आपकी लिस्टिंग अभी "जाँच में" है। एडमिन के approve करने के बाद वह सबको दिखेगी। '
-                'आप "मेरी लिस्टिंग" में उसकी स्थिति देख सकते हैं।',
-            'Your listing is now "under review". It will be visible to everyone after the admin approves it. '
-                'You can see its status in "My listings".',
-          ),
-          style: const TextStyle(height: 1.4),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(t('ठीक है', 'OK')),
-          ),
-        ],
-      ),
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(builder: (_) => const ListingSuccessScreen()),
     );
     if (!mounted) return;
     _resetForm();
@@ -294,6 +279,7 @@ class _AddListingScreenState extends State<AddListingScreen> {
       _gender = 'male';
       _city = 'Nahan';
       _rooms = 1;
+      _loc = null;
       _step = 0;
     });
     if (_scroll.hasClients) _scroll.jumpTo(0);
@@ -620,6 +606,193 @@ class _AddListingScreenState extends State<AddListingScreen> {
     );
   }
 
+  // ------------------------------------------------------------ मैप पिन
+
+  Future<void> _pickLocation() async {
+    final r = await Navigator.of(context).push<LocationResult>(
+      MaterialPageRoute<LocationResult>(
+        builder: (_) => LocationPickerScreen(initial: _loc),
+      ),
+    );
+    if (r == null || !mounted) return;
+    setState(() {
+      _loc = r;
+      // खाली फ़ील्ड मैप के पते से अपने आप भर दो (मालिक बाद में बदल सकता है)
+      if (_address.text.trim().isEmpty) _address.text = r.address;
+      if (_area.text.trim().isEmpty && r.locality.isNotEmpty) {
+        _area.text = r.locality;
+      }
+      if (allCities.contains(r.city)) _city = r.city;
+    });
+  }
+
+  Widget _stepPin() {
+    final loc = _loc;
+    return Column(
+      children: [
+        _headerCard(
+            Icons.pin_drop,
+            t('प्रॉपर्टी का मैप पिन', 'Property map pin'),
+            t('नक्शे पर ठीक वही जगह चुनें जहाँ आपकी प्रॉपर्टी है',
+                'Choose the exact spot of your property on the map')),
+        _card(
+          loc == null
+              ? Column(
+                  children: [
+                    const SizedBox(height: 8),
+                    Container(
+                      width: 84,
+                      height: 84,
+                      decoration: const BoxDecoration(
+                        color: AppColors.tint,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.add_location_alt,
+                          size: 44, color: AppColors.primary),
+                    ),
+                    const SizedBox(height: 14),
+                    Text(
+                      t('अभी पिन नहीं लगा है', 'No pin placed yet'),
+                      style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.text),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      t('GPS से अपनी मौजूदा जगह लें, पता खोजें या नक्शा खिसकाकर पिन लगाएँ।',
+                          'Use GPS, search an address or move the map to place the pin.'),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                          fontSize: 13, height: 1.4, color: AppColors.muted),
+                    ),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton.icon(
+                        onPressed: _pickLocation,
+                        icon: const Icon(Icons.map, size: 22),
+                        label: Text(t('नक्शे पर पिन लगाएँ', 'Place pin on map')),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          textStyle: const TextStyle(
+                              fontSize: 15, fontWeight: FontWeight.w700),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14)),
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.check_circle,
+                            color: AppColors.primary, size: 26),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            t('पिन लग गया है', 'Pin placed'),
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.text),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: AppColors.tintLight,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Icon(Icons.location_on,
+                                  size: 20, color: AppColors.primary),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Text(
+                                  loc.address,
+                                  style: const TextStyle(
+                                      fontSize: 13.5,
+                                      height: 1.4,
+                                      color: AppColors.text),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            '${loc.lat.toStringAsFixed(5)}, ${loc.lng.toStringAsFixed(5)}',
+                            style: const TextStyle(
+                                fontSize: 12, color: AppColors.muted),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 46,
+                      child: OutlinedButton.icon(
+                        onPressed: _pickLocation,
+                        icon: const Icon(Icons.edit_location_alt, size: 20),
+                        label: Text(t('पिन बदलें', 'Change pin')),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.primary,
+                          side: const BorderSide(
+                              color: AppColors.primary, width: 1.2),
+                          textStyle: const TextStyle(
+                              fontSize: 14.5, fontWeight: FontWeight.w700),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14)),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+        ),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: AppColors.tint,
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Icon(Icons.info_outline,
+                  color: AppColors.primary, size: 22),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  t(
+                    'यह पिन नज़दीकी कमरे दिखाने और किरायेदार को Google Maps में रास्ता दिखाने के काम आएगा।',
+                    'This pin is used to show nearby rooms and to give tenants directions in Google Maps.',
+                  ),
+                  style: const TextStyle(
+                      fontSize: 12.5, height: 1.4, color: AppColors.text),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   // ------------------------------------------------------------ बॉडी / बटन
 
   Widget _body() {
@@ -627,13 +800,24 @@ class _AddListingScreenState extends State<AddListingScreen> {
       case 0:
         return _step0();
       case 1:
-        return _step1();
+        return Column(
+          children: [
+            const GuideVideo(
+              asset: 'assets/guide_rent.mp4',
+              hi: 'यहाँ अपना किराया भरें। आप महीने के कितने रुपये पर कमरा देना चाहते हैं?',
+              en: 'Enter your rent here. How much per month do you want for the room?',
+            ),
+            _step1(),
+          ],
+        );
       case 2:
         return _step2();
       case 3:
         return _step3();
       case 4:
         return _step4();
+      case 5:
+        return _stepPin();
       default:
         return _step5();
     }
