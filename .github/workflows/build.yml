@@ -21,6 +21,17 @@ jobs:
         run: |
           sed -i 's#<application#<uses-permission android:name="android.permission.INTERNET"/>\n    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>\n    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>\n    <application#' out/android/app/src/main/AndroidManifest.xml
           grep -n "uses-permission" out/android/app/src/main/AndroidManifest.xml
+      - name: Add Google login deep link
+        run: |
+          python3 - << 'PYEOF'
+          p = 'out/android/app/src/main/AndroidManifest.xml'
+          s = open(p).read()
+          link = '<intent-filter><action android:name="android.intent.action.VIEW"/><category android:name="android.intent.category.DEFAULT"/><category android:name="android.intent.category.BROWSABLE"/><data android:scheme="roommitra" android:host="login-callback"/></intent-filter>'
+          if 'login-callback' not in s:
+              s = s.replace('</activity>', link + '</activity>', 1)
+          open(p, 'w').write(s)
+          PYEOF
+          grep -c "login-callback" out/android/app/src/main/AndroidManifest.xml
       - name: Add R8 keep rules
         run: |
           cat > out/android/app/proguard-rules.pro << 'EOF'
@@ -61,8 +72,20 @@ jobs:
           mkdir -p out/assets
           for f in *.png *.jpg; do cp "$f" out/assets/; done
           for f in guide_*.mp4; do [ -f "$f" ] && cp "$f" out/assets/ || true; done
+          [ -f intro.mp4 ] && cp intro.mp4 out/assets/ || true
           cp file_00000000b18c8208822c12bae77db15e.png out/assets/splash.png
           cp app_logo_green.png out/assets/logo.png
+      - name: Use fixed signing key (so updates install over old app)
+        env:
+          KS_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+        run: |
+          if [ -n "$KS_B64" ]; then
+            mkdir -p ~/.android
+            echo "$KS_B64" | base64 -d > ~/.android/debug.keystore
+            echo "Fixed signing key installed"
+          else
+            echo "No ANDROID_KEYSTORE_B64 secret, using random key"
+          fi
       - name: Build
         working-directory: out
         run: |
