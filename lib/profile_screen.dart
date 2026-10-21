@@ -49,11 +49,108 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   /// एडमिन पैनल सिर्फ तब दिखेगा जब सर्वर का is_admin() true दे
   bool _isAdmin = false;
+  String _name = '';
 
   @override
   void initState() {
     super.initState();
     _checkAdmin();
+    _loadName();
+  }
+
+  Future<void> _loadName() async {
+    try {
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user == null) return;
+      final row = await Supabase.instance.client
+          .from('profiles')
+          .select('full_name')
+          .eq('id', user.id)
+          .maybeSingle();
+      var n = (row?['full_name'] ?? '').toString().trim();
+      if (n.isEmpty) {
+        n = (user.userMetadata?['full_name'] ??
+                user.userMetadata?['name'] ??
+                '')
+            .toString()
+            .trim();
+      }
+      if (!mounted) return;
+      setState(() => _name = n);
+    } catch (_) {}
+  }
+
+  Future<void> _editProfile() async {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
+      showMsg(context, t('पहले लॉगिन करें', 'Please log in first'));
+      return;
+    }
+    final ctrl = TextEditingController(text: _name);
+    final saved = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.fromLTRB(
+            20, 20, 20, 20 + MediaQuery.of(ctx).viewInsets.bottom),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(t('प्रोफाइल अपडेट करें', 'Update profile'),
+                style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.text)),
+            const SizedBox(height: 14),
+            TextField(
+              controller: ctrl,
+              maxLength: 60,
+              textCapitalization: TextCapitalization.words,
+              decoration: InputDecoration(
+                labelText: t('आपका नाम', 'Your name'),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton(
+                onPressed: () => Navigator.of(ctx).pop(true),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                ),
+                child: Text(t('सेव करें', 'Save'),
+                    style: const TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.w700)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+    final newName = ctrl.text.trim();
+    ctrl.dispose();
+    if (saved != true || newName.isEmpty || !mounted) return;
+    try {
+      await Supabase.instance.client
+          .from('profiles')
+          .update({'full_name': newName}).eq('id', user.id);
+      if (!mounted) return;
+      setState(() => _name = newName);
+      showMsg(context, t('प्रोफाइल सेव हो गई', 'Profile saved'));
+    } catch (_) {
+      if (!mounted) return;
+      showMsg(context,
+          t('सेव नहीं हो सका, फिर कोशिश करें', 'Could not save, try again'));
+    }
   }
 
   Future<void> _checkAdmin() async {
@@ -200,40 +297,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       );
     }
-    return InkWell(
-      onTap: () => showMsg(
-        context,
-        t('ईमेल जोड़ने की सुविधा जल्द आएगी', 'Add email is coming soon'),
-      ),
-      borderRadius: BorderRadius.circular(8),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 2),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.email, size: _kIconSmall, color: AppColors.primary),
-            const SizedBox(width: 6),
-            Flexible(
-              child: Text(
-                t('ईमेल जोड़ें', 'Add Email'),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.primary,
-                  decoration: TextDecoration.underline,
-                  decorationColor: AppColors.primary,
-                ),
-              ),
-            ),
-            const SizedBox(width: 4),
-            const Icon(Icons.add_circle_outline,
-                size: _kIconSmall, color: AppColors.primary),
-          ],
-        ),
-      ),
-    );
+    return const SizedBox.shrink();
   }
 
   Widget _headerCard(BuildContext context) {
@@ -255,7 +319,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     Flexible(
                       child: Text(
-                        t('उपयोगकर्ता', 'User'),
+                        _name.isEmpty ? t('उपयोगकर्ता', 'User') : _name,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
@@ -265,8 +329,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                     const SizedBox(width: 6),
-                    const Icon(Icons.verified,
-                        color: AppColors.primary, size: 20),
+                    GestureDetector(
+                      onTap: _editProfile,
+                      child: const Icon(Icons.edit,
+                          color: AppColors.primary, size: 20),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 6),
@@ -481,6 +548,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             );
           },
         ),
+      _MenuItem(
+        Icons.manage_accounts,
+        t('प्रोफाइल अपडेट करें', 'Update profile'),
+        t('अपना नाम बदलें', 'Change your name'),
+        _editProfile,
+      ),
       _MenuItem(
         Icons.group_add,
         t('दोस्तों को बुलाएँ', 'Invite friends'),
