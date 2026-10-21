@@ -27,10 +27,27 @@ class _GuideVideoState extends State<GuideVideo> {
   bool _muted = false;
   bool _hidden = false;
 
+  /// क्या यह स्क्रीन अभी सच में दिख रही है? (नीचे के टैब बनकर छिपे रहते हैं, तब न चले)
+  bool _visible = false;
+
   @override
   void initState() {
     super.initState();
     _init();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final v = TickerMode.of(context);
+    if (v == _visible) return;
+    _visible = v;
+    final c = _c;
+    if (!v) {
+      c?.pause();
+    } else if (_ready && c != null && GuideVideo._played.add(widget.asset)) {
+      c.play();
+    }
   }
 
   Future<void> _init() async {
@@ -44,7 +61,7 @@ class _GuideVideoState extends State<GuideVideo> {
       });
       if (!mounted) return;
       setState(() => _ready = true);
-      if (GuideVideo._played.add(widget.asset)) {
+      if (_visible && GuideVideo._played.add(widget.asset)) {
         await c.play();
       }
     } catch (_) {
