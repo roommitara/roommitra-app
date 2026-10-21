@@ -820,7 +820,16 @@ class _AddListingScreenState extends State<AddListingScreen> {
           ],
         );
       case 2:
-        return _step2();
+        return Column(
+          children: [
+            const GuideVideo(
+              asset: 'assets/guide_photos.mp4',
+              hi: 'यहाँ कमरे की कम से कम आठ साफ़ फोटो डालिए। रोशनी में खींची हुई फोटो ज़्यादा लोगों को पसंद आती हैं।',
+              en: 'Add at least eight clear photos of the room here. Photos taken in good light attract more people.',
+            ),
+            _step2(),
+          ],
+        );
       case 3:
         return _step3();
       case 4:
