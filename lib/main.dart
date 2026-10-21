@@ -108,11 +108,13 @@ class _SplashScreenState extends State<SplashScreen> {
     // intro सिर्फ ऐप पहली बार खुलने पर चलता है
     try {
       final prefs = await SharedPreferences.getInstance();
-      if (prefs.getBool('intro_seen') == true) {
+      if (prefs.getBool('intro_seen_v2') == true) {
+        // पहले देख चुके हैं: हरी स्प्लैश स्क्रीन थोड़ी देर दिखाकर आगे बढ़ो
+        await Future<void>.delayed(const Duration(milliseconds: 1600));
         _goNext();
         return;
       }
-      await prefs.setBool('intro_seen', true);
+      await prefs.setBool('intro_seen_v2', true);
     } catch (_) {}
     try {
       final c = VideoPlayerController.asset('assets/intro.mp4');
