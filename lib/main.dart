@@ -6,6 +6,7 @@ import 'app_shell.dart';
 import 'login_screen.dart';
 import 'onboarding_screen.dart';
 import 'otp_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'strings.dart';
 import 'theme.dart';
 
@@ -104,6 +105,15 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _startVideo() async {
+    // intro सिर्फ ऐप पहली बार खुलने पर चलता है
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (prefs.getBool('intro_seen') == true) {
+        _goNext();
+        return;
+      }
+      await prefs.setBool('intro_seen', true);
+    } catch (_) {}
     try {
       final c = VideoPlayerController.asset('assets/intro.mp4');
       _video = c;
@@ -193,7 +203,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     final c = _video;
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.white,
       body: Stack(
         children: [
           // वीडियो लोड होने तक पुरानी स्प्लैश इमेज
