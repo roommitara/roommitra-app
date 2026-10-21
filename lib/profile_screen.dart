@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'admin_review_screen.dart';
 import 'data.dart';
@@ -50,6 +51,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   /// एडमिन पैनल सिर्फ तब दिखेगा जब सर्वर का is_admin() true दे
   bool _isAdmin = false;
   String _name = '';
+  String _avatarUrl = '';
+  bool _avatarBusy = false;
 
   @override
   void initState() {
@@ -78,6 +81,75 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (!mounted) return;
       setState(() => _name = n);
     } catch (_) {}
+  }
+
+  void _readAvatar() {
+    final u = Supabase.instance.client.auth.currentUser;
+    final m = u?.userMetadata;
+    final url = (m?['avatar_url'] ?? m?['picture'] ?? '').toString();
+    if (url != _avatarUrl) _avatarUrl = url;
+  }
+
+  Future<void> _pickAvatar() async {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
+      showMsg(context, t('पहले लॉगिन करें', 'Please log in first'));
+      return;
+    }
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 8),
+            ListTile(
+              leading: const Icon(Icons.photo_library, color: AppColors.primary),
+              title: Text(t('गैलरी से चुनें', 'Choose from gallery')),
+              onTap: () => Navigator.of(ctx).pop(ImageSource.gallery),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_camera, color: AppColors.primary),
+              title: Text(t('कैमरे से खींचें', 'Take a photo')),
+              onTap: () => Navigator.of(ctx).pop(ImageSource.camera),
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+    if (source == null) return;
+    try {
+      final file = await ImagePicker().pickImage(
+          source: source, maxWidth: 600, maxHeight: 600, imageQuality: 80);
+      if (file == null || !mounted) return;
+      setState(() => _avatarBusy = true);
+      final bytes = await file.readAsBytes();
+      final path =
+          '${user.id}/avatar_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final storage = Supabase.instance.client.storage.from('room-photos');
+      await storage.uploadBinary(path, bytes,
+          fileOptions:
+              const FileOptions(contentType: 'image/jpeg', upsert: false));
+      final url = storage.getPublicUrl(path);
+      await Supabase.instance.client.auth
+          .updateUser(UserAttributes(data: {'avatar_url': url}));
+      if (!mounted) return;
+      setState(() {
+        _avatarUrl = url;
+        _avatarBusy = false;
+      });
+      showMsg(context, t('प्रोफाइल फोटो बदल गई', 'Profile photo updated'));
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _avatarBusy = false);
+      showMsg(
+          context,
+          t('फोटो नहीं लग सकी, फिर कोशिश करें',
+              'Could not set the photo, please try again'));
+    }
   }
 
   Future<void> _editProfile() async {
@@ -254,28 +326,83 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  /// प्रोफाइल फोटो की जगह: हरा ग्रेडिएंट गोला, सफेद किनारा और हल्की छाया
+  /// प्रोफाइल फोटो: फोटो हो तो वही, वरना हरा गोला। दबाने पर नई फोटो चुन सकते हैं।
   Widget _avatarPlaceholder() {
-    return Container(
+    _readAvatar();
+    final fallback = Container(
       width: 72,
       height: 72,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         shape: BoxShape.circle,
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           colors: [AppColors.primary, AppColors.primaryDark],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        border: Border.all(color: Colors.white, width: 3),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withOpacity(0.35),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
       child: const Icon(Icons.person, color: Colors.white, size: 42),
+    );
+    return GestureDetector(
+      onTap: _avatarBusy ? null : _pickAvatar,
+      child: SizedBox(
+        width: 76,
+        height: 76,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Container(
+              width: 76,
+              height: 76,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 3),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withOpacity(0.35),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: ClipOval(
+                child: _avatarUrl.isEmpty
+                    ? fallback
+                    : Image.network(
+                        _avatarUrl,
+                        width: 70,
+                        height: 70,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => fallback,
+                      ),
+              ),
+            ),
+            if (_avatarBusy)
+              const Positioned.fill(
+                child: Center(
+                  child: SizedBox(
+                      width: 26,
+                      height: 26,
+                      child: CircularProgressIndicator(strokeWidth: 3)),
+                ),
+              ),
+            Positioned(
+              right: -2,
+              bottom: -2,
+              child: Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 2),
+                ),
+                child: const Icon(Icons.photo_camera,
+                    color: Colors.white, size: 15),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -551,7 +678,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _MenuItem(
         Icons.manage_accounts,
         t('प्रोफाइल अपडेट करें', 'Update profile'),
-        t('अपना नाम बदलें', 'Change your name'),
+        t('अपना नाम बदलें, फोटो बदलने के लिए फोटो दबाएँ', 'Change your name; tap the photo to change it'),
         _editProfile,
       ),
       _MenuItem(
