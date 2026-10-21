@@ -10,7 +10,8 @@ import 'theme.dart';
 /// सिर्फ वही कमरे आते हैं जिनमें मालिक ने मैप पिन लगाया है।
 class NearbyRooms extends StatelessWidget {
   static const double _maxKm = 50;
-  const NearbyRooms({super.key});
+  final VoidCallback? onSeeAll;
+  const NearbyRooms({super.key, this.onSeeAll});
 
   Widget _box(Widget child) {
     return Container(
@@ -59,106 +60,197 @@ class NearbyRooms extends StatelessWidget {
     );
   }
 
+  Widget _amen(IconData icon, String text) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 15, color: AppColors.muted),
+        const SizedBox(width: 4),
+        Text(text,
+            style: const TextStyle(fontSize: 12, color: AppColors.muted)),
+      ],
+    );
+  }
+
   Widget _card(BuildContext context, Listing l, double km) {
+    final fav = appState.isFav(l.id);
+    final ams = allAmenities.where((a) => l.amenities.contains(a.id)).take(2);
     return GestureDetector(
       onTap: () => Navigator.of(context).push(
         MaterialPageRoute<void>(builder: (_) => DetailScreen(listing: l)),
       ),
       child: Container(
-        width: 200,
-        clipBehavior: Clip.antiAlias,
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: AppColors.border),
           boxShadow: const [
             BoxShadow(
-                color: Color(0x1A000000), blurRadius: 10, offset: Offset(0, 3)),
+                color: Color(0x14000000), blurRadius: 8, offset: Offset(0, 2)),
           ],
         ),
-        child: Column(
+        child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Stack(
-              children: [
-                ListingImage(
-                  listing: l,
-                  height: 110,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
-                Positioned(
-                  left: 8,
-                  bottom: 8,
-                  child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(12),
+            SizedBox(
+              width: 150,
+              height: 130,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(14),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    ListingImage(
+                      listing: l,
+                      height: 130,
+                      width: 150,
+                      fit: BoxFit.cover,
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
+                    Positioned(
+                      left: 6,
+                      top: 6,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.location_on,
+                                size: 13, color: Colors.white),
+                            const SizedBox(width: 3),
+                            Text(
+                              NearbyService.formatKm(km),
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 11.5,
+                                  fontWeight: FontWeight.w700),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      right: 6,
+                      top: 6,
+                      child: GestureDetector(
+                        onTap: () => appState.toggleFavorite(l.id),
+                        child: Container(
+                          width: 32,
+                          height: 32,
+                          decoration: const BoxDecoration(
+                              color: Colors.white, shape: BoxShape.circle),
+                          child: Icon(
+                            fav ? Icons.favorite : Icons.favorite_border,
+                            size: 19,
+                            color:
+                                fav ? const Color(0xFFE53935) : AppColors.text,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: SizedBox(
+                height: 130,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l.title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                          fontSize: 16,
+                          height: 1.2,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.text),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
                       children: [
-                        const Icon(Icons.near_me, size: 13, color: Colors.white),
-                        const SizedBox(width: 4),
-                        Text(
-                          NearbyService.formatKm(km),
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 11.5,
-                              fontWeight: FontWeight.w700),
+                        const Icon(Icons.location_on,
+                            size: 15, color: AppColors.primary),
+                        const SizedBox(width: 3),
+                        Expanded(
+                          child: Text(
+                            l.area,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                                fontSize: 12.5, color: AppColors.muted),
+                          ),
                         ),
                       ],
                     ),
-                  ),
-                ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    l.title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                        fontSize: 14.5,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.text),
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    l.area,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style:
-                        const TextStyle(fontSize: 12, color: AppColors.muted),
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        '₹${inr(l.price)}',
-                        style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.primary),
-                      ),
-                      const SizedBox(width: 3),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 1),
-                        child: Text(
-                          t('/माह', '/month'),
-                          style: const TextStyle(
-                              fontSize: 11, color: AppColors.primary),
+                    const SizedBox(height: 6),
+                    Wrap(
+                      spacing: 10,
+                      runSpacing: 2,
+                      children: ams.map((a) => _amen(a.icon, a.label)).toList(),
+                    ),
+                    const Spacer(),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Expanded(
+                          child: Text.rich(
+                            TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: '₹${inr(l.price)}',
+                                  style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w800,
+                                      color: AppColors.primaryDark),
+                                ),
+                                TextSpan(
+                                  text: ' ${t('/माह', '/month')}',
+                                  style: const TextStyle(
+                                      fontSize: 12,
+                                      color: AppColors.primaryDark),
+                                ),
+                              ],
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                        if (l.verified)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 5),
+                            decoration: BoxDecoration(
+                              color: AppColors.tint,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.verified,
+                                    size: 14, color: AppColors.primary),
+                                const SizedBox(width: 3),
+                                Text(t('सत्यापित', 'Verified'),
+                                    style: const TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w700,
+                                        color: AppColors.primaryDark)),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -246,24 +338,18 @@ class NearbyRooms extends StatelessWidget {
       );
     }
 
-    final shown = near.take(10).toList();
-    return SizedBox(
-      height: 236,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.only(bottom: 14, left: 2, right: 2),
-        itemCount: shown.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 12),
-        itemBuilder: (context, i) =>
-            _card(context, shown[i].key, shown[i].value),
-      ),
+    final shown = near.take(3).toList();
+    return Column(
+      children: [
+        for (final e in shown) _card(context, e.key, e.value),
+      ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: Listenable.merge([NearbyService.instance, listingsStore]),
+      listenable: Listenable.merge([NearbyService.instance, listingsStore, appState]),
       builder: (context, _) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -287,11 +373,30 @@ class NearbyRooms extends StatelessWidget {
                     listingsStore.load();
                   },
                   child: const Padding(
-                    padding: EdgeInsets.all(4),
+                    padding: EdgeInsets.all(6),
                     child:
                         Icon(Icons.refresh, size: 22, color: AppColors.primary),
                   ),
                 ),
+                if (onSeeAll != null)
+                  InkWell(
+                    onTap: onSeeAll,
+                    child: Padding(
+                      padding: const EdgeInsets.all(4),
+                      child: Row(
+                        children: [
+                          Text(t('सभी देखें', 'See all'),
+                              style: const TextStyle(
+                                  color: AppColors.primary,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700)),
+                          const SizedBox(width: 4),
+                          const Icon(Icons.arrow_forward,
+                              size: 16, color: AppColors.primary),
+                        ],
+                      ),
+                    ),
+                  ),
               ],
             ),
             const SizedBox(height: 12),

@@ -146,90 +146,74 @@ class _HomeScreenState extends State<HomeScreen> {
         'assets/city_shimla.jpg'),
   ];
 
-  Widget _cityChip() {
-    return PopupMenuButton<String>(
-      onSelected: appState.setCity,
-      itemBuilder: (_) => _cities
-          .map((c) => PopupMenuItem(value: c.name, child: Text(c.name)))
-          .toList(),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.border),
-        ),
-        child: Row(
-          children: [
-            const Icon(Icons.location_on, size: 24, color: AppColors.primary),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                '${appState.city}, ${t('हिमाचल प्रदेश', 'Himachal Pradesh')}',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                    color: AppColors.text,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700),
-              ),
-            ),
-            const Icon(Icons.keyboard_arrow_down,
-                size: 26, color: AppColors.primaryDark),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _header(double top) {
     return Container(
       width: double.infinity,
       color: Colors.white,
       padding: EdgeInsets.fromLTRB(16, top + 12, 16, 12),
-      child: Column(
+      child: Row(
         children: [
-          Row(
-            children: [
-              const RoomMitraLogo(dark: true),
-              const Spacer(),
-              GestureDetector(
-                onTap: AppLang.toggle,
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: AppColors.tint,
-                    borderRadius: BorderRadius.circular(18),
-                  ),
-                  child: Text(
+          const Flexible(child: RoomMitraLogo(dark: true)),
+          const SizedBox(width: 8),
+          const Spacer(),
+          GestureDetector(
+            onTap: AppLang.toggle,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(
+                color: AppColors.tint,
+                borderRadius: BorderRadius.circular(22),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.language,
+                      size: 20, color: AppColors.primaryDark),
+                  const SizedBox(width: 6),
+                  Text(
                     AppLang.isHindi ? 'English' : 'हिंदी',
                     style: const TextStyle(
-                        fontSize: 13,
+                        fontSize: 14,
                         fontWeight: FontWeight.w800,
                         color: AppColors.primaryDark),
                   ),
-                ),
+                ],
               ),
-              const SizedBox(width: 12),
-              GestureDetector(
-                onTap: widget.onProfileTap,
-                child: Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.primaryDark, width: 2),
-                  ),
-                  child: const Icon(Icons.person_outline,
-                      color: AppColors.primaryDark, size: 26),
-                ),
-              ),
-            ],
+            ),
           ),
-          const SizedBox(height: 14),
-          _cityChip(),
+          const SizedBox(width: 10),
+          PopupMenuButton<String>(
+            tooltip: t('शहर चुनें', 'Choose city'),
+            onSelected: appState.setCity,
+            itemBuilder: (_) => _cities
+                .map((c) => PopupMenuItem(
+                    value: c.name,
+                    child: Row(
+                      children: [
+                        Icon(
+                            c.name == appState.city
+                                ? Icons.check_circle
+                                : Icons.location_on_outlined,
+                            size: 20,
+                            color: AppColors.primary),
+                        const SizedBox(width: 8),
+                        Text(AppLang.isHindi
+                            ? (cityHindi[c.name] ?? c.name)
+                            : c.name),
+                      ],
+                    )))
+                .toList(),
+            child: Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: AppColors.primaryDark, width: 2),
+              ),
+              child: const Icon(Icons.location_on,
+                  color: AppColors.primaryDark, size: 28),
+            ),
+          ),
         ],
       ),
     );
@@ -418,18 +402,22 @@ class _HomeScreenState extends State<HomeScreen> {
     return Column(
       children: [
         SizedBox(
-          height: 176,
+          height: 200,
           child: PageView(
             controller: _bannerPc,
             onPageChanged: (i) => setState(() => _bannerI = i),
             children: [
               Padding(
-                padding: const EdgeInsets.only(right: 4),
-                child: _exploreBanner(),
+                padding: const EdgeInsets.symmetric(horizontal: 2),
+                child: _findSlide(),
               ),
               Padding(
-                padding: const EdgeInsets.only(left: 4),
-                child: _banner(),
+                padding: const EdgeInsets.symmetric(horizontal: 2),
+                child: _addPropertySlide(),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 2),
+                child: _noBrokerSlide(),
               ),
             ],
           ),
@@ -437,7 +425,7 @@ class _HomeScreenState extends State<HomeScreen> {
         const SizedBox(height: 10),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(2, (i) {
+          children: List.generate(3, (i) {
             final on = i == _bannerI;
             return AnimatedContainer(
               duration: const Duration(milliseconds: 200),
@@ -455,22 +443,55 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// "Find Your Perfect Room in <शहर>" वाला बैनर
-  Widget _exploreBanner() {
-    final city = AppLang.isHindi
-        ? (cityHindi[appState.city] ?? appState.city)
-        : appState.city;
+  static const Color _lime = Color(0xFF7BF03A);
+
+  Widget _feature(IconData icon, String text) {
+    return Expanded(
+      child: Row(
+        children: [
+          Container(
+            width: 30,
+            height: 30,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: _lime, width: 1.4),
+            ),
+            child: Icon(icon, size: 16, color: _lime),
+          ),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(
+              text,
+              maxLines: 2,
+              style: const TextStyle(
+                  color: Colors.white, fontSize: 11, height: 1.2),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// तीनों स्लाइड का एक जैसा डिज़ाइन: गहरा हरा बैकग्राउंड, दाईं तरफ फोटो
+  Widget _slide({
+    required String line1,
+    required String line2,
+    String? accent,
+    Widget? middle,
+    required String btn,
+    required VoidCallback onTap,
+    required String image,
+    bool solidButton = false,
+  }) {
     return Container(
       clipBehavior: Clip.hardEdge,
-      constraints: const BoxConstraints(minHeight: 150),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFFE8F5EC), Color(0xFFD3EBDB)],
+          colors: [Color(0xFF062F1E), Color(0xFF0B4A2C)],
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
         ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Stack(
         children: [
@@ -478,17 +499,17 @@ class _HomeScreenState extends State<HomeScreen> {
             right: 0,
             top: 0,
             bottom: 0,
-            width: 170,
+            width: 200,
             child: ShaderMask(
               blendMode: BlendMode.dstIn,
               shaderCallback: (rect) => const LinearGradient(
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,
                 colors: [Color(0x00FFFFFF), Color(0xFFFFFFFF)],
-                stops: [0.0, 0.5],
+                stops: [0.0, 0.6],
               ).createShader(rect),
               child: Image.asset(
-                'assets/room1.jpg',
+                image,
                 fit: BoxFit.cover,
                 alignment: Alignment.centerRight,
                 errorBuilder: (_, __, ___) => const SizedBox.shrink(),
@@ -496,58 +517,87 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 14, 120, 14),
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(Icons.home_rounded,
-                        color: AppColors.primary, size: 30),
+                    const Icon(Icons.home_rounded, color: _lime, size: 34),
                     const SizedBox(width: 8),
                     Expanded(
-                      child: Text(
-                        t('$city में अपना परफेक्ट कमरा खोजें',
-                            'Find Your Perfect Room in $city'),
+                      child: Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(text: '$line1\n'),
+                            TextSpan(
+                                text: line2,
+                                style: const TextStyle(color: Colors.white)),
+                            if (accent != null)
+                              TextSpan(
+                                  text: ' $accent',
+                                  style: const TextStyle(color: _lime)),
+                          ],
+                        ),
                         style: const TextStyle(
-                            fontSize: 18,
-                            height: 1.2,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.primaryDark),
+                            color: Colors.white,
+                            fontSize: 20,
+                            height: 1.15,
+                            fontWeight: FontWeight.w800),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  t('सुरक्षित | किफायती | सत्यापित लिस्टिंग',
-                      'Safe | Affordable | Verified Listings'),
-                  style: const TextStyle(
-                      fontSize: 11.5, height: 1.3, color: AppColors.text),
-                ),
-                const SizedBox(height: 12),
-                ElevatedButton(
-                  onPressed: widget.onSearchTap,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryDark,
-                    foregroundColor: Colors.white,
-                    elevation: 2,
-                    shape: const StadiumBorder(),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 11),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(t('कमरे देखें', 'Explore Rooms'),
-                          style: const TextStyle(
-                              fontWeight: FontWeight.w800, fontSize: 13)),
-                      const SizedBox(width: 6),
-                      const Icon(Icons.arrow_forward, size: 16),
-                    ],
-                  ),
+                if (middle != null) middle,
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: solidButton
+                      ? ElevatedButton(
+                          onPressed: onTap,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: _lime,
+                            foregroundColor: const Color(0xFF063D24),
+                            elevation: 3,
+                            shape: const StadiumBorder(),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 18, vertical: 12),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(btn,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 14)),
+                              const SizedBox(width: 6),
+                              const Icon(Icons.arrow_forward, size: 18),
+                            ],
+                          ),
+                        )
+                      : OutlinedButton(
+                          onPressed: onTap,
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            backgroundColor: const Color(0x33000000),
+                            side: const BorderSide(color: _lime, width: 1.6),
+                            shape: const StadiumBorder(),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 18, vertical: 12),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(btn,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 14)),
+                              const SizedBox(width: 6),
+                              const Icon(Icons.arrow_forward, size: 18),
+                            ],
+                          ),
+                        ),
                 ),
               ],
             ),
@@ -557,104 +607,59 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// मकान मालिक वाला बैनर (पहले जैसा)
-  Widget _banner() {
-    return Container(
-      clipBehavior: Clip.hardEdge,
-      constraints: const BoxConstraints(minHeight: 150),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF062F1E), Color(0xFF0B4A2C)],
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Stack(
+  Widget _findSlide() {
+    final city = AppLang.isHindi
+        ? (cityHindi[appState.city] ?? appState.city)
+        : appState.city;
+    return _slide(
+      line1: t('अपना परफेक्ट', 'Find Your Perfect'),
+      line2: t('कमरा खोजें', 'Room in'),
+      accent: city,
+      middle: Row(
         children: [
-          Positioned(
-            right: 0,
-            top: 0,
-            bottom: 0,
-            width: 190,
-            child: ShaderMask(
-              blendMode: BlendMode.dstIn,
-              shaderCallback: (rect) => const LinearGradient(
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-                colors: [Color(0x00FFFFFF), Color(0xFFFFFFFF)],
-                stops: [0.0, 0.55],
-              ).createShader(rect),
-              child: Image.asset(
-                'assets/banner_house.jpg',
-                fit: BoxFit.cover,
-                alignment: Alignment.centerRight,
-                errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(Icons.home_outlined,
-                              color: AppColors.accent, size: 30),
-                          const SizedBox(width: 8),
-                          Flexible(
-                            child: Text(
-                              t('मकान मालिक हैं?', 'Are you a house owner?'),
-                              style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w800),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        t('अपनी प्रॉपर्टी लिस्ट करें और\nसीधे किरायेदार पाएं',
-                            'List your property and\nfind tenants directly'),
-                        style: const TextStyle(
-                            color: Colors.white, fontSize: 13, height: 1.35),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: widget.onListTap,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF7BF03A),
-                    foregroundColor: const Color(0xFF063D24),
-                    elevation: 3,
-                    shape: const StadiumBorder(),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 12),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(t('अब लिस्ट करें', 'List now'),
-                          style: const TextStyle(
-                              fontWeight: FontWeight.w800, fontSize: 13)),
-                      const SizedBox(width: 4),
-                      const Icon(Icons.arrow_forward, size: 16),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
+          _feature(Icons.verified_user_outlined,
+              t('सुरक्षित\nलिस्टिंग', 'Safe\nListings')),
+          _feature(Icons.verified_outlined,
+              t('जाँचे हुए\nमालिक', 'Verified\nOwners')),
+          _feature(Icons.bolt, t('सीधा\nसंपर्क', 'Quick\nConnect')),
         ],
       ),
+      btn: t('कमरे देखें', 'Explore Rooms'),
+      onTap: widget.onSearchTap,
+      image: 'assets/room1.jpg',
+    );
+  }
+
+  Widget _addPropertySlide() {
+    return _slide(
+      line1: t('अपनी प्रॉपर्टी', 'Add Your'),
+      line2: t('जोड़ें', 'Property'),
+      accent: t('फ्री में', 'for free'),
+      middle: Text(
+        t('मकान मालिक हैं? कमरा लिस्ट करें और\nसीधे किरायेदार पाएं',
+            'House owner? List your room and\nfind tenants directly'),
+        style: const TextStyle(color: Colors.white, fontSize: 13, height: 1.35),
+      ),
+      btn: t('प्रॉपर्टी जोड़ें', 'Add Property'),
+      onTap: widget.onListTap,
+      image: 'assets/banner_house.jpg',
+      solidButton: true,
+    );
+  }
+
+  Widget _noBrokerSlide() {
+    return _slide(
+      line1: t('कोई दलाल नहीं,', 'No Broker,'),
+      line2: t('कोई', 'No'),
+      accent: t('कमीशन', 'Commission'),
+      middle: Text(
+        t('कॉल या WhatsApp से सीधे मकान मालिक\nसे बात करें',
+            'Talk directly to owners by call\nor WhatsApp'),
+        style: const TextStyle(color: Colors.white, fontSize: 13, height: 1.35),
+      ),
+      btn: t('कमरे देखें', 'See Rooms'),
+      onTap: widget.onSearchTap,
+      image: 'assets/room2.jpg',
     );
   }
 
@@ -1055,7 +1060,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               const SizedBox(height: 18),
                               _bannerCarousel(),
                               const SizedBox(height: 22),
-                              const NearbyRooms(),
+                              NearbyRooms(onSeeAll: widget.onSearchTap),
                               const SizedBox(height: 12),
                               _sectionHeader(
                                   t('हाल की लिस्टिंग', 'Recent Listings')),
