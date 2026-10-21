@@ -792,28 +792,6 @@ class _DetailScreenState extends State<DetailScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          SizedBox(
-            width: double.infinity,
-            height: 44,
-            child: OutlinedButton.icon(
-              onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (_) => BookingScreen(listing: l),
-                ),
-              ),
-              icon: const Icon(Icons.calendar_month, size: 20),
-              label: Text(t('विज़िट का समय चुनें', 'Choose visit time')),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.primary,
-                side: const BorderSide(color: AppColors.primary, width: 1.2),
-                textStyle:
-                    const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14)),
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
           Row(
             children: [
               Expanded(

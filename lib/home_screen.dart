@@ -278,9 +278,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     const RoomMitraLogo(dark: true),
                     const Spacer(),
-                    _messageIcon(),
-                    const SizedBox(width: 16),
-                    _notifIcon(),
                   ],
                 ),
                 const SizedBox(height: 14),

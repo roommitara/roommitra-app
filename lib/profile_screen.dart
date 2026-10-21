@@ -468,19 +468,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           );
         },
       ),
-      _MenuItem(
-        Icons.chat_bubble,
-        t('मेरे संदेश', 'My messages'),
-        t('मकान मालिकों और किरायेदारों से चैट',
-            'Chat with owners and tenants'),
-        () {
-          Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (_) => const MessagesScreen(),
-            ),
-          );
-        },
-      ),
       if (_isAdmin)
         _MenuItem(
           Icons.admin_panel_settings,
@@ -495,22 +482,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           },
         ),
       _MenuItem(
-        Icons.manage_accounts,
-        t('प्रोफाइल अपडेट करें', 'Update profile'),
-        t('अपनी जानकारी और फोटो अपडेट करें',
-            'Update your details and photo'),
-        () => showMsg(context,
-            t('प्रोफाइल अपडेट जल्द आएगा', 'Profile update coming soon')),
-      ),
-      _MenuItem(
-        Icons.shield,
-        t('सुरक्षा और गोपनीयता', 'Security & privacy'),
-        t('लॉगिन और डेटा सुरक्षा सेटिंग्स',
-            'Login and data security settings'),
-        () => showMsg(context,
-            t('यह हिस्सा जल्द आएगा', 'This section is coming soon')),
-      ),
-      _MenuItem(
         Icons.group_add,
         t('दोस्तों को बुलाएँ', 'Invite friends'),
         t('RoomMitra का लिंक WhatsApp पर शेयर करें',
@@ -519,19 +490,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Navigator.of(context).push(
             MaterialPageRoute<void>(
               builder: (_) => const InviteScreen(),
-            ),
-          );
-        },
-      ),
-      _MenuItem(
-        Icons.notifications,
-        t('नोटिफिकेशन सेटिंग', 'Notification settings'),
-        t('मैसेज, नए कमरे के नोटिफिकेशन',
-            'Notifications for messages and new rooms'),
-        () {
-          Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (_) => const NotificationSettingsScreen(),
             ),
           );
         },
