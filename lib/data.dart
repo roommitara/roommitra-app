@@ -8,13 +8,13 @@ import 'strings.dart';
 /// खाली छोड़ने पर बटन सिर्फ एक संदेश दिखाएँगे।
 const String demoPhone = '';
 
-const List<String> allCities = ['Nahan', 'Paonta Sahib', 'Rajgarh', 'Kala Amb'];
+const List<String> allCities = ['Nahan', 'Paonta Sahib', 'Solan', 'Shimla'];
 
 const Map<String, String> cityHindi = {
   'Nahan': 'नाहन',
   'Paonta Sahib': 'पांवटा साहिब',
-  'Rajgarh': 'राजगढ़',
-  'Kala Amb': 'काला अंब',
+  'Solan': 'सोलन',
+  'Shimla': 'शिमला',
 };
 
 /// शहर का नाम चुनी हुई भाषा में: हिंदी में नाहन, English में Nahan

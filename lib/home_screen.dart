@@ -91,7 +91,8 @@ class _City {
   final IconData icon;
   final Color c1;
   final Color c2;
-  const _City(this.name, this.icon, this.c1, this.c2);
+  final String image;
+  const _City(this.name, this.icon, this.c1, this.c2, this.image);
 }
 
 class HomeScreen extends StatefulWidget {
@@ -135,11 +136,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   static const List<_City> _cities = [
-    _City('Nahan', Icons.location_city, Color(0xFF7FB0DC), Color(0xFF9CC6A0)),
+    _City('Nahan', Icons.location_city, Color(0xFF7FB0DC), Color(0xFF9CC6A0),
+        'assets/city_nahan.jpg'),
     _City('Paonta Sahib', Icons.account_balance, Color(0xFFC9A57C),
-        Color(0xFF8FB7D9)),
-    _City('Rajgarh', Icons.landscape, Color(0xFF9CC6A0), Color(0xFF5E9B78)),
-    _City('Kala Amb', Icons.factory, Color(0xFFF2B27A), Color(0xFFE08E5A)),
+        Color(0xFF8FB7D9), 'assets/city_paonta.jpg'),
+    _City('Solan', Icons.landscape, Color(0xFF9CC6A0), Color(0xFF5E9B78),
+        'assets/city_solan.jpg'),
+    _City('Shimla', Icons.terrain, Color(0xFF8FB7D9), Color(0xFF5B8DB8),
+        'assets/city_shimla.jpg'),
   ];
 
   Widget _cityChip() {
@@ -961,7 +965,17 @@ class _HomeScreenState extends State<HomeScreen> {
                         end: Alignment.bottomCenter,
                       ),
                     ),
-                    child: Icon(c.icon, size: 36, color: Colors.white),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.asset(
+                        c.image,
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        height: double.infinity,
+                        errorBuilder: (_, __, ___) =>
+                            Icon(c.icon, size: 36, color: Colors.white),
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 6),
                   Row(
