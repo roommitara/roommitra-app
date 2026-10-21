@@ -3,9 +3,7 @@ import 'package:flutter/services.dart';
 import 'data.dart';
 import 'detail_screen.dart';
 import 'location_service.dart';
-import 'messages_screen.dart';
 import 'nearby_rooms.dart';
-import 'notifications_screen.dart';
 import 'strings.dart';
 import 'theme.dart';
 
@@ -99,10 +97,12 @@ class _City {
 class HomeScreen extends StatefulWidget {
   final VoidCallback onListTap;
   final VoidCallback onSearchTap;
+  final VoidCallback? onProfileTap;
   const HomeScreen({
     super.key,
     required this.onListTap,
     required this.onSearchTap,
+    this.onProfileTap,
   });
 
   @override
@@ -110,7 +110,14 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  static const Color _skyBottom = Color(0xFFEAF5EE);
+  final PageController _bannerPc = PageController();
+  int _bannerI = 0;
+
+  @override
+  void dispose() {
+    _bannerPc.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -135,73 +142,6 @@ class _HomeScreenState extends State<HomeScreen> {
     _City('Kala Amb', Icons.factory, Color(0xFFF2B27A), Color(0xFFE08E5A)),
   ];
 
-  Widget _badge(int count) {
-    return Container(
-      padding: const EdgeInsets.all(4),
-      decoration: const BoxDecoration(
-        color: Color(0xFFE53935),
-        shape: BoxShape.circle,
-      ),
-      child: Text(
-        '$count',
-        style: const TextStyle(
-            color: Colors.white, fontSize: 10, fontWeight: FontWeight.w700),
-      ),
-    );
-  }
-
-  Widget _messageIcon() {
-    return ListenableBuilder(
-      listenable: conversations,
-      builder: (context, _) {
-        final unread = conversations.value
-            .where((c) => c.status == 'inbox')
-            .fold<int>(0, (s, c) => s + c.unread);
-        return GestureDetector(
-          onTap: () async {
-            await Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => const MessagesScreen(),
-              ),
-            );
-            if (mounted) setState(() {});
-          },
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              const Icon(Icons.chat_bubble_outline,
-                  color: AppColors.primaryDark, size: 28),
-              if (unread > 0)
-                Positioned(right: -6, top: -6, child: _badge(unread)),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _notifIcon() {
-    final unread = demoNotifications.where((n) => n.unread).length;
-    return GestureDetector(
-      onTap: () async {
-        await Navigator.of(context).push(
-          MaterialPageRoute<void>(
-            builder: (_) => const NotificationsScreen(),
-          ),
-        );
-        if (mounted) setState(() {});
-      },
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          const Icon(Icons.notifications_none,
-              color: AppColors.primaryDark, size: 30),
-          if (unread > 0) Positioned(right: -4, top: -4, child: _badge(unread)),
-        ],
-      ),
-    );
-  }
-
   Widget _cityChip() {
     return PopupMenuButton<String>(
       onSelected: appState.setCity,
@@ -209,27 +149,30 @@ class _HomeScreenState extends State<HomeScreen> {
           .map((c) => PopupMenuItem(value: c.name, child: Text(c.name)))
           .toList(),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
         decoration: BoxDecoration(
-          color: const Color(0xEFFFFFFF),
-          borderRadius: BorderRadius.circular(24),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(color: AppColors.border),
         ),
         child: Row(
-          mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.location_on, size: 22, color: AppColors.primary),
-            const SizedBox(width: 8),
-            Text(
-              appState.city,
-              style: const TextStyle(
-                  color: AppColors.primaryDark,
-                  fontSize: 17,
-                  fontWeight: FontWeight.w800),
+            const Icon(Icons.location_on, size: 24, color: AppColors.primary),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                '${appState.city}, ${t('हिमाचल प्रदेश', 'Himachal Pradesh')}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                    color: AppColors.text,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700),
+              ),
             ),
-            const SizedBox(width: 4),
             const Icon(Icons.keyboard_arrow_down,
-                size: 22, color: AppColors.primaryDark),
+                size: 26, color: AppColors.primaryDark),
           ],
         ),
       ),
@@ -237,54 +180,52 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _header(double top) {
-    final w = MediaQuery.of(context).size.width;
     return Container(
       width: double.infinity,
-      clipBehavior: Clip.hardEdge,
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Color(0xFFCFE6F5), _skyBottom],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
-      ),
-      child: Stack(
+      color: Colors.white,
+      padding: EdgeInsets.fromLTRB(16, top + 12, 16, 12),
+      child: Column(
         children: [
-          Positioned(
-            right: 0,
-            top: 0,
-            bottom: 0,
-            width: w * 0.62,
-            child: ShaderMask(
-              blendMode: BlendMode.dstIn,
-              shaderCallback: (rect) => const LinearGradient(
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-                colors: [Color(0x00FFFFFF), Color(0xFFFFFFFF)],
-              ).createShader(rect),
-              child: Image.asset(
-                'assets/header_bg.jpg',
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-              ),
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.fromLTRB(20, top + 14, 20, 32),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    const RoomMitraLogo(dark: true),
-                    const Spacer(),
-                  ],
+          Row(
+            children: [
+              const RoomMitraLogo(dark: true),
+              const Spacer(),
+              GestureDetector(
+                onTap: AppLang.toggle,
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: AppColors.tint,
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  child: Text(
+                    AppLang.isHindi ? 'English' : 'हिंदी',
+                    style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.primaryDark),
+                  ),
                 ),
-                const SizedBox(height: 14),
-                _cityChip(),
-              ],
-            ),
+              ),
+              const SizedBox(width: 12),
+              GestureDetector(
+                onTap: widget.onProfileTap,
+                child: Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: AppColors.primaryDark, width: 2),
+                  ),
+                  child: const Icon(Icons.person_outline,
+                      color: AppColors.primaryDark, size: 26),
+                ),
+              ),
+            ],
           ),
+          const SizedBox(height: 14),
+          _cityChip(),
         ],
       ),
     );
@@ -311,52 +252,55 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                t('किराए का कमरा, PG, फ्लैट खोजें...',
-                    'Search rental room, PG, flat...'),
+                t('कमरा, PG, फ्लैट, दुकान खोजें...',
+                    'Search for rooms, PG, flats, shops...'),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(color: AppColors.muted, fontSize: 15),
               ),
             ),
-            const Icon(Icons.tune, size: 26, color: AppColors.primaryDark),
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: AppColors.tint,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(Icons.tune,
+                  size: 22, color: AppColors.primaryDark),
+            ),
           ],
         ),
       ),
     );
   }
 
-  /// बड़ा टाइल (पहली लाइन के 3)
-  Widget _bigTile(IconData icon, Color bg, Color fg, String label) {
+  Widget _tile(IconData icon, Color bg, Color fg, String label) {
     return Expanded(
       child: GestureDetector(
         onTap: widget.onSearchTap,
         child: Container(
-          height: 104,
-          padding: const EdgeInsets.fromLTRB(12, 12, 10, 12),
+          height: 92,
+          padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 10),
           decoration: BoxDecoration(
             color: bg,
             borderRadius: BorderRadius.circular(16),
           ),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 36, color: fg),
-              const Spacer(),
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      label,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w800,
-                          color: fg),
-                    ),
-                  ),
-                  Icon(Icons.arrow_forward, size: 16, color: fg),
-                ],
+              Icon(icon, size: 30, color: fg),
+              const SizedBox(height: 8),
+              Text(
+                label,
+                maxLines: 2,
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                    fontSize: 11.5,
+                    height: 1.15,
+                    fontWeight: FontWeight.w800,
+                    color: fg),
               ),
             ],
           ),
@@ -365,42 +309,47 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// छोटा टाइल (दूसरी लाइन के 4)
-  Widget _smallTile(IconData icon, Color bg, Color fg, String label,
-      {String? sub}) {
+  Widget _genderCard(
+      IconData icon, Color bg, Color fg, String title, String sub) {
     return Expanded(
       child: GestureDetector(
         onTap: widget.onSearchTap,
         child: Container(
-          height: 104,
-          padding: const EdgeInsets.fromLTRB(8, 10, 6, 8),
+          padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: bg,
             borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.border),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Row(
             children: [
-              Icon(icon, size: 30, color: fg),
-              const Spacer(),
-              Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                    fontSize: 12.5, fontWeight: FontWeight.w800, color: fg),
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(color: fg, shape: BoxShape.circle),
+                child: Icon(icon, color: Colors.white, size: 26),
               ),
-              if (sub != null)
-                Text(
-                  sub,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 9.5, color: fg),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.text)),
+                    Text(sub,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                            fontSize: 11.5, color: AppColors.muted)),
+                  ],
                 ),
-              Align(
-                alignment: Alignment.centerRight,
-                child: Icon(Icons.arrow_forward, size: 14, color: fg),
               ),
+              Icon(Icons.chevron_right, color: fg),
             ],
           ),
         ),
@@ -413,32 +362,77 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         Row(
           children: [
-            _bigTile(Icons.home_rounded, const Color(0xFFE3F3EA),
-                const Color(0xFF1B7A43), t('PG / हॉस्टल', 'PG / Hostel')),
-            const SizedBox(width: 10),
-            _bigTile(Icons.single_bed, const Color(0xFFE3F0FD),
-                const Color(0xFF1F5FA8), t('सिंगल रूम', 'Single Room')),
-            const SizedBox(width: 10),
-            _bigTile(Icons.king_bed, const Color(0xFFFFF0E0),
-                const Color(0xFFE67E22), t('डबल रूम', 'Double Room')),
+            _tile(Icons.single_bed, const Color(0xFFE3F3EA),
+                const Color(0xFF1B7A43), t('सिंगल\nरूम', 'Single\nRoom')),
+            const SizedBox(width: 8),
+            _tile(Icons.king_bed, const Color(0xFFE3F0FD),
+                const Color(0xFF1F5FA8), t('डबल\nरूम', 'Double\nRoom')),
+            const SizedBox(width: 8),
+            _tile(Icons.apartment, const Color(0xFFFFF0E0),
+                const Color(0xFFE67E22), t('PG /\nहॉस्टल', 'PG /\nHostel')),
+            const SizedBox(width: 8),
+            _tile(Icons.home_rounded, const Color(0xFFEDE8FB),
+                const Color(0xFF5B3FA8), t('फ्लैट', 'Flat')),
+            const SizedBox(width: 8),
+            _tile(Icons.storefront, const Color(0xFFFCE8F6),
+                const Color(0xFFD6336C), t('दुकान', 'Shop')),
+            const SizedBox(width: 8),
+            _tile(Icons.people, const Color(0xFFE0F5F3),
+                const Color(0xFF1E8E86), t('शेयरिंग', 'Sharing')),
           ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            _genderCard(Icons.female, const Color(0xFFFCEFF8),
+                const Color(0xFFD6336C), t('लड़कियाँ', 'Girls'),
+                t('सिर्फ लड़कियों के लिए', 'Only for Female')),
+            const SizedBox(width: 10),
+            _genderCard(Icons.male, const Color(0xFFEAF3FD),
+                const Color(0xFF1F5FA8), t('लड़के', 'Boys'),
+                t('सिर्फ लड़कों के लिए', 'Only for Male')),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _bannerCarousel() {
+    return Column(
+      children: [
+        SizedBox(
+          height: 176,
+          child: PageView(
+            controller: _bannerPc,
+            onPageChanged: (i) => setState(() => _bannerI = i),
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(right: 4),
+                child: _exploreBanner(),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 4),
+                child: _banner(),
+              ),
+            ],
+          ),
         ),
         const SizedBox(height: 10),
         Row(
-          children: [
-            _smallTile(Icons.apartment, const Color(0xFFEDE8FB),
-                const Color(0xFF5B3FA8), t('फ्लैट', 'Flat')),
-            const SizedBox(width: 8),
-            _smallTile(Icons.storefront, const Color(0xFFFFF0E0),
-                const Color(0xFFE67E22), t('दुकान', 'Shop')),
-            const SizedBox(width: 8),
-            _smallTile(Icons.people, const Color(0xFFFCE8F6),
-                const Color(0xFF8E3A9E), t('शेयरिंग', 'Sharing'),
-                sub: t('(लड़का / लड़की)', '(Male / Female)')),
-            const SizedBox(width: 8),
-            _smallTile(Icons.groups, const Color(0xFFE0F5F3),
-                const Color(0xFF1E8E86), t('लड़कियाँ / लड़के', 'Girls / Boys')),
-          ],
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(2, (i) {
+            final on = i == _bannerI;
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              margin: const EdgeInsets.symmetric(horizontal: 3),
+              width: on ? 18 : 7,
+              height: 7,
+              decoration: BoxDecoration(
+                color: on ? AppColors.primary : AppColors.border,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            );
+          }),
         ),
       ],
     );
@@ -771,14 +765,33 @@ class _HomeScreenState extends State<HomeScreen> {
                       width: 34,
                       height: 34,
                       decoration: const BoxDecoration(
-                        color: Color(0x66000000),
+                        color: Colors.white,
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
                         fav ? Icons.favorite : Icons.favorite_border,
                         size: 20,
-                        color: fav ? const Color(0xFFFF6B6B) : Colors.white,
+                        color: fav ? const Color(0xFFE53935) : AppColors.text,
                       ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  left: 8,
+                  bottom: 8,
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Text(
+                      '₹${inr(l.price)} ${t('/माह', '/month')}',
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w800),
                     ),
                   ),
                 ),
@@ -816,35 +829,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                   const SizedBox(height: 8),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        '₹${inr(l.price)}',
-                        style: const TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.primary),
-                      ),
-                      const SizedBox(width: 3),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 2),
-                        child: Text(
-                          t('/माह', '/month'),
-                          style: const TextStyle(
-                              fontSize: 12, color: AppColors.primary),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
                   Wrap(
                     spacing: 12,
                     runSpacing: 4,
                     children: [
-                      _stat(Icons.bed_outlined, '${l.rooms} Room'),
-                      if (l.bathLabel.isNotEmpty)
-                        _stat(Icons.bathtub_outlined, l.bathLabel),
+                      ...allAmenities
+                          .where((a) => l.amenities.contains(a.id))
+                          .take(3)
+                          .map((a) => _stat(a.icon, a.label)),
+                      if (l.amenities.isEmpty)
+                        _stat(Icons.bed_outlined, '${l.rooms} Room'),
                     ],
                   ),
                 ],
@@ -1017,34 +1011,29 @@ class _HomeScreenState extends State<HomeScreen> {
                   physics: const BouncingScrollPhysics(
                       parent: AlwaysScrollableScrollPhysics()),
                   child: Container(
-                    color: _skyBottom,
+                    color: Colors.white,
                     child: Column(
                       children: [
                         _header(top),
                         Container(
                           width: double.infinity,
-                          padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.vertical(
-                                top: Radius.circular(26)),
-                          ),
+                          padding: const EdgeInsets.fromLTRB(16, 4, 16, 28),
+                          color: Colors.white,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               _searchBar(),
-                              const SizedBox(height: 20),
+                              const SizedBox(height: 18),
                               _categoryTiles(),
-                              const SizedBox(height: 20),
-                              _exploreBanner(),
-                              const SizedBox(height: 24),
+                              const SizedBox(height: 18),
+                              _bannerCarousel(),
+                              const SizedBox(height: 22),
                               const NearbyRooms(),
                               const SizedBox(height: 12),
-                              _sectionHeader(t('खास कमरे', 'Featured Rooms')),
+                              _sectionHeader(
+                                  t('हाल की लिस्टिंग', 'Recent Listings')),
                               const SizedBox(height: 12),
                               _roomGrid(cardW),
-                              const SizedBox(height: 24),
-                              _banner(),
                               const SizedBox(height: 24),
                               _sectionHeader(
                                   t('लोकप्रिय शहर', 'Popular cities')),

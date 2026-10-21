@@ -120,7 +120,10 @@ class _AppShellState extends State<AppShell> {
       valueListenable: AppLang.notifier,
       builder: (context, lang, _) {
         final pages = <Widget>[
-          HomeScreen(onListTap: () => _go(2), onSearchTap: () => _go(1)),
+          HomeScreen(
+              onListTap: () => _go(2),
+              onSearchTap: () => _go(1),
+              onProfileTap: () => _go(4)),
           const SearchScreen(),
           AddListingScreen(onDone: () => _go(0)),
           FavoritesScreen(onSearchTap: () => _go(1)),
