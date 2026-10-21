@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'data.dart';
 import 'detail_screen.dart' show DetailScreen;
+import 'edit_real_listing.dart';
 import 'home_screen.dart' show RoomMitraLogo;
 import 'strings.dart';
 import 'theme.dart';
@@ -609,6 +610,14 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
                       builder: (_) => DetailScreen(listing: l),
                     ),
                   );
+                }),
+                _actionBtn(Icons.edit_outlined, t('बदलें', 'Edit'), () async {
+                  final changed = await Navigator.of(context).push<bool>(
+                    MaterialPageRoute<bool>(
+                      builder: (_) => EditRealListingScreen(listingId: l.id),
+                    ),
+                  );
+                  if (changed == true) await myRealListings.load();
                 }),
                 if (canMarkRented)
                   _actionBtn(
