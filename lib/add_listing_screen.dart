@@ -831,7 +831,16 @@ class _AddListingScreenState extends State<AddListingScreen> {
           ],
         );
       case 3:
-        return _step3();
+        return Column(
+          children: [
+            const GuideVideo(
+              asset: 'assets/guide_amenities.mp4',
+              hi: 'यहाँ कमरे की सुविधाएँ चुनिए, और अपना नाम व फोन नंबर भरिए, ताकि किरायेदार सीधे आपसे बात कर सकें।',
+              en: 'Choose the room facilities here, and enter your name and phone number so tenants can contact you directly.',
+            ),
+            _step3(),
+          ],
+        );
       case 4:
         return _step4();
       case 5:
