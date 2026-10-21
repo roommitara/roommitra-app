@@ -279,10 +279,15 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _tile(IconData icon, Color bg, Color fg, String label) {
+  void _openWith(Filters f) {
+    searchPreset.value = f;
+    widget.onSearchTap();
+  }
+
+  Widget _tile(IconData icon, Color bg, Color fg, String label, String kind) {
     return Expanded(
       child: GestureDetector(
-        onTap: widget.onSearchTap,
+        onTap: () => _openWith(Filters(kind: kind)),
         child: Container(
           height: 92,
           padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 10),
@@ -313,11 +318,11 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _genderCard(
-      IconData icon, Color bg, Color fg, String title, String sub) {
+  Widget _genderCard(IconData icon, Color bg, Color fg, String title,
+      String sub, Filters preset) {
     return Expanded(
       child: GestureDetector(
-        onTap: widget.onSearchTap,
+        onTap: () => _openWith(preset),
         child: Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
@@ -367,22 +372,28 @@ class _HomeScreenState extends State<HomeScreen> {
         Row(
           children: [
             _tile(Icons.single_bed, const Color(0xFFE3F3EA),
-                const Color(0xFF1B7A43), t('सिंगल\nरूम', 'Single\nRoom')),
+                const Color(0xFF1B7A43), t('सिंगल\nरूम', 'Single\nRoom'),
+                'single_room'),
             const SizedBox(width: 8),
             _tile(Icons.king_bed, const Color(0xFFE3F0FD),
-                const Color(0xFF1F5FA8), t('डबल\nरूम', 'Double\nRoom')),
+                const Color(0xFF1F5FA8), t('डबल\nरूम', 'Double\nRoom'),
+                'double_room'),
             const SizedBox(width: 8),
             _tile(Icons.apartment, const Color(0xFFFFF0E0),
-                const Color(0xFFE67E22), t('PG /\nहॉस्टल', 'PG /\nHostel')),
+                const Color(0xFFE67E22), t('PG /\nहॉस्टल', 'PG /\nHostel'),
+                'pg_hostel'),
             const SizedBox(width: 8),
             _tile(Icons.home_rounded, const Color(0xFFEDE8FB),
-                const Color(0xFF5B3FA8), t('फ्लैट', 'Flat')),
+                const Color(0xFF5B3FA8), t('फ्लैट', 'Flat'),
+                'flat'),
             const SizedBox(width: 8),
             _tile(Icons.storefront, const Color(0xFFFCE8F6),
-                const Color(0xFFD6336C), t('दुकान', 'Shop')),
+                const Color(0xFFD6336C), t('दुकान', 'Shop'),
+                'shop'),
             const SizedBox(width: 8),
             _tile(Icons.people, const Color(0xFFE0F5F3),
-                const Color(0xFF1E8E86), t('शेयरिंग', 'Sharing')),
+                const Color(0xFF1E8E86), t('शेयरिंग', 'Sharing'),
+                'sharing'),
           ],
         ),
         const SizedBox(height: 12),
@@ -390,11 +401,13 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             _genderCard(Icons.female, const Color(0xFFFCEFF8),
                 const Color(0xFFD6336C), t('लड़कियाँ', 'Girls'),
-                t('सिर्फ लड़कियों के लिए', 'Only for Female')),
+                t('सिर्फ लड़कियों के लिए', 'Only for Female'),
+                Filters(girlsOnly: true)),
             const SizedBox(width: 10),
             _genderCard(Icons.male, const Color(0xFFEAF3FD),
                 const Color(0xFF1F5FA8), t('लड़के', 'Boys'),
-                t('सिर्फ लड़कों के लिए', 'Only for Male')),
+                t('सिर्फ लड़कों के लिए', 'Only for Male'),
+                Filters(boysOnly: true)),
           ],
         ),
       ],

@@ -479,6 +479,7 @@ class Filters {
   bool safeWomen;
   bool directOwner;
   bool girlsOnly;
+  bool boysOnly; // सिर्फ वे कमरे जो लड़कियों के लिए ख़ास नहीं हैं
   bool immediate;
   bool commercial;
 
@@ -494,6 +495,7 @@ class Filters {
     this.safeWomen = false,
     this.directOwner = false,
     this.girlsOnly = false,
+    this.boysOnly = false,
     this.immediate = false,
     this.commercial = false,
   }) : amenities = amenities ?? <String>{};
@@ -511,6 +513,7 @@ class Filters {
       safeWomen: safeWomen,
       directOwner: directOwner,
       girlsOnly: girlsOnly,
+      boysOnly: boysOnly,
       immediate: immediate,
       commercial: commercial,
     );
@@ -527,6 +530,7 @@ class Filters {
     if (safeWomen) n++;
     if (directOwner) n++;
     if (girlsOnly) n++;
+    if (boysOnly) n++;
     if (immediate) n++;
     if (commercial) n++;
     return n;
@@ -559,11 +563,15 @@ class Filters {
     if (safeWomen && !l.safeWomen) return false;
     if (directOwner && !l.directOwner) return false;
     if (girlsOnly && !l.girlsOnly) return false;
+    if (boysOnly && l.girlsOnly) return false;
     if (immediate && !l.immediate) return false;
     if (commercial && !l.commercial) return false;
     return true;
   }
 }
+
+/// होम से किसी श्रेणी पर दबाने पर खोज स्क्रीन में यही फ़िल्टर लग जाता है
+final ValueNotifier<Filters?> searchPreset = ValueNotifier<Filters?>(null);
 
 /// पूरे ऐप में साझा जानकारी: चुना हुआ शहर और पसंदीदा कमरे
 class AppState extends ChangeNotifier {

@@ -51,10 +51,23 @@ class _SearchScreenState extends State<SearchScreen> {
     if (!listingsStore.loaded) {
       listingsStore.load();
     }
+    searchPreset.addListener(_applyPreset);
+  }
+
+  void _applyPreset() {
+    final p = searchPreset.value;
+    if (p == null || !mounted) return;
+    setState(() {
+      _filters = p.copy();
+      _type = 'सभी';
+      _queryCtrl.clear();
+    });
+    searchPreset.value = null;
   }
 
   @override
   void dispose() {
+    searchPreset.removeListener(_applyPreset);
     _queryCtrl.dispose();
     super.dispose();
   }
