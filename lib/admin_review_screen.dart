@@ -22,6 +22,7 @@ class _AdminReviewScreenState extends State<AdminReviewScreen> {
   String? _error;
   List<Map<String, dynamic>> _pending = [];
   List<Map<String, dynamic>> _reports = [];
+  List<Map<String, dynamic>> _live = [];
   Map<String, Map<String, dynamic>> _reportedListings = {};
 
   @override
@@ -41,6 +42,12 @@ class _AdminReviewScreenState extends State<AdminReviewScreen> {
           .select()
           .eq('status', 'pending')
           .order('created_at', ascending: true);
+      final live = await _db
+          .from('room_listings')
+          .select()
+          .inFilter('status', ['approved', 'hidden', 'rented'])
+          .order('created_at', ascending: false)
+          .limit(100);
       final reports = await _db
           .from('room_reports')
           .select()
@@ -64,6 +71,7 @@ class _AdminReviewScreenState extends State<AdminReviewScreen> {
       setState(() {
         _pending = List<Map<String, dynamic>>.from(pending as List);
         _reports = reportList;
+        _live = List<Map<String, dynamic>>.from(live as List);
         _reportedListings = byId;
         _loading = false;
       });
@@ -112,6 +120,19 @@ class _AdminReviewScreenState extends State<AdminReviewScreen> {
     }
   }
 
+  Future<void> _deleteListing(String id) async {
+    try {
+      await _db.from('room_listings').delete().eq('id', id);
+      if (!mounted) return;
+      showMsg(context, t('कमरा हटा दिया', 'Room deleted'));
+      listingsStore.load();
+      _load();
+    } catch (e) {
+      if (!mounted) return;
+      showMsg(context, t('नहीं हो पाया', 'Failed'));
+    }
+  }
+
   Future<void> _closeReport(String reportId, String status) async {
     try {
       await _db.from('room_reports').update({'status': status}).eq('id', reportId);
@@ -146,7 +167,7 @@ class _AdminReviewScreenState extends State<AdminReviewScreen> {
       valueListenable: AppLang.notifier,
       builder: (context, _, __) {
         return DefaultTabController(
-          length: 2,
+          length: 3,
           child: Scaffold(
             backgroundColor: AppColors.tintLight,
             appBar: AppBar(
@@ -168,6 +189,8 @@ class _AdminReviewScreenState extends State<AdminReviewScreen> {
                       'New rooms (${_pending.length})')),
                   Tab(text: t('रिपोर्ट (${_reports.length})',
                       'Reports (${_reports.length})')),
+                  Tab(text: t('सभी कमरे (${_live.length})',
+                      'All rooms (${_live.length})')),
                 ],
               ),
             ),
@@ -176,7 +199,7 @@ class _AdminReviewScreenState extends State<AdminReviewScreen> {
                 : _error != null
                     ? _message(_error!, retry: true)
                     : TabBarView(
-                        children: [_pendingTab(), _reportsTab()],
+                        children: [_pendingTab(), _reportsTab(), _liveTab()],
                       ),
           ),
         );
@@ -210,10 +233,14 @@ class _AdminReviewScreenState extends State<AdminReviewScreen> {
       return _message(t('कोई नया कमरा जाँच के लिए नहीं है 🎉',
           'No new rooms waiting for review 🎉'));
     }
-    return ListView.builder(
-      padding: const EdgeInsets.all(12),
-      itemCount: _pending.length,
-      itemBuilder: (c, i) => _listingCard(_pending[i]),
+    return RefreshIndicator(
+      onRefresh: _load,
+      child: ListView.builder(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(12),
+        itemCount: _pending.length,
+        itemBuilder: (c, i) => _listingCard(_pending[i]),
+      ),
     );
   }
 
@@ -339,6 +366,62 @@ class _AdminReviewScreenState extends State<AdminReviewScreen> {
       context: context,
       builder: (c) => Dialog(
         child: InteractiveViewer(child: Image.network(url)),
+      ),
+    );
+  }
+
+  Widget _liveTab() {
+    if (_live.isEmpty) {
+      return _message(t('अभी कोई कमरा नहीं है', 'No rooms yet'));
+    }
+    return RefreshIndicator(
+      onRefresh: _load,
+      child: ListView.builder(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(12),
+        itemCount: _live.length,
+        itemBuilder: (c, i) {
+          final r = _live[i];
+          final id = r['id'].toString();
+          final status = (r['status'] ?? '').toString();
+          return _listingCard(r, showReview: false, extra: [
+            const SizedBox(height: 8),
+            Text('${t('स्थिति', 'Status')}: $status',
+                style: const TextStyle(
+                    fontWeight: FontWeight.w700, color: AppColors.primaryDark)),
+            const SizedBox(height: 8),
+            Wrap(spacing: 8, runSpacing: 8, children: [
+              if (status == 'approved')
+                OutlinedButton(
+                  onPressed: () async {
+                    if (await _confirm(t('कमरा छिपाएँ?', 'Hide this room?'),
+                        t('यह सबको दिखना बंद हो जाएगा।',
+                            'It will stop showing to everyone.'))) {
+                      _setStatus(id, 'hidden');
+                    }
+                  },
+                  child: Text(t('छिपाएँ', 'Hide')),
+                ),
+              if (status == 'hidden')
+                OutlinedButton(
+                  onPressed: () => _setStatus(id, 'approved'),
+                  child: Text(t('फिर से दिखाएँ', 'Show again')),
+                ),
+              OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.danger),
+                onPressed: () async {
+                  if (await _confirm(
+                      t('कमरा हमेशा के लिए हटाएँ?', 'Delete this room forever?'),
+                      t('यह वापस नहीं आएगा।', 'This cannot be undone.'))) {
+                    _deleteListing(id);
+                  }
+                },
+                child: Text(t('हटाएँ', 'Delete')),
+              ),
+            ]),
+          ]);
+        },
       ),
     );
   }
