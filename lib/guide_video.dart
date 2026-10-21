@@ -52,6 +52,21 @@ class _GuideVideoState extends State<GuideVideo> {
     }
   }
 
+  /// स्टेप बदलने पर Flutter वही State दोबारा इस्तेमाल करता है, इसलिए नई वीडियो यहाँ लोड करो
+  @override
+  void didUpdateWidget(covariant GuideVideo oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.asset != widget.asset) {
+      _c?.dispose();
+      _c = null;
+      _ready = false;
+      _failed = false;
+      _hidden = false;
+      _muted = false;
+      _init();
+    }
+  }
+
   @override
   void dispose() {
     _c?.dispose();

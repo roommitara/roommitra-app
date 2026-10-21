@@ -800,7 +800,8 @@ class _AddListingScreenState extends State<AddListingScreen> {
       case 0:
         return Column(
           children: [
-            const GuideVideo(
+            GuideVideo(
+              key: const ValueKey('guide_category'),
               asset: 'assets/guide_category.mp4',
               hi: 'यहाँ अपने कमरे का प्रकार चुनिए, फिर नाम लिखिए, इलाका बताइए और कमरों की संख्या भरिए।',
               en: 'Choose your room type here, then enter the title, area and number of rooms.',
@@ -811,7 +812,8 @@ class _AddListingScreenState extends State<AddListingScreen> {
       case 1:
         return Column(
           children: [
-            const GuideVideo(
+            GuideVideo(
+              key: const ValueKey('guide_rent'),
               asset: 'assets/guide_rent.mp4',
               hi: 'यहाँ अपना किराया भरें। आप महीने के कितने रुपये पर कमरा देना चाहते हैं?',
               en: 'Enter your rent here. How much per month do you want for the room?',
@@ -822,7 +824,8 @@ class _AddListingScreenState extends State<AddListingScreen> {
       case 2:
         return Column(
           children: [
-            const GuideVideo(
+            GuideVideo(
+              key: const ValueKey('guide_photos'),
               asset: 'assets/guide_photos.mp4',
               hi: 'यहाँ कमरे की कम से कम आठ साफ़ फोटो डालिए। रोशनी में खींची हुई फोटो ज़्यादा लोगों को पसंद आती हैं।',
               en: 'Add at least eight clear photos of the room here. Photos taken in good light attract more people.',
@@ -833,7 +836,8 @@ class _AddListingScreenState extends State<AddListingScreen> {
       case 3:
         return Column(
           children: [
-            const GuideVideo(
+            GuideVideo(
+              key: const ValueKey('guide_amenities'),
               asset: 'assets/guide_amenities.mp4',
               hi: 'यहाँ कमरे की सुविधाएँ चुनिए, और अपना नाम व फोन नंबर भरिए, ताकि किरायेदार सीधे आपसे बात कर सकें।',
               en: 'Choose the room facilities here, and enter your name and phone number so tenants can contact you directly.',
@@ -844,7 +848,8 @@ class _AddListingScreenState extends State<AddListingScreen> {
       case 4:
         return Column(
           children: [
-            const GuideVideo(
+            GuideVideo(
+              key: const ValueKey('guide_address'),
               asset: 'assets/guide_address.mp4',
               hi: 'यहाँ अपने कमरे का पूरा पता लिखिए और पास की कोई जानी-पहचानी जगह बताइए, ताकि लोग आसानी से ढूँढ सकें।',
               en: 'Write the full address of your room here and mention a nearby landmark so people can find it easily.',
