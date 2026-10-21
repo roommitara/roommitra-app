@@ -50,7 +50,7 @@ class _FilterScreenState extends State<FilterScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.border),
       ),
@@ -66,7 +66,7 @@ class _FilterScreenState extends State<FilterScreen> {
         Flexible(
           child: Text(
             text,
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w800,
                 color: AppColors.text),
@@ -78,7 +78,7 @@ class _FilterScreenState extends State<FilterScreen> {
 
   Widget _topBar() {
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [AppColors.primaryDark, AppColors.primary],
           begin: Alignment.topLeft,
@@ -144,7 +144,7 @@ class _FilterScreenState extends State<FilterScreen> {
               children: [
                 Text(
                   t('फ़िल्टर', 'Filter'),
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
                       color: AppColors.text),
@@ -153,7 +153,7 @@ class _FilterScreenState extends State<FilterScreen> {
                   t('अपनी जरूरत के अनुसार कमरे को फ़िल्टर करें',
                       'Filter rooms as per your need'),
                   style:
-                      const TextStyle(fontSize: 12, color: AppColors.text),
+                      TextStyle(fontSize: 12, color: AppColors.text),
                 ),
               ],
             ),
@@ -171,8 +171,8 @@ class _FilterScreenState extends State<FilterScreen> {
                 style: const TextStyle(fontSize: 11.5, height: 1.2)),
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.primary,
-              backgroundColor: Colors.white,
-              side: const BorderSide(color: AppColors.primary),
+              backgroundColor: AppColors.surface,
+              side: BorderSide(color: AppColors.primary),
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),
@@ -196,12 +196,12 @@ class _FilterScreenState extends State<FilterScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('₹${inr(_f.minPrice)}',
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
                       color: AppColors.text)),
               Text(maxText,
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
                       color: AppColors.text)),
@@ -251,7 +251,7 @@ class _FilterScreenState extends State<FilterScreen> {
             ),
             child: Row(
               children: [
-                const Icon(Icons.location_on_outlined,
+                Icon(Icons.location_on_outlined,
                     size: 20, color: AppColors.primary),
                 const SizedBox(width: 8),
                 Expanded(
@@ -259,13 +259,13 @@ class _FilterScreenState extends State<FilterScreen> {
                     controller: _localityCtrl,
                     onChanged: (v) => setState(() => _f.locality = v),
                     style:
-                        const TextStyle(fontSize: 14, color: AppColors.text),
+                        TextStyle(fontSize: 14, color: AppColors.text),
                     decoration: InputDecoration(
                       border: InputBorder.none,
                       isDense: true,
                       hintText: t('कॉलोनी, एरिया या इलाके का नाम',
                           'Colony, area or locality name'),
-                      hintStyle: const TextStyle(
+                      hintStyle: TextStyle(
                           fontSize: 14, color: AppColors.muted),
                     ),
                   ),
@@ -287,7 +287,7 @@ class _FilterScreenState extends State<FilterScreen> {
               child: DropdownButton<int>(
                 value: _f.distanceKm,
                 isExpanded: true,
-                icon: const Icon(Icons.keyboard_arrow_down,
+                icon: Icon(Icons.keyboard_arrow_down,
                     color: AppColors.text),
                 items: _distances
                     .map((d) => DropdownMenuItem<int>(
@@ -395,7 +395,7 @@ class _FilterScreenState extends State<FilterScreen> {
                       width: w,
                       height: 78,
                       decoration: BoxDecoration(
-                        color: on ? AppColors.tint : Colors.white,
+                        color: on ? AppColors.tint : AppColors.surface,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: on ? AppColors.primary : AppColors.border,
@@ -426,7 +426,7 @@ class _FilterScreenState extends State<FilterScreen> {
                                   a.label,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       fontSize: 11,
                                       fontWeight: FontWeight.w600,
                                       color: AppColors.text),
@@ -453,7 +453,7 @@ class _FilterScreenState extends State<FilterScreen> {
         Expanded(
           child: Text(
             label,
-            style: const TextStyle(fontSize: 14.5, color: AppColors.text),
+            style: TextStyle(fontSize: 14.5, color: AppColors.text),
           ),
         ),
         Switch(
@@ -502,7 +502,7 @@ class _FilterScreenState extends State<FilterScreen> {
       builder: (context, lang, _) {
         final count = widget.countFor(_f);
         return Scaffold(
-          backgroundColor: const Color(0xFFF7FCF9),
+          backgroundColor: AppColors.bg,
           body: Column(
             children: [
               _topBar(),
@@ -522,8 +522,8 @@ class _FilterScreenState extends State<FilterScreen> {
               Container(
                 padding: EdgeInsets.fromLTRB(
                     16, 10, 16, 10 + MediaQuery.of(context).padding.bottom),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
                   boxShadow: [
                     BoxShadow(
                         color: Color(0x14000000),

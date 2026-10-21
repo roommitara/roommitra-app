@@ -13,6 +13,7 @@ import 'theme.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await AppLang.load();
+  await AppTheme.load();
 
   String? startupError;
   try {
@@ -69,8 +70,40 @@ class ErrorApp extends StatelessWidget {
   }
 }
 
-class RoomMitraApp extends StatelessWidget {
+class RoomMitraApp extends StatefulWidget {
   const RoomMitraApp({super.key});
+
+  @override
+  State<RoomMitraApp> createState() => _RoomMitraAppState();
+}
+
+class _RoomMitraAppState extends State<RoomMitraApp> {
+  @override
+  void initState() {
+    super.initState();
+    AppTheme.dark.addListener(_onTheme);
+  }
+
+  @override
+  void dispose() {
+    AppTheme.dark.removeListener(_onTheme);
+    super.dispose();
+  }
+
+  /// रंग AppColors से आते हैं (Theme से नहीं), इसलिए थीम बदलने पर पूरा ऐप फिर से बनाना पड़ता है
+  void _onTheme() {
+    if (!mounted) return;
+    setState(() {});
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      void rebuild(Element e) {
+        e.markNeedsBuild();
+        e.visitChildren(rebuild);
+      }
+
+      final root = WidgetsBinding.instance.rootElement;
+      if (root != null) rebuild(root);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

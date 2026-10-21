@@ -127,7 +127,7 @@ Listing _listingOf(String id) {
 
 Widget _greenBar(BuildContext context) {
   return Container(
-    decoration: const BoxDecoration(
+    decoration: BoxDecoration(
       gradient: LinearGradient(
         colors: [AppColors.primaryDark, AppColors.primary],
         begin: Alignment.topLeft,
@@ -265,25 +265,25 @@ class _MessagesScreenState extends State<MessagesScreen> {
       height: 50,
       padding: const EdgeInsets.symmetric(horizontal: 14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(25),
         border: Border.all(color: AppColors.border, width: 1.2),
       ),
       child: Row(
         children: [
-          const Icon(Icons.search, color: AppColors.primary, size: 24),
+          Icon(Icons.search, color: AppColors.primary, size: 24),
           const SizedBox(width: 10),
           Expanded(
             child: TextField(
               controller: _q,
               onChanged: (_) => setState(() {}),
-              style: const TextStyle(fontSize: 14.5, color: AppColors.text),
+              style: TextStyle(fontSize: 14.5, color: AppColors.text),
               decoration: InputDecoration(
                 border: InputBorder.none,
                 isDense: true,
                 hintText: t('किसी से चैट खोजें...', 'Search chats...'),
                 hintStyle:
-                    const TextStyle(fontSize: 14.5, color: AppColors.muted),
+                    TextStyle(fontSize: 14.5, color: AppColors.muted),
               ),
             ),
           ),
@@ -293,7 +293,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 _q.clear();
                 setState(() {});
               },
-              child: const Icon(Icons.close, size: 20, color: AppColors.muted),
+              child: Icon(Icons.close, size: 20, color: AppColors.muted),
             ),
         ],
       ),
@@ -309,7 +309,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: AppColors.border),
         ),
@@ -318,12 +318,12 @@ class _MessagesScreenState extends State<MessagesScreen> {
             Container(
               width: 52,
               height: 52,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: AppColors.tint,
                 shape: BoxShape.circle,
               ),
               child:
-                  const Icon(Icons.person, color: AppColors.primary, size: 30),
+                  Icon(Icons.person, color: AppColors.primary, size: 30),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -337,7 +337,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                           c.name,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontSize: 15.5,
                               fontWeight: FontWeight.w800,
                               color: AppColors.text),
@@ -353,7 +353,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                         ),
                         child: Text(
                           c.roleLabel,
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontSize: 10.5,
                               fontWeight: FontWeight.w700,
                               color: AppColors.primary),
@@ -379,12 +379,12 @@ class _MessagesScreenState extends State<MessagesScreen> {
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      const Icon(Icons.done_all,
+                      Icon(Icons.done_all,
                           size: 16, color: AppColors.primary),
                       const SizedBox(width: 4),
                       Text(
                         '${t('आज', 'Today')} ${last.time}',
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 11.5, color: AppColors.muted),
                       ),
                     ],
@@ -398,7 +398,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 width: 26,
                 height: 26,
                 alignment: Alignment.center,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: AppColors.primary,
                   shape: BoxShape.circle,
                 ),
@@ -411,7 +411,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 ),
               )
             else
-              const Icon(Icons.chevron_right, color: AppColors.text),
+              Icon(Icons.chevron_right, color: AppColors.text),
           ],
         ),
       ),
@@ -438,7 +438,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
           Text(
             texts[_tab],
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w800,
                 color: AppColors.text),
@@ -451,7 +451,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7FCF9),
+      backgroundColor: AppColors.bg,
       body: Column(
         children: [
           _greenBar(context),
@@ -580,7 +580,7 @@ class _ChatScreenState extends State<ChatScreen> {
           value: 'restore', child: Text(t('अनब्लॉक करें', 'Unblock'))));
     }
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [AppColors.primaryDark, AppColors.primary],
           begin: Alignment.topLeft,
@@ -598,11 +598,11 @@ class _ChatScreenState extends State<ChatScreen> {
           Container(
             width: 42,
             height: 42,
-            decoration: const BoxDecoration(
-              color: Colors.white,
+            decoration: BoxDecoration(
+              color: AppColors.surface,
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.person, color: AppColors.primary, size: 26),
+            child: Icon(Icons.person, color: AppColors.primary, size: 26),
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -651,7 +651,7 @@ class _ChatScreenState extends State<ChatScreen> {
       margin: const EdgeInsets.fromLTRB(12, 10, 12, 4),
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: AppColors.border),
       ),
@@ -671,7 +671,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   l.title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 14.5,
                       fontWeight: FontWeight.w800,
                       color: AppColors.text),
@@ -681,12 +681,12 @@ class _ChatScreenState extends State<ChatScreen> {
                   l.area,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 12, color: AppColors.muted),
+                  style: TextStyle(fontSize: 12, color: AppColors.muted),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   '₹${inr(l.price)}${t('/माह', '/month')}',
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w800,
                       color: AppColors.primary),
@@ -712,11 +712,11 @@ class _ChatScreenState extends State<ChatScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(t('विवरण देखें', 'View details'),
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
                           color: AppColors.primary)),
-                  const Icon(Icons.chevron_right,
+                  Icon(Icons.chevron_right,
                       size: 16, color: AppColors.primary),
                 ],
               ),
@@ -737,7 +737,7 @@ class _ChatScreenState extends State<ChatScreen> {
         margin: const EdgeInsets.only(bottom: 8),
         padding: const EdgeInsets.fromLTRB(12, 8, 12, 6),
         decoration: BoxDecoration(
-          color: mine ? const Color(0xFFDDF4E4) : Colors.white,
+          color: mine ? AppColors.tint : AppColors.surface,
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(14),
             topRight: const Radius.circular(14),
@@ -754,13 +754,13 @@ class _ChatScreenState extends State<ChatScreen> {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.location_on,
+                  Icon(Icons.location_on,
                       size: 20, color: AppColors.primary),
                   const SizedBox(width: 6),
                   Flexible(
                     child: Text(
                       '${t('लोकेशन', 'Location')}: ${m.text}',
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 14.5,
                           height: 1.4,
                           fontWeight: FontWeight.w600,
@@ -772,7 +772,7 @@ class _ChatScreenState extends State<ChatScreen> {
             else
               Text(
                 m.text,
-                style: const TextStyle(
+                style: TextStyle(
                     fontSize: 14.5, height: 1.4, color: AppColors.text),
               ),
             const SizedBox(height: 4),
@@ -782,11 +782,11 @@ class _ChatScreenState extends State<ChatScreen> {
                 Text(
                   m.time,
                   style:
-                      const TextStyle(fontSize: 10.5, color: AppColors.muted),
+                      TextStyle(fontSize: 10.5, color: AppColors.muted),
                 ),
                 if (mine) ...[
                   const SizedBox(width: 4),
-                  const Icon(Icons.done_all,
+                  Icon(Icons.done_all,
                       size: 14, color: AppColors.primary),
                 ],
               ],
@@ -814,7 +814,7 @@ class _ChatScreenState extends State<ChatScreen> {
             const SizedBox(width: 6),
             Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                   fontSize: 12.5,
                   fontWeight: FontWeight.w700,
                   color: AppColors.primary),
@@ -829,18 +829,18 @@ class _ChatScreenState extends State<ChatScreen> {
     final bottom = MediaQuery.of(context).padding.bottom;
     if (c.status == 'blocked') {
       return Container(
-        color: Colors.white,
+        color: AppColors.surface,
         padding: EdgeInsets.fromLTRB(16, 12, 16, 12 + bottom),
         child: Row(
           children: [
-            const Icon(Icons.block, color: AppColors.danger, size: 22),
+            Icon(Icons.block, color: AppColors.danger, size: 22),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
                 t('आपने इस यूज़र को ब्लॉक किया है',
                     'You have blocked this user'),
                 style:
-                    const TextStyle(fontSize: 13.5, color: AppColors.text),
+                    TextStyle(fontSize: 13.5, color: AppColors.text),
               ),
             ),
             TextButton(
@@ -853,7 +853,7 @@ class _ChatScreenState extends State<ChatScreen> {
     }
     final l = _listingOf(c.listingId);
     return Container(
-      color: Colors.white,
+      color: AppColors.surface,
       padding: EdgeInsets.fromLTRB(12, 8, 12, 8 + bottom),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -890,7 +890,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   height: 48,
                   padding: const EdgeInsets.symmetric(horizontal: 14),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF3FAF6),
+                    color: AppColors.tintLight,
                     borderRadius: BorderRadius.circular(24),
                     border: Border.all(color: AppColors.border),
                   ),
@@ -899,12 +899,12 @@ class _ChatScreenState extends State<ChatScreen> {
                     onSubmitted: (v) => _send(v),
                     textInputAction: TextInputAction.send,
                     style:
-                        const TextStyle(fontSize: 14.5, color: AppColors.text),
+                        TextStyle(fontSize: 14.5, color: AppColors.text),
                     decoration: InputDecoration(
                       border: InputBorder.none,
                       isDense: true,
                       hintText: t('यहाँ संदेश लिखें...', 'Type a message...'),
-                      hintStyle: const TextStyle(
+                      hintStyle: TextStyle(
                           fontSize: 14.5, color: AppColors.muted),
                     ),
                   ),
@@ -916,7 +916,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 child: Container(
                   width: 48,
                   height: 48,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: AppColors.primary,
                     shape: BoxShape.circle,
                   ),
@@ -933,7 +933,7 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF1F6F3),
+      backgroundColor: AppColors.bg,
       body: Column(
         children: [
           _header(),

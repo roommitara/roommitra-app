@@ -11,7 +11,7 @@ class ListingSuccessScreen extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.border),
       ),
@@ -33,13 +33,13 @@ class ListingSuccessScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(title,
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w800,
                         color: AppColors.text)),
                 const SizedBox(height: 2),
                 Text(sub,
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 12.5, height: 1.35, color: AppColors.muted)),
               ],
             ),
@@ -55,12 +55,12 @@ class ListingSuccessScreen extends StatelessWidget {
       valueListenable: AppLang.notifier,
       builder: (context, lang, _) {
         return Scaffold(
-          backgroundColor: const Color(0xFFF7FCF9),
+          backgroundColor: AppColors.bg,
           body: Column(
             children: [
               Container(
                 width: double.infinity,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [AppColors.primaryDark, AppColors.primary],
                     begin: Alignment.topLeft,
@@ -82,11 +82,11 @@ class ListingSuccessScreen extends StatelessWidget {
                       child: Container(
                         width: 96,
                         height: 96,
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
+                        decoration: BoxDecoration(
+                          color: AppColors.surface,
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.check_rounded,
+                        child: Icon(Icons.check_rounded,
                             size: 64, color: AppColors.primary),
                       ),
                     ),
@@ -118,7 +118,7 @@ class ListingSuccessScreen extends StatelessWidget {
                     children: [
                       Text(
                         t('आगे क्या होगा?', 'What happens next?'),
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.w800,
                             color: AppColors.text),
@@ -146,7 +146,7 @@ class ListingSuccessScreen extends StatelessWidget {
                       Text(
                         t('आप "प्रोफ़ाइल → मेरी लिस्टिंग" में स्थिति देख सकते हैं।',
                             'You can check the status in "Profile → My listings".'),
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 12.5,
                             height: 1.4,
                             color: AppColors.muted),
@@ -158,7 +158,7 @@ class ListingSuccessScreen extends StatelessWidget {
               Container(
                 padding: EdgeInsets.fromLTRB(
                     20, 10, 20, 12 + MediaQuery.of(context).padding.bottom),
-                color: Colors.white,
+                color: AppColors.surface,
                 child: SizedBox(
                   width: double.infinity,
                   height: 54,

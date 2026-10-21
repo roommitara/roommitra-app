@@ -159,7 +159,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
 
   Widget _topBar() {
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [AppColors.primaryDark, AppColors.primary],
           begin: Alignment.topLeft,
@@ -217,7 +217,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.border),
       ),
@@ -233,11 +233,11 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
                     Container(
                       width: 82,
                       height: 82,
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         color: AppColors.tint,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.person,
+                      child: Icon(Icons.person,
                           size: 50, color: AppColors.primary),
                     ),
                     if (o.verified)
@@ -266,7 +266,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
                   children: [
                     Text(
                       o.displayName,
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 21,
                           fontWeight: FontWeight.w800,
                           color: AppColors.text),
@@ -280,7 +280,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
                                 ? t('मकान मालिक (Verified)',
                                     'Owner (Verified)')
                                 : t('मकान मालिक', 'Owner'),
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontSize: 13.5,
                                 fontWeight: FontWeight.w700,
                                 color: AppColors.primary),
@@ -288,7 +288,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
                         ),
                         if (o.verified) ...[
                           const SizedBox(width: 4),
-                          const Icon(Icons.verified,
+                          Icon(Icons.verified,
                               size: 16, color: AppColors.primary),
                         ],
                       ],
@@ -296,7 +296,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        const Icon(Icons.location_on,
+                        Icon(Icons.location_on,
                             size: 16, color: AppColors.primary),
                         const SizedBox(width: 3),
                         Expanded(
@@ -304,7 +304,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
                             '${cityName(l.city)}, ${t('हिमाचल प्रदेश', 'Himachal Pradesh')}',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontSize: 13, color: AppColors.text),
                           ),
                         ),
@@ -313,13 +313,13 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        const Icon(Icons.star,
+                        Icon(Icons.star,
                             size: 17, color: AppColors.primary),
                         const SizedBox(width: 3),
                         Flexible(
                           child: Text(
                             '${o.rating} (${o.ratingCount} ${t('रेटिंग, डेमो', 'ratings, demo')})',
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontSize: 13, color: AppColors.text),
                           ),
                         ),
@@ -342,7 +342,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
                     label: Text(t('संदेश भेजें', 'Message')),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.primary,
-                      side: const BorderSide(
+                      side: BorderSide(
                           color: AppColors.primary, width: 1.2),
                       textStyle: const TextStyle(
                           fontSize: 14.5, fontWeight: FontWeight.w700),
@@ -388,7 +388,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
             big,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w800,
                 color: AppColors.text),
@@ -398,7 +398,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
             label,
             textAlign: TextAlign.center,
             maxLines: 2,
-            style: const TextStyle(fontSize: 11, color: AppColors.muted),
+            style: TextStyle(fontSize: 11, color: AppColors.muted),
           ),
         ],
       ),
@@ -449,12 +449,12 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
         children: [
           Row(
             children: [
-              const Icon(Icons.account_circle,
+              Icon(Icons.account_circle,
                   color: AppColors.primary, size: 24),
               const SizedBox(width: 8),
               Text(
                 t('मेरे बारे में', 'About me'),
-                style: const TextStyle(
+                style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w800,
                     color: AppColors.text),
@@ -468,7 +468,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
             overflow: (_aboutOpen || !long)
                 ? TextOverflow.visible
                 : TextOverflow.ellipsis,
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: 14, height: 1.5, color: AppColors.text),
           ),
           if (long)
@@ -483,7 +483,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
                       _aboutOpen
                           ? t('कम पढ़ें', 'Read less')
                           : t('और जानें', 'Read more'),
-                      style: const TextStyle(
+                      style: TextStyle(
                           color: AppColors.primary,
                           fontWeight: FontWeight.w700,
                           fontSize: 14),
@@ -507,7 +507,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: ok ? AppColors.tint : const Color(0xFFF1F1F1),
+        color: ok ? AppColors.tint : AppColors.tintLight,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
@@ -546,11 +546,11 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
         children: [
           Row(
             children: [
-              const Icon(Icons.shield, color: AppColors.primary, size: 24),
+              Icon(Icons.shield, color: AppColors.primary, size: 24),
               const SizedBox(width: 8),
               Text(
                 t('वेरिफिकेशन', 'Verification'),
-                style: const TextStyle(
+                style: TextStyle(
                     fontSize: 17,
                     fontWeight: FontWeight.w800,
                     color: AppColors.text),
@@ -572,7 +572,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
           Text(
             t('Verified बैज एडमिन की जाँच के बाद ही मिलता है।',
                 'The Verified badge is given only after admin review.'),
-            style: const TextStyle(fontSize: 12, color: AppColors.muted),
+            style: TextStyle(fontSize: 12, color: AppColors.muted),
           ),
         ],
       ),
@@ -586,7 +586,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
         Icon(icon, size: 14, color: AppColors.primary),
         const SizedBox(width: 4),
         Text(text,
-            style: const TextStyle(fontSize: 11.5, color: AppColors.muted)),
+            style: TextStyle(fontSize: 11.5, color: AppColors.muted)),
       ],
     );
   }
@@ -602,7 +602,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: AppColors.border),
         ),
@@ -649,7 +649,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
                     x.title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w800,
                         color: AppColors.text),
@@ -657,7 +657,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
                   const SizedBox(height: 3),
                   Row(
                     children: [
-                      const Icon(Icons.location_on,
+                      Icon(Icons.location_on,
                           size: 14, color: AppColors.primary),
                       const SizedBox(width: 3),
                       Expanded(
@@ -665,7 +665,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
                           x.area,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontSize: 12.5, color: AppColors.muted),
                         ),
                       ),
@@ -674,7 +674,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
                   const SizedBox(height: 5),
                   Text(
                     '₹${inr(x.price)}${t('/माह', '/month')}',
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w800,
                         color: AppColors.primary),
@@ -693,7 +693,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: AppColors.text),
+            Icon(Icons.chevron_right, color: AppColors.text),
           ],
         ),
       ),
@@ -712,11 +712,11 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
           Container(
             width: 48,
             height: 48,
-            decoration: const BoxDecoration(
-              color: Colors.white,
+            decoration: BoxDecoration(
+              color: AppColors.surface,
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.people_outline,
+            child: Icon(Icons.people_outline,
                 color: AppColors.primary, size: 26),
           ),
           const SizedBox(width: 12),
@@ -727,7 +727,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
                 Text(
                   t('क्या आप भी किराये के कमरे की तलाश में हैं?',
                       'Are you also looking for a room to rent?'),
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 13.5,
                       fontWeight: FontWeight.w800,
                       color: AppColors.text),
@@ -736,7 +736,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
                 Text(
                   t('${o.name} से सीधे संपर्क करें और अपनी ज़रूरत बताएँ।',
                       'Contact ${o.nameEn} directly and tell them what you need.'),
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 12, height: 1.3, color: AppColors.text),
                 ),
               ],
@@ -749,8 +749,8 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
             label: Text(t('संदेश', 'Message')),
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.primary,
-              backgroundColor: Colors.white,
-              side: const BorderSide(color: AppColors.primary),
+              backgroundColor: AppColors.surface,
+              side: BorderSide(color: AppColors.primary),
               padding: const EdgeInsets.symmetric(horizontal: 10),
               textStyle:
                   const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
@@ -767,7 +767,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
   Widget build(BuildContext context) {
     final items = _ownerListings;
     return Scaffold(
-      backgroundColor: const Color(0xFFF7FCF9),
+      backgroundColor: AppColors.bg,
       body: Column(
         children: [
           _topBar(),
@@ -786,12 +786,12 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
                 const SizedBox(height: 16),
                 Row(
                   children: [
-                    const Icon(Icons.home, color: AppColors.primary, size: 22),
+                    Icon(Icons.home, color: AppColors.primary, size: 22),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         t('इनके द्वारा दिए गए कमरे', 'Rooms listed by them'),
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.w800,
                             color: AppColors.text),
@@ -800,7 +800,7 @@ class _OwnerProfileScreenState extends State<OwnerProfileScreen> {
                     Text(
                       t('कुल ${items.length} कमरे',
                           '${items.length} rooms in total'),
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 12.5,
                           fontWeight: FontWeight.w700,
                           color: AppColors.primary),

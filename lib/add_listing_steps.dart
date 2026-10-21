@@ -220,7 +220,7 @@ extension _AddListingSteps on _AddListingScreenState {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(Icons.info_outline,
+              Icon(Icons.info_outline,
                   color: AppColors.primary, size: 22),
               const SizedBox(width: 10),
               Expanded(
@@ -229,7 +229,7 @@ extension _AddListingSteps on _AddListingScreenState {
                     'किराया और डिपॉजिट किरायेदार सीधे आपसे तय करेगा। RoomMitra पर कोई ऑनलाइन पेमेंट नहीं होता।',
                     'The tenant will fix the rent and deposit directly with you. There is no online payment on RoomMitra.',
                   ),
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 12.5, height: 1.4, color: AppColors.text),
                 ),
               ),
@@ -317,7 +317,7 @@ extension _AddListingSteps on _AddListingScreenState {
               Icon(icon, color: AppColors.primary, size: 28),
               const SizedBox(height: 4),
               Text(text,
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
                       color: AppColors.primary)),
@@ -356,7 +356,7 @@ extension _AddListingSteps on _AddListingScreenState {
                 t('JPG, PNG (अधिकतम 5MB प्रति फोटो)',
                     'JPG, PNG (maximum 5MB per photo)'),
                 style:
-                    const TextStyle(fontSize: 11.5, color: AppColors.muted),
+                    TextStyle(fontSize: 11.5, color: AppColors.muted),
               ),
               const SizedBox(height: 14),
               Row(
@@ -365,7 +365,7 @@ extension _AddListingSteps on _AddListingScreenState {
                     child: Text(
                       t('अपलोड की गई फोटो (${_photos.length}/$_maxPhotos)',
                           'Uploaded photos (${_photos.length}/$_maxPhotos)'),
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w800,
                           color: AppColors.text),
@@ -377,12 +377,12 @@ extension _AddListingSteps on _AddListingScreenState {
                       child: Row(
                         children: [
                           Text(t('सभी हटाएं', 'Remove all'),
-                              style: const TextStyle(
+                              style: TextStyle(
                                   fontSize: 12.5,
                                   fontWeight: FontWeight.w600,
                                   color: AppColors.danger)),
                           const SizedBox(width: 4),
-                          const Icon(Icons.delete_outline,
+                          Icon(Icons.delete_outline,
                               size: 18, color: AppColors.danger),
                         ],
                       ),
@@ -401,7 +401,7 @@ extension _AddListingSteps on _AddListingScreenState {
                   child: Text(
                     t('अभी कोई फोटो नहीं जोड़ी गई', 'No photos added yet'),
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 13, color: AppColors.muted),
                   ),
                 )
@@ -432,11 +432,11 @@ extension _AddListingSteps on _AddListingScreenState {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.lightbulb,
+                  Icon(Icons.lightbulb,
                       color: AppColors.primary, size: 20),
                   const SizedBox(width: 8),
                   Text(t('फोटो के लिए सुझाव', 'Tips for photos'),
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w800,
                           color: AppColors.text)),
@@ -454,7 +454,7 @@ extension _AddListingSteps on _AddListingScreenState {
                       '• Keep photos sharp, avoid blurry ones\n'
                       '• Show the door, window and balcony too',
                 ),
-                style: const TextStyle(
+                style: TextStyle(
                     fontSize: 12.5, height: 1.6, color: AppColors.text),
               ),
             ],
@@ -500,7 +500,7 @@ extension _AddListingSteps on _AddListingScreenState {
                           width: w,
                           height: 78,
                           decoration: BoxDecoration(
-                            color: on ? AppColors.tint : Colors.white,
+                            color: on ? AppColors.tint : AppColors.surface,
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
                               color: on ? AppColors.primary : AppColors.border,
@@ -533,7 +533,7 @@ extension _AddListingSteps on _AddListingScreenState {
                                       a.label,
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                           fontSize: 11,
                                           fontWeight: FontWeight.w600,
                                           color: AppColors.text),
@@ -558,10 +558,10 @@ extension _AddListingSteps on _AddListingScreenState {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.phone, color: AppColors.primary, size: 22),
+                  Icon(Icons.phone, color: AppColors.primary, size: 22),
                   const SizedBox(width: 8),
                   Text(t('आपका संपर्क विवरण', 'Your contact details'),
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
                           color: AppColors.text)),
@@ -590,7 +590,7 @@ extension _AddListingSteps on _AddListingScreenState {
               Text(
                 t('ये नंबर सबको नहीं दिखते। किरायेदार को कॉल या WhatsApp के बटन से ही संपर्क मिलता है।',
                     'These numbers are not shown to everyone. Tenants reach you only through the call or WhatsApp buttons.'),
-                style: const TextStyle(
+                style: TextStyle(
                     fontSize: 12, height: 1.4, color: AppColors.muted),
               ),
             ],
@@ -638,7 +638,7 @@ extension _AddListingSteps on _AddListingScreenState {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(Icons.lock, color: AppColors.primary, size: 22),
+              Icon(Icons.lock, color: AppColors.primary, size: 22),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
@@ -646,7 +646,7 @@ extension _AddListingSteps on _AddListingScreenState {
                     'आपका पूरा पता और फोन नंबर सुरक्षित रहता है। किरायेदार को सिर्फ इलाके का नाम दिखता है।',
                     'Your full address and phone number stay safe. Tenants only see the area name.',
                   ),
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 12.5, height: 1.4, color: AppColors.text),
                 ),
               ),
@@ -669,12 +669,12 @@ extension _AddListingSteps on _AddListingScreenState {
             width: 110,
             child: Text(k,
                 style:
-                    const TextStyle(fontSize: 13, color: AppColors.muted)),
+                    TextStyle(fontSize: 13, color: AppColors.muted)),
           ),
           Expanded(
             child: Text(
               v.isEmpty ? '-' : v,
-              style: const TextStyle(
+              style: TextStyle(
                   fontSize: 13.5,
                   fontWeight: FontWeight.w700,
                   color: AppColors.text),
@@ -739,7 +739,7 @@ extension _AddListingSteps on _AddListingScreenState {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(Icons.verified_user,
+              Icon(Icons.verified_user,
                   color: AppColors.primary, size: 22),
               const SizedBox(width: 10),
               Expanded(
@@ -748,7 +748,7 @@ extension _AddListingSteps on _AddListingScreenState {
                     'लिस्टिंग 100% फ्री है। सबमिट के बाद एडमिन जाँच करेगा, फिर वह सबको दिखेगी।',
                     'Listing is 100% free. After you submit, the admin will review it and then it will be visible to everyone.',
                   ),
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 12.5, height: 1.4, color: AppColors.text),
                 ),
               ),

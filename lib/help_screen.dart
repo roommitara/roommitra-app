@@ -184,7 +184,7 @@ class _HelpScreenState extends State<HelpScreen> {
 
   Widget _topBar() {
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [AppColors.primaryDark, AppColors.primary],
           begin: Alignment.topLeft,
@@ -223,7 +223,7 @@ class _HelpScreenState extends State<HelpScreen> {
       ),
       child: Row(
         children: [
-          const CircleAvatar(
+          CircleAvatar(
             radius: 26,
             backgroundColor: AppColors.primary,
             child: Icon(Icons.support_agent, color: Colors.white, size: 30),
@@ -235,7 +235,7 @@ class _HelpScreenState extends State<HelpScreen> {
               children: [
                 Text(
                   t('सहायता और सपोर्ट', 'Help & Support'),
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w800,
                       color: AppColors.text),
@@ -244,7 +244,7 @@ class _HelpScreenState extends State<HelpScreen> {
                 Text(
                   t('अक्सर पूछे जाने वाले सवालों के जवाब यहाँ मिलेंगे।',
                       'Answers to frequently asked questions are here.'),
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 12.5, height: 1.3, color: AppColors.text),
                 ),
               ],
@@ -260,25 +260,25 @@ class _HelpScreenState extends State<HelpScreen> {
       height: 50,
       padding: const EdgeInsets.symmetric(horizontal: 14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(25),
         border: Border.all(color: AppColors.border, width: 1.2),
       ),
       child: Row(
         children: [
-          const Icon(Icons.search, color: AppColors.primary, size: 24),
+          Icon(Icons.search, color: AppColors.primary, size: 24),
           const SizedBox(width: 10),
           Expanded(
             child: TextField(
               controller: _q,
               onChanged: (_) => setState(() {}),
-              style: const TextStyle(fontSize: 14.5, color: AppColors.text),
+              style: TextStyle(fontSize: 14.5, color: AppColors.text),
               decoration: InputDecoration(
                 border: InputBorder.none,
                 isDense: true,
                 hintText: t('अपना सवाल खोजें...', 'Search your question...'),
                 hintStyle:
-                    const TextStyle(fontSize: 14.5, color: AppColors.muted),
+                    TextStyle(fontSize: 14.5, color: AppColors.muted),
               ),
             ),
           ),
@@ -288,7 +288,7 @@ class _HelpScreenState extends State<HelpScreen> {
                 _q.clear();
                 setState(() {});
               },
-              child: const Icon(Icons.close, size: 20, color: AppColors.muted),
+              child: Icon(Icons.close, size: 20, color: AppColors.muted),
             ),
         ],
       ),
@@ -335,7 +335,7 @@ class _HelpScreenState extends State<HelpScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
             color: open ? AppColors.primary : AppColors.border,
@@ -361,7 +361,7 @@ class _HelpScreenState extends State<HelpScreen> {
                   Expanded(
                     child: Text(
                       f.tQ,
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 14.5,
                           fontWeight: FontWeight.w800,
                           height: 1.3,
@@ -383,7 +383,7 @@ class _HelpScreenState extends State<HelpScreen> {
               padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
               child: Text(
                 f.tA,
-                style: const TextStyle(
+                style: TextStyle(
                     fontSize: 13.5, height: 1.5, color: AppColors.text),
               ),
             ),
@@ -417,7 +417,7 @@ class _HelpScreenState extends State<HelpScreen> {
                 label: Text(label),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.primary,
-                  side: const BorderSide(color: AppColors.primary, width: 1.2),
+                  side: BorderSide(color: AppColors.primary, width: 1.2),
                   textStyle: const TextStyle(
                       fontSize: 14, fontWeight: FontWeight.w700),
                   shape: RoundedRectangleBorder(
@@ -440,13 +440,13 @@ class _HelpScreenState extends State<HelpScreen> {
         children: [
           Row(
             children: [
-              const Icon(Icons.headset_mic, color: AppColors.primary, size: 24),
+              Icon(Icons.headset_mic, color: AppColors.primary, size: 24),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   t('जवाब नहीं मिला? हमसे संपर्क करें',
                       'Did not find an answer? Contact us'),
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 15.5,
                       fontWeight: FontWeight.w800,
                       color: AppColors.text),
@@ -458,7 +458,7 @@ class _HelpScreenState extends State<HelpScreen> {
           Text(
             t('अपनी समस्या लिखकर भेजें, हम जल्द से जल्द जवाब देंगे।',
                 'Write your problem and send it, we will reply as soon as possible.'),
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: 12.5, height: 1.4, color: AppColors.text),
           ),
           const SizedBox(height: 12),
@@ -479,13 +479,13 @@ class _HelpScreenState extends State<HelpScreen> {
       padding: const EdgeInsets.symmetric(vertical: 36),
       child: Column(
         children: [
-          const Icon(Icons.search_off, size: 52, color: AppColors.muted),
+          Icon(Icons.search_off, size: 52, color: AppColors.muted),
           const SizedBox(height: 10),
           Text(
             t('कोई सवाल नहीं मिला। दूसरा शब्द आज़माएँ।',
                 'No question found. Try a different word.'),
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 14.5, color: AppColors.muted),
+            style: TextStyle(fontSize: 14.5, color: AppColors.muted),
           ),
         ],
       ),
@@ -505,7 +505,7 @@ class _HelpScreenState extends State<HelpScreen> {
     }).toList();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF7FCF9),
+      backgroundColor: AppColors.bg,
       body: Column(
         children: [
           _topBar(),

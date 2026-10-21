@@ -216,7 +216,7 @@ class _AdminReviewScreenState extends State<AdminReviewScreen> {
           children: [
             Text(text,
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: AppColors.muted, fontSize: 15)),
+                style: TextStyle(color: AppColors.muted, fontSize: 15)),
             if (retry) ...[
               const SizedBox(height: 12),
               ElevatedButton(
@@ -257,7 +257,7 @@ class _AdminReviewScreenState extends State<AdminReviewScreen> {
       margin: const EdgeInsets.only(bottom: 14),
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14),
-          side: const BorderSide(color: AppColors.border)),
+          side: BorderSide(color: AppColors.border)),
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
@@ -289,23 +289,23 @@ class _AdminReviewScreenState extends State<AdminReviewScreen> {
               ),
             const SizedBox(height: 10),
             Text((r['title'] ?? '').toString(),
-                style: const TextStyle(
+                style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
                     color: AppColors.text)),
             const SizedBox(height: 4),
             Text(
                 '₹${r['monthly_rent']} / ${t('महीना', 'month')}  •  ${r['locality'] ?? ''} ${r['city'] ?? ''}',
-                style: const TextStyle(color: AppColors.primaryDark)),
+                style: TextStyle(color: AppColors.primaryDark)),
             const SizedBox(height: 4),
             Text(
                 '${t('प्रकार', 'Type')}: ${r['room_type'] ?? r['kind'] ?? ''}  •  ${t('फोटो', 'Photos')}: ${photos.length}  •  ${r['lat'] != null ? t('मैप पिन ✓', 'Map pin ✓') : t('मैप पिन ✗', 'Map pin ✗')}',
-                style: const TextStyle(color: AppColors.muted, fontSize: 13)),
+                style: TextStyle(color: AppColors.muted, fontSize: 13)),
             if (amenities.isNotEmpty) ...[
               const SizedBox(height: 4),
               Text(amenities,
                   style:
-                      const TextStyle(color: AppColors.muted, fontSize: 13)),
+                      TextStyle(color: AppColors.muted, fontSize: 13)),
             ],
             if ((r['description'] ?? '').toString().isNotEmpty) ...[
               const SizedBox(height: 6),
@@ -387,7 +387,7 @@ class _AdminReviewScreenState extends State<AdminReviewScreen> {
           return _listingCard(r, showReview: false, extra: [
             const SizedBox(height: 8),
             Text('${t('स्थिति', 'Status')}: $status',
-                style: const TextStyle(
+                style: TextStyle(
                     fontWeight: FontWeight.w700, color: AppColors.primaryDark)),
             const SizedBox(height: 8),
             Wrap(spacing: 8, runSpacing: 8, children: [
@@ -441,17 +441,17 @@ class _AdminReviewScreenState extends State<AdminReviewScreen> {
           margin: const EdgeInsets.only(bottom: 14),
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(14),
-              side: const BorderSide(color: AppColors.border)),
+              side: BorderSide(color: AppColors.border)),
           child: Padding(
             padding: const EdgeInsets.all(12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(children: [
-                  const Icon(Icons.flag, color: AppColors.danger, size: 18),
+                  Icon(Icons.flag, color: AppColors.danger, size: 18),
                   const SizedBox(width: 6),
                   Text(_reasonLabel((rep['reason'] ?? '').toString()),
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontWeight: FontWeight.w700,
                           color: AppColors.danger)),
                 ]),
@@ -464,7 +464,7 @@ class _AdminReviewScreenState extends State<AdminReviewScreen> {
                     listing == null
                         ? t('कमरा नहीं मिला', 'Room not found')
                         : '${listing['title']}  (${listing['status']})',
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontWeight: FontWeight.w600, color: AppColors.text)),
                 const SizedBox(height: 10),
                 Wrap(spacing: 8, runSpacing: 8, children: [

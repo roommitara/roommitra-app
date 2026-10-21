@@ -127,7 +127,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   BoxDecoration _cardDeco() {
     return BoxDecoration(
-      color: Colors.white,
+      color: AppColors.surface,
       borderRadius: BorderRadius.circular(16),
       border: Border.all(color: AppColors.border),
       boxShadow: const [
@@ -149,16 +149,16 @@ class _SearchScreenState extends State<SearchScreen> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.location_on, size: 20, color: AppColors.primary),
+            Icon(Icons.location_on, size: 20, color: AppColors.primary),
             const SizedBox(width: 4),
             Text(
               cityName(appState.city),
-              style: const TextStyle(
+              style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: AppColors.text),
             ),
-            const Icon(Icons.keyboard_arrow_down,
+            Icon(Icons.keyboard_arrow_down,
                 size: 20, color: AppColors.text),
           ],
         ),
@@ -172,26 +172,26 @@ class _SearchScreenState extends State<SearchScreen> {
       height: 54,
       padding: const EdgeInsets.only(left: 14, right: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(28),
         border: Border.all(color: AppColors.border, width: 1.3),
       ),
       child: Row(
         children: [
-          const Icon(Icons.search, color: AppColors.primary, size: 26),
+          Icon(Icons.search, color: AppColors.primary, size: 26),
           const SizedBox(width: 10),
           Expanded(
             child: TextField(
               controller: _queryCtrl,
               onChanged: (_) => setState(() {}),
               textInputAction: TextInputAction.search,
-              style: const TextStyle(fontSize: 15, color: AppColors.text),
+              style: TextStyle(fontSize: 15, color: AppColors.text),
               decoration: InputDecoration(
                 border: InputBorder.none,
                 isDense: true,
                 hintText: t('$city में कमरा खोजें', 'Search rooms in $city'),
                 hintStyle:
-                    const TextStyle(fontSize: 15, color: AppColors.muted),
+                    TextStyle(fontSize: 15, color: AppColors.muted),
               ),
             ),
           ),
@@ -201,7 +201,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 _queryCtrl.clear();
                 setState(() {});
               },
-              child: const Padding(
+              child: Padding(
                 padding: EdgeInsets.all(6),
                 child: Icon(Icons.close, size: 20, color: AppColors.muted),
               ),
@@ -276,14 +276,14 @@ class _SearchScreenState extends State<SearchScreen> {
           const SizedBox(width: 8),
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
                 color: AppColors.text),
           ),
           if (arrow) ...[
             const SizedBox(width: 4),
-            const Icon(Icons.keyboard_arrow_down,
+            Icon(Icons.keyboard_arrow_down,
                 size: 20, color: AppColors.text),
           ],
         ],
@@ -345,7 +345,7 @@ class _SearchScreenState extends State<SearchScreen> {
         Expanded(
           child: Text(
             t('कुल $count परिणाम', 'Total $count results'),
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w800,
                 color: AppColors.text),
@@ -441,7 +441,7 @@ class _SearchScreenState extends State<SearchScreen> {
       ),
       child: Text(
         '₹${inr(price)}${t('/माह', '/month')}',
-        style: const TextStyle(
+        style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w800,
             color: AppColors.primary),
@@ -456,7 +456,7 @@ class _SearchScreenState extends State<SearchScreen> {
         Icon(icon, size: 14, color: AppColors.primary),
         const SizedBox(width: 4),
         Text(text,
-            style: const TextStyle(fontSize: 11.5, color: AppColors.muted)),
+            style: TextStyle(fontSize: 11.5, color: AppColors.muted)),
       ],
     );
   }
@@ -506,7 +506,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         l.title,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w800,
                             color: AppColors.text),
@@ -514,7 +514,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       const SizedBox(height: 4),
                       Row(
                         children: [
-                          const Icon(Icons.location_on,
+                          Icon(Icons.location_on,
                               size: 15, color: AppColors.primary),
                           const SizedBox(width: 3),
                           Expanded(
@@ -522,7 +522,7 @@ class _SearchScreenState extends State<SearchScreen> {
                               l.area,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
+                              style: TextStyle(
                                   fontSize: 12.5, color: AppColors.primary),
                             ),
                           ),
@@ -556,7 +556,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 l.desc,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
+                style: TextStyle(
                     fontSize: 12.5, height: 1.35, color: AppColors.muted),
               ),
             ],
@@ -583,7 +583,7 @@ class _SearchScreenState extends State<SearchScreen> {
               l.title,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
+              style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w800,
                   color: AppColors.text),
@@ -591,7 +591,7 @@ class _SearchScreenState extends State<SearchScreen> {
             const SizedBox(height: 3),
             Row(
               children: [
-                const Icon(Icons.location_on,
+                Icon(Icons.location_on,
                     size: 14, color: AppColors.primary),
                 const SizedBox(width: 2),
                 Expanded(
@@ -599,7 +599,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     l.area,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 12, color: AppColors.muted),
                   ),
                 ),
@@ -623,17 +623,17 @@ class _SearchScreenState extends State<SearchScreen> {
         padding: const EdgeInsets.symmetric(vertical: 7),
         child: Row(
           children: [
-            const Icon(Icons.check_circle,
+            Icon(Icons.check_circle,
                 size: 22, color: AppColors.primary),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
                 text,
-                style: const TextStyle(
+                style: TextStyle(
                     fontSize: 14.5, height: 1.3, color: AppColors.text),
               ),
             ),
-            const Icon(Icons.chevron_right,
+            Icon(Icons.chevron_right,
                 size: 20, color: AppColors.muted),
           ],
         ),
@@ -655,7 +655,7 @@ class _SearchScreenState extends State<SearchScreen> {
           Text(
             t('कोई कमरा नहीं मिला', 'No rooms found'),
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: 27,
                 fontWeight: FontWeight.w800,
                 color: AppColors.primary),
@@ -665,7 +665,7 @@ class _SearchScreenState extends State<SearchScreen> {
             t('आपके द्वारा चुनी गई जानकारी के अनुसार,\nकोई भी कमरा उपलब्ध नहीं है।',
                 'According to your selection,\nno rooms are available.'),
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: 15, height: 1.5, color: AppColors.text),
           ),
           const SizedBox(height: 18),
@@ -682,14 +682,14 @@ class _SearchScreenState extends State<SearchScreen> {
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.lightbulb_outline,
+                    Icon(Icons.lightbulb_outline,
                         size: 24, color: AppColors.primary),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         t('आप ये भी कोशिश कर सकते हैं:',
                             'You can also try:'),
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 15.5,
                             fontWeight: FontWeight.w800,
                             color: AppColors.primary),
@@ -747,12 +747,12 @@ class _SearchScreenState extends State<SearchScreen> {
       padding: const EdgeInsets.fromLTRB(20, 40, 20, 40),
       child: Column(
         children: [
-          const Icon(Icons.wifi_off, size: 44, color: AppColors.muted),
+          Icon(Icons.wifi_off, size: 44, color: AppColors.muted),
           const SizedBox(height: 10),
           Text(
             listingsStore.error ?? '',
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
                 color: AppColors.muted),
@@ -778,7 +778,7 @@ class _SearchScreenState extends State<SearchScreen> {
             final loaded = listingsStore.loaded;
             final results = loaded ? _resultsWith(_filters) : <Listing>[];
             return Scaffold(
-              backgroundColor: const Color(0xFFF7FCF9),
+              backgroundColor: AppColors.bg,
               body: RefreshIndicator(
                 onRefresh: () => listingsStore.load(),
                 child: CustomScrollView(

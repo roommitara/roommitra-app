@@ -88,8 +88,8 @@ class _AppShellState extends State<AppShell> {
 
   Widget _bottomBar(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      decoration: BoxDecoration(
+        color: AppColors.surface,
         boxShadow: [
           BoxShadow(
               color: Color(0x1A000000), blurRadius: 12, offset: Offset(0, -2)),

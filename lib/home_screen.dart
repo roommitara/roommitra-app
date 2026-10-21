@@ -149,7 +149,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _header(double top) {
     return Container(
       width: double.infinity,
-      color: Colors.white,
+      color: AppColors.surface,
       padding: EdgeInsets.fromLTRB(16, top + 12, 16, 12),
       child: Row(
         children: [
@@ -167,12 +167,12 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.language,
+                  Icon(Icons.language,
                       size: 20, color: AppColors.primaryDark),
                   const SizedBox(width: 6),
                   Text(
                     AppLang.isHindi ? 'English' : 'हिंदी',
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w800,
                         color: AppColors.primaryDark),
@@ -210,7 +210,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 shape: BoxShape.circle,
                 border: Border.all(color: AppColors.primaryDark, width: 2),
               ),
-              child: const Icon(Icons.location_on,
+              child: Icon(Icons.location_on,
                   color: AppColors.primaryDark, size: 28),
             ),
           ),
@@ -226,7 +226,7 @@ class _HomeScreenState extends State<HomeScreen> {
         height: 56,
         padding: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surface,
           borderRadius: BorderRadius.circular(28),
           border: Border.all(color: AppColors.border, width: 1.2),
           boxShadow: const [
@@ -236,7 +236,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         child: Row(
           children: [
-            const Icon(Icons.search, color: AppColors.primaryDark, size: 28),
+            Icon(Icons.search, color: AppColors.primaryDark, size: 28),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
@@ -244,7 +244,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     'Search for rooms, PG, flats, shops...'),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(color: AppColors.muted, fontSize: 15),
+                style: TextStyle(color: AppColors.muted, fontSize: 15),
               ),
             ),
             Container(
@@ -254,7 +254,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: AppColors.tint,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Icon(Icons.tune,
+              child: Icon(Icons.tune,
                   size: 22, color: AppColors.primaryDark),
             ),
           ],
@@ -330,14 +330,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     Text(title,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w800,
                             color: AppColors.text)),
                     Text(sub,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 11.5, color: AppColors.muted)),
                   ],
                 ),
@@ -669,7 +669,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Expanded(
           child: Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: 21,
                 fontWeight: FontWeight.w800,
                 color: AppColors.primaryDark),
@@ -681,13 +681,13 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               Text(
                 t('सभी देखें', 'See all'),
-                style: const TextStyle(
+                style: TextStyle(
                     color: AppColors.primary,
                     fontSize: 13,
                     fontWeight: FontWeight.w700),
               ),
               const SizedBox(width: 4),
-              const Icon(Icons.arrow_forward,
+              Icon(Icons.arrow_forward,
                   size: 16, color: AppColors.primary),
             ],
           ),
@@ -703,7 +703,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Icon(icon, size: 15, color: AppColors.muted),
         const SizedBox(width: 4),
         Text(text,
-            style: const TextStyle(fontSize: 12, color: AppColors.muted)),
+            style: TextStyle(fontSize: 12, color: AppColors.muted)),
       ],
     );
   }
@@ -731,7 +731,7 @@ class _HomeScreenState extends State<HomeScreen> {
         width: w,
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surface,
           borderRadius: BorderRadius.circular(16),
           boxShadow: const [
             BoxShadow(
@@ -786,8 +786,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Container(
                       width: 34,
                       height: 34,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
+                      decoration: BoxDecoration(
+                        color: AppColors.surface,
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
@@ -828,7 +828,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     l.title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w800,
                         color: AppColors.text),
@@ -836,7 +836,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      const Icon(Icons.location_on,
+                      Icon(Icons.location_on,
                           size: 15, color: AppColors.primary),
                       const SizedBox(width: 3),
                       Expanded(
@@ -844,7 +844,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           l.area,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontSize: 13, color: AppColors.muted),
                         ),
                       ),
@@ -899,12 +899,12 @@ class _HomeScreenState extends State<HomeScreen> {
       return _infoBox(
         Column(
           children: [
-            const Icon(Icons.wifi_off, size: 40, color: AppColors.muted),
+            Icon(Icons.wifi_off, size: 40, color: AppColors.muted),
             const SizedBox(height: 8),
             Text(
               listingsStore.error!,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: AppColors.muted),
@@ -929,13 +929,13 @@ class _HomeScreenState extends State<HomeScreen> {
       return _infoBox(
         Column(
           children: [
-            const Icon(Icons.search_off, size: 40, color: AppColors.muted),
+            Icon(Icons.search_off, size: 40, color: AppColors.muted),
             const SizedBox(height: 8),
             Text(
               t('इस शहर में अभी कोई कमरा नहीं है',
                   'There are no rooms in this city yet'),
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: AppColors.muted),
@@ -998,7 +998,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 6),
                   Row(
                     children: [
-                      const Icon(Icons.location_on_outlined,
+                      Icon(Icons.location_on_outlined,
                           size: 16, color: AppColors.primary),
                       const SizedBox(width: 2),
                       Expanded(
@@ -1006,7 +1006,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           c.name,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
                               color: AppColors.text),
@@ -1034,23 +1034,26 @@ class _HomeScreenState extends State<HomeScreen> {
           listenable: Listenable.merge([appState, listingsStore]),
           builder: (context, _) {
             return AnnotatedRegion<SystemUiOverlayStyle>(
-              value: SystemUiOverlayStyle.dark.copyWith(
+              value: (AppTheme.isDark
+                      ? SystemUiOverlayStyle.light
+                      : SystemUiOverlayStyle.dark)
+                  .copyWith(
                 statusBarColor: Colors.transparent,
               ),
               child: Scaffold(
-                backgroundColor: Colors.white,
+                backgroundColor: AppColors.bg,
                 body: SingleChildScrollView(
                   physics: const BouncingScrollPhysics(
                       parent: AlwaysScrollableScrollPhysics()),
                   child: Container(
-                    color: Colors.white,
+                    color: AppColors.surface,
                     child: Column(
                       children: [
                         _header(top),
                         Container(
                           width: double.infinity,
                           padding: const EdgeInsets.fromLTRB(16, 4, 16, 28),
-                          color: Colors.white,
+                          color: AppColors.surface,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [

@@ -26,7 +26,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
   Widget _topBar(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [AppColors.primaryDark, AppColors.primary],
           begin: Alignment.topLeft,
@@ -57,7 +57,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           Container(
             width: 52,
             height: 52,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               color: AppColors.primary,
               shape: BoxShape.circle,
             ),
@@ -70,7 +70,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
               children: [
                 Text(
                   t('मेरे पसंदीदा कमरे', 'My favourite rooms'),
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w800,
                       color: AppColors.text),
@@ -79,7 +79,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 Text(
                   t('आपके द्वारा सेव किए गए सभी कमरे यहाँ दिखाई देंगे।',
                       'All the rooms you have saved will appear here.'),
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 12, height: 1.3, color: AppColors.text),
                 ),
               ],
@@ -89,19 +89,19 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.surface,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: AppColors.primary),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.bookmark,
+                Icon(Icons.bookmark,
                     size: 18, color: AppColors.primary),
                 const SizedBox(width: 4),
                 Text(
                   t('कुल $count', 'Total $count'),
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 12.5,
                       fontWeight: FontWeight.w800,
                       color: AppColors.primary),
@@ -121,7 +121,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         Icon(icon, size: 14, color: AppColors.primary),
         const SizedBox(width: 4),
         Text(text,
-            style: const TextStyle(fontSize: 11.5, color: AppColors.muted)),
+            style: TextStyle(fontSize: 11.5, color: AppColors.muted)),
       ],
     );
   }
@@ -157,7 +157,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: AppColors.border),
           boxShadow: const [
@@ -221,7 +221,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                           l.title,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w800,
                               color: AppColors.text),
@@ -240,7 +240,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      const Icon(Icons.location_on,
+                      Icon(Icons.location_on,
                           size: 15, color: AppColors.primary),
                       const SizedBox(width: 3),
                       Expanded(
@@ -248,7 +248,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                           l.area,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontSize: 12.5, color: AppColors.primary),
                         ),
                       ),
@@ -264,7 +264,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                     ),
                     child: Text(
                       '₹${inr(l.price)}${t('/माह', '/month')}',
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w800,
                           color: AppColors.primary),
@@ -289,7 +289,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                       amen,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 12, color: AppColors.muted),
                     ),
                   ],
@@ -307,7 +307,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                               ),
                               child: Text(
                                 tag,
-                                style: const TextStyle(
+                                style: TextStyle(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w600,
                                     color: AppColors.primary),
@@ -329,12 +329,12 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       padding: const EdgeInsets.fromLTRB(24, 48, 24, 24),
       child: Column(
         children: [
-          const Icon(Icons.favorite_border, size: 72, color: AppColors.muted),
+          Icon(Icons.favorite_border, size: 72, color: AppColors.muted),
           const SizedBox(height: 14),
           Text(
             t('अभी कोई पसंदीदा कमरा नहीं है', 'No favourite rooms yet'),
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w800,
                 color: AppColors.text),
@@ -344,7 +344,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             t('कमरे पर दिल का निशान दबाकर उसे यहाँ सेव करें।',
                 'Tap the heart icon on a room to save it here.'),
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 14, color: AppColors.muted),
+            style: TextStyle(fontSize: 14, color: AppColors.muted),
           ),
           const SizedBox(height: 18),
           ElevatedButton.icon(
@@ -379,12 +379,12 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       padding: const EdgeInsets.fromLTRB(24, 40, 24, 24),
       child: Column(
         children: [
-          const Icon(Icons.wifi_off, size: 56, color: AppColors.muted),
+          Icon(Icons.wifi_off, size: 56, color: AppColors.muted),
           const SizedBox(height: 12),
           Text(
             listingsStore.error ?? '',
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
                 color: AppColors.muted),
@@ -417,7 +417,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                     .toList()
                 : <Listing>[];
             return Scaffold(
-              backgroundColor: const Color(0xFFF7FCF9),
+              backgroundColor: AppColors.bg,
               body: Column(
                 children: [
                   _topBar(context),

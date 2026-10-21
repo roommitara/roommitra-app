@@ -36,7 +36,7 @@ class NearbyRooms extends StatelessWidget {
           Text(
             text,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: 13.5,
                 height: 1.4,
                 fontWeight: FontWeight.w600,
@@ -67,7 +67,7 @@ class NearbyRooms extends StatelessWidget {
         Icon(icon, size: 15, color: AppColors.muted),
         const SizedBox(width: 4),
         Text(text,
-            style: const TextStyle(fontSize: 12, color: AppColors.muted)),
+            style: TextStyle(fontSize: 12, color: AppColors.muted)),
       ],
     );
   }
@@ -83,7 +83,7 @@ class NearbyRooms extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surface,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(color: AppColors.border),
           boxShadow: const [
@@ -143,8 +143,8 @@ class NearbyRooms extends StatelessWidget {
                         child: Container(
                           width: 32,
                           height: 32,
-                          decoration: const BoxDecoration(
-                              color: Colors.white, shape: BoxShape.circle),
+                          decoration: BoxDecoration(
+                              color: AppColors.surface, shape: BoxShape.circle),
                           child: Icon(
                             fav ? Icons.favorite : Icons.favorite_border,
                             size: 19,
@@ -169,7 +169,7 @@ class NearbyRooms extends StatelessWidget {
                       l.title,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 16,
                           height: 1.2,
                           fontWeight: FontWeight.w800,
@@ -178,7 +178,7 @@ class NearbyRooms extends StatelessWidget {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        const Icon(Icons.location_on,
+                        Icon(Icons.location_on,
                             size: 15, color: AppColors.primary),
                         const SizedBox(width: 3),
                         Expanded(
@@ -186,7 +186,7 @@ class NearbyRooms extends StatelessWidget {
                             l.area,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontSize: 12.5, color: AppColors.muted),
                           ),
                         ),
@@ -208,14 +208,14 @@ class NearbyRooms extends StatelessWidget {
                               children: [
                                 TextSpan(
                                   text: '₹${inr(l.price)}',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.w800,
                                       color: AppColors.primaryDark),
                                 ),
                                 TextSpan(
                                   text: ' ${t('/माह', '/month')}',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       fontSize: 12,
                                       color: AppColors.primaryDark),
                                 ),
@@ -236,11 +236,11 @@ class NearbyRooms extends StatelessWidget {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(Icons.verified,
+                                Icon(Icons.verified,
                                     size: 14, color: AppColors.primary),
                                 const SizedBox(width: 3),
                                 Text(t('सत्यापित', 'Verified'),
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                         fontSize: 11,
                                         fontWeight: FontWeight.w700,
                                         color: AppColors.primaryDark)),
@@ -356,12 +356,12 @@ class NearbyRooms extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Icon(Icons.near_me, color: AppColors.primary, size: 22),
+                Icon(Icons.near_me, color: AppColors.primary, size: 22),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
                     t('आपके पास के कमरे', 'Rooms near you'),
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 21,
                         fontWeight: FontWeight.w800,
                         color: AppColors.primaryDark),
@@ -372,7 +372,7 @@ class NearbyRooms extends StatelessWidget {
                     NearbyService.instance.refresh(ask: true);
                     listingsStore.load();
                   },
-                  child: const Padding(
+                  child: Padding(
                     padding: EdgeInsets.all(6),
                     child:
                         Icon(Icons.refresh, size: 22, color: AppColors.primary),
@@ -386,12 +386,12 @@ class NearbyRooms extends StatelessWidget {
                       child: Row(
                         children: [
                           Text(t('सभी देखें', 'See all'),
-                              style: const TextStyle(
+                              style: TextStyle(
                                   color: AppColors.primary,
                                   fontSize: 13,
                                   fontWeight: FontWeight.w700)),
                           const SizedBox(width: 4),
-                          const Icon(Icons.arrow_forward,
+                          Icon(Icons.arrow_forward,
                               size: 16, color: AppColors.primary),
                         ],
                       ),

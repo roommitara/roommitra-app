@@ -117,7 +117,7 @@ final MyRealListingsStore myRealListings = MyRealListingsStore();
 
 Widget _topBar(BuildContext context) {
   return Container(
-    decoration: const BoxDecoration(
+    decoration: BoxDecoration(
       gradient: LinearGradient(
         colors: [AppColors.primaryDark, AppColors.primary],
         begin: Alignment.topLeft,
@@ -176,7 +176,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
           Container(
             width: 58,
             height: 58,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               color: AppColors.primary,
               shape: BoxShape.circle,
             ),
@@ -189,7 +189,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
               children: [
                 Text(
                   t('नमस्ते, मकान मालिक', 'Hello, house owner'),
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.w800,
                       color: AppColors.text),
@@ -198,7 +198,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
                 Text(
                   t('आपका मालिक डैशबोर्ड', 'Your owner dashboard'),
                   style:
-                      const TextStyle(fontSize: 12.5, color: AppColors.text),
+                      TextStyle(fontSize: 12.5, color: AppColors.text),
                 ),
               ],
             ),
@@ -213,7 +213,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surface,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(color: AppColors.border),
         ),
@@ -223,7 +223,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
             const SizedBox(height: 4),
             Text(
               number,
-              style: const TextStyle(
+              style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
                   color: AppColors.text),
@@ -233,7 +233,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
               label,
               textAlign: TextAlign.center,
               maxLines: 2,
-              style: const TextStyle(fontSize: 11, color: AppColors.muted),
+              style: TextStyle(fontSize: 11, color: AppColors.muted),
             ),
           ],
         ),
@@ -459,7 +459,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.border),
       ),
@@ -520,7 +520,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
                       l.title,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w800,
                           color: AppColors.text),
@@ -528,7 +528,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        const Icon(Icons.location_on,
+                        Icon(Icons.location_on,
                             size: 15, color: AppColors.primary),
                         const SizedBox(width: 3),
                         Expanded(
@@ -536,7 +536,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
                             l.area,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontSize: 12.5, color: AppColors.primary),
                           ),
                         ),
@@ -557,7 +557,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
                           ),
                           child: Text(
                             '₹${inr(l.price)}${t('/माह', '/month')}',
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w800,
                                 color: AppColors.primary),
@@ -575,7 +575,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
             const SizedBox(height: 10),
             Text(
               note,
-              style: const TextStyle(
+              style: TextStyle(
                   fontSize: 12.5, height: 1.35, color: AppColors.muted),
             ),
           ],
@@ -591,7 +591,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
                 const SizedBox(width: 10),
                 Text(
                   t('बदल रहे हैं...', 'Updating...'),
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
                       color: AppColors.text),
@@ -652,12 +652,12 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
         padding: const EdgeInsets.fromLTRB(16, 30, 16, 30),
         child: Column(
           children: [
-            const Icon(Icons.wifi_off, size: 48, color: AppColors.muted),
+            Icon(Icons.wifi_off, size: 48, color: AppColors.muted),
             const SizedBox(height: 10),
             Text(
               s.error ?? '',
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                   fontSize: 14.5,
                   fontWeight: FontWeight.w600,
                   color: AppColors.muted),
@@ -678,7 +678,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
           t('अपनी लिस्टिंग देखने के लिए पहले लॉगिन करें।',
               'Please log in first to see your listings.'),
           textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 14.5, color: AppColors.muted),
+          style: TextStyle(fontSize: 14.5, color: AppColors.muted),
         ),
       );
     }
@@ -724,7 +724,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
         Icon(icon, size: 14, color: AppColors.primary),
         const SizedBox(width: 4),
         Text(text,
-            style: const TextStyle(fontSize: 11.5, color: AppColors.muted)),
+            style: TextStyle(fontSize: 11.5, color: AppColors.muted)),
       ],
     );
   }
@@ -748,7 +748,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
             child: Text(t('हटाएं', 'Delete'),
-                style: const TextStyle(color: AppColors.danger)),
+                style: TextStyle(color: AppColors.danger)),
           ),
         ],
       ),
@@ -768,7 +768,8 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
   }
 
   Widget _actionBtn(IconData icon, String label, VoidCallback onTap,
-      {Color color = AppColors.primary}) {
+      {Color? color}) {
+    final c = color ?? AppColors.primary;
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -776,17 +777,17 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: color.withValues(alpha: 0.5)),
+          border: Border.all(color: c.withValues(alpha: 0.5)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 18, color: color),
+            Icon(icon, size: 18, color: c),
             const SizedBox(width: 6),
             Text(
               label,
               style: TextStyle(
-                  fontSize: 13, fontWeight: FontWeight.w700, color: color),
+                  fontSize: 13, fontWeight: FontWeight.w700, color: c),
             ),
           ],
         ),
@@ -801,7 +802,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.border),
       ),
@@ -860,7 +861,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
                       m.displayTitle,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w800,
                           color: AppColors.text),
@@ -868,7 +869,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        const Icon(Icons.location_on,
+                        Icon(Icons.location_on,
                             size: 15, color: AppColors.primary),
                         const SizedBox(width: 3),
                         Expanded(
@@ -876,7 +877,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
                             m.area,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontSize: 12.5, color: AppColors.primary),
                           ),
                         ),
@@ -907,7 +908,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
                           ),
                           child: Text(
                             '₹${inr(m.price)}${t('/माह', '/month')}',
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w800,
                                 color: AppColors.primary),
@@ -959,7 +960,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
                     children: [
                       Text(
                         active ? t('सक्रिय', 'Active') : t('निष्क्रिय', 'Inactive'),
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w700,
                             color: AppColors.text),
@@ -994,14 +995,14 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
           width: double.infinity,
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: const Color(0xFFFFF6E0),
+            color: AppTheme.isDark ? const Color(0xFF3A3115) : const Color(0xFFFFF6E0),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFFE8C77A)),
+            border: Border.all(color: AppTheme.isDark ? const Color(0xFF6B5A22) : const Color(0xFFE8C77A)),
           ),
           child: Text(
             t('डेमो लिस्टिंग: ये अभी सिर्फ इस फोन में हैं, ऑनलाइन सेव नहीं हुईं और दूसरों को नहीं दिखेंगी।',
                 'Demo listings: these exist only on this phone, are not saved online and are not visible to others.'),
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: 12.5, height: 1.35, color: AppColors.text),
           ),
         ),
@@ -1016,12 +1017,12 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
       padding: const EdgeInsets.fromLTRB(24, 40, 24, 40),
       child: Column(
         children: [
-          const Icon(Icons.home_work_outlined,
+          Icon(Icons.home_work_outlined,
               size: 64, color: AppColors.muted),
           const SizedBox(height: 12),
           Text(
             t('अभी कोई लिस्टिंग नहीं है', 'No listings yet'),
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w800,
                 color: AppColors.text),
@@ -1031,7 +1032,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
             t('नीचे के बटन से अपना पहला कमरा जोड़ें।',
                 'Add your first room using the button below.'),
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 14, color: AppColors.muted),
+            style: TextStyle(fontSize: 14, color: AppColors.muted),
           ),
         ],
       ),
@@ -1048,7 +1049,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
 
   Widget _buildBody(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7FCF9),
+      backgroundColor: AppColors.bg,
       body: Column(
         children: [
           _topBar(context),
@@ -1070,13 +1071,13 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
                       const SizedBox(height: 16),
                       Row(
                         children: [
-                          const Icon(Icons.home,
+                          Icon(Icons.home,
                               color: AppColors.primary, size: 22),
                           const SizedBox(width: 8),
                           Text(
                             t('मेरी लिस्टिंग (${real.length})',
                                 'My listings (${real.length})'),
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w800,
                                 color: AppColors.text),
@@ -1095,8 +1096,8 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
           Container(
             padding: EdgeInsets.fromLTRB(
                 16, 10, 16, 10 + MediaQuery.of(context).padding.bottom),
-            decoration: const BoxDecoration(
-              color: Colors.white,
+            decoration: BoxDecoration(
+              color: AppColors.surface,
               boxShadow: [
                 BoxShadow(
                     color: Color(0x14000000),
@@ -1216,9 +1217,9 @@ class _EditListingScreenState extends State<EditListingScreen> {
         );
     return InputDecoration(
       hintText: hint,
-      hintStyle: const TextStyle(fontSize: 14, color: AppColors.muted),
+      hintStyle: TextStyle(fontSize: 14, color: AppColors.muted),
       filled: true,
-      fillColor: Colors.white,
+      fillColor: AppColors.surface,
       isDense: true,
       contentPadding:
           const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
@@ -1242,7 +1243,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
             padding: const EdgeInsets.only(bottom: 6),
             child: Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
                   color: AppColors.text),
@@ -1255,7 +1256,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
             maxLines: maxLines,
             inputFormatters:
                 digitsOnly ? [FilteringTextInputFormatter.digitsOnly] : null,
-            style: const TextStyle(fontSize: 15, color: AppColors.text),
+            style: TextStyle(fontSize: 15, color: AppColors.text),
             decoration: _deco(''),
           ),
         ],
@@ -1273,7 +1274,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
 
   Widget _buildBody(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7FCF9),
+      backgroundColor: AppColors.bg,
       body: Column(
         children: [
           _topBar(context),
@@ -1285,7 +1286,7 @@ class _EditListingScreenState extends State<EditListingScreen> {
               child: Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.surface,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: AppColors.border),
                 ),
@@ -1294,12 +1295,12 @@ class _EditListingScreenState extends State<EditListingScreen> {
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.edit,
+                        Icon(Icons.edit,
                             color: AppColors.primary, size: 22),
                         const SizedBox(width: 8),
                         Text(
                           t('लिस्टिंग बदलें', 'Edit listing'),
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w800,
                               color: AppColors.text),
@@ -1330,8 +1331,8 @@ class _EditListingScreenState extends State<EditListingScreen> {
           Container(
             padding: EdgeInsets.fromLTRB(
                 16, 10, 16, 10 + MediaQuery.of(context).padding.bottom),
-            decoration: const BoxDecoration(
-              color: Colors.white,
+            decoration: BoxDecoration(
+              color: AppColors.surface,
               boxShadow: [
                 BoxShadow(
                     color: Color(0x14000000),

@@ -90,7 +90,7 @@ Widget _listingMiniCard(Listing l, {bool showVerified = true}) {
   return Container(
     padding: const EdgeInsets.all(10),
     decoration: BoxDecoration(
-      color: Colors.white,
+      color: AppColors.surface,
       borderRadius: BorderRadius.circular(16),
       border: Border.all(color: AppColors.border),
     ),
@@ -141,28 +141,28 @@ Widget _listingMiniCard(Listing l, {bool showVerified = true}) {
               Text(l.title,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
                       color: AppColors.text)),
               const SizedBox(height: 4),
               Row(
                 children: [
-                  const Icon(Icons.location_on,
+                  Icon(Icons.location_on,
                       size: 16, color: AppColors.primary),
                   const SizedBox(width: 3),
                   Expanded(
                     child: Text(l.area,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 13, color: AppColors.text)),
                   ),
                 ],
               ),
               const SizedBox(height: 6),
               Text('₹${inr(l.price)}${t('/माह', '/month')}',
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
                       color: AppColors.primary)),
@@ -190,11 +190,11 @@ Widget _listingMiniCard(Listing l, {bool showVerified = true}) {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.verified_user,
+                      Icon(Icons.verified_user,
                           size: 15, color: AppColors.primary),
                       const SizedBox(width: 5),
                       Text(t('सत्यापित प्रॉपर्टी', 'Verified property'),
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontSize: 11.5, color: AppColors.text)),
                     ],
                   ),
@@ -214,7 +214,7 @@ Widget _mini(IconData icon, String text) {
     children: [
       Icon(icon, size: 14, color: AppColors.primary),
       const SizedBox(width: 3),
-      Text(text, style: const TextStyle(fontSize: 11.5, color: AppColors.text)),
+      Text(text, style: TextStyle(fontSize: 11.5, color: AppColors.text)),
     ],
   );
 }
@@ -339,12 +339,12 @@ class _BookingScreenState extends State<BookingScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(title,
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.w800,
                             color: AppColors.text)),
                     Text(sub,
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 12, color: AppColors.muted)),
                   ],
                 ),
@@ -370,7 +370,7 @@ class _BookingScreenState extends State<BookingScreen> {
               margin: EdgeInsets.only(right: i == _dates.length - 1 ? 0 : 6),
               padding: const EdgeInsets.symmetric(vertical: 10),
               decoration: BoxDecoration(
-                color: sel ? AppColors.primary : Colors.white,
+                color: sel ? AppColors.primary : AppColors.surface,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                     color: sel ? AppColors.primary : AppColors.border),
@@ -421,7 +421,7 @@ class _BookingScreenState extends State<BookingScreen> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             decoration: BoxDecoration(
-              color: sel ? AppColors.primary : Colors.white,
+              color: sel ? AppColors.primary : AppColors.surface,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                   color: sel ? AppColors.primary : AppColors.border),
@@ -458,9 +458,9 @@ class _BookingScreenState extends State<BookingScreen> {
             children: [
               Text(label,
                   style:
-                      const TextStyle(fontSize: 11.5, color: AppColors.muted)),
+                      TextStyle(fontSize: 11.5, color: AppColors.muted)),
               Text(value,
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
                       color: AppColors.text)),
@@ -486,11 +486,11 @@ class _BookingScreenState extends State<BookingScreen> {
         children: [
           Row(
             children: [
-              const Icon(Icons.home, color: AppColors.primary, size: 24),
+              Icon(Icons.home, color: AppColors.primary, size: 24),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(t('आपकी बुकिंग का सारांश', 'Your booking summary'),
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w800,
                         color: AppColors.text)),
@@ -514,14 +514,14 @@ class _BookingScreenState extends State<BookingScreen> {
             ),
             child: Row(
               children: [
-                const Icon(Icons.info, size: 20, color: AppColors.primary),
+                Icon(Icons.info, size: 20, color: AppColors.primary),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     t('कमरा देखने के बाद ही आप बुकिंग की पुष्टि करेंगे।\nइससे पहले कोई भुगतान नहीं करना होगा।',
                         'You will confirm the booking only after seeing the room.\nNo payment is needed before that.'),
                     style:
-                        const TextStyle(fontSize: 12, color: AppColors.text),
+                        TextStyle(fontSize: 12, color: AppColors.text),
                   ),
                 ),
               ],
@@ -578,7 +578,7 @@ class _BookingScreenState extends State<BookingScreen> {
       value: SystemUiOverlayStyle.light
           .copyWith(statusBarColor: Colors.transparent),
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.bg,
         body: Column(
           children: [
             _topBar(context),
@@ -635,14 +635,14 @@ class BookingSuccessScreen extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
+          Padding(
             padding: EdgeInsets.only(top: 6),
             child: Icon(Icons.circle, size: 6, color: AppColors.primary),
           ),
           const SizedBox(width: 8),
           Expanded(
             child: Text(text,
-                style: const TextStyle(
+                style: TextStyle(
                     fontSize: 12.5, height: 1.35, color: AppColors.text)),
           ),
         ],
@@ -656,7 +656,7 @@ class BookingSuccessScreen extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: color ?? Colors.white,
+        color: color ?? AppColors.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.border),
       ),
@@ -671,7 +671,7 @@ class BookingSuccessScreen extends StatelessWidget {
       value: SystemUiOverlayStyle.light
           .copyWith(statusBarColor: Colors.transparent),
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.bg,
         body: Column(
           children: [
             _topBar(context),
@@ -683,17 +683,17 @@ class BookingSuccessScreen extends StatelessWidget {
                     Container(
                       width: 104,
                       height: 104,
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         color: AppColors.tint,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.home_work,
+                      child: Icon(Icons.home_work,
                           size: 56, color: AppColors.primary),
                     ),
                     const SizedBox(height: 14),
                     Text(t('बधाई हो!', 'Congratulations!'),
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 34,
                             fontWeight: FontWeight.w800,
                             color: AppColors.primaryDark)),
@@ -702,7 +702,7 @@ class BookingSuccessScreen extends StatelessWidget {
                         t('आपका विज़िट अनुरोध भेज दिया गया है!',
                             'Your visit request has been sent!'),
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 19,
                             fontWeight: FontWeight.w800,
                             color: AppColors.primary)),
@@ -711,7 +711,7 @@ class BookingSuccessScreen extends StatelessWidget {
                       t('अब आप सीधे मकान मालिक से बात कर सकते हैं। कृपया उनसे संपर्क करें और कमरे की आगे की प्रक्रिया पूरी करें।',
                           'You can now talk to the owner directly. Please contact them and complete the next steps for the room.'),
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 14, height: 1.4, color: AppColors.text),
                     ),
                     const SizedBox(height: 16),
@@ -719,7 +719,7 @@ class BookingSuccessScreen extends StatelessWidget {
                       color: AppColors.tintLight,
                       child: Row(
                         children: [
-                          const Icon(Icons.shield,
+                          Icon(Icons.shield,
                               size: 34, color: AppColors.primary),
                           const SizedBox(width: 10),
                           Expanded(
@@ -729,7 +729,7 @@ class BookingSuccessScreen extends StatelessWidget {
                                 Text(
                                     t('RoomMitra पर आपको सुरक्षित और भरोसेमंद लिस्टिंग मिलती है।',
                                         'On RoomMitra you get safe and trusted listings.'),
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                         fontSize: 13,
                                         fontWeight: FontWeight.w700,
                                         color: AppColors.text)),
@@ -737,7 +737,7 @@ class BookingSuccessScreen extends StatelessWidget {
                                 Text(
                                     t('कृपया बातचीत और लेन-देन हमेशा सीधे मकान मालिक से ही करें।',
                                         'Please always talk and deal directly with the owner.'),
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                         fontSize: 11.5,
                                         color: AppColors.muted)),
                               ],
@@ -753,7 +753,7 @@ class BookingSuccessScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(t('मकान मालिक की जानकारी', 'Owner details'),
-                              style: const TextStyle(
+                              style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w800,
                                   color: AppColors.text)),
@@ -764,11 +764,11 @@ class BookingSuccessScreen extends StatelessWidget {
                               Container(
                                 width: 62,
                                 height: 62,
-                                decoration: const BoxDecoration(
+                                decoration: BoxDecoration(
                                   color: AppColors.tint,
                                   shape: BoxShape.circle,
                                 ),
-                                child: const Icon(Icons.person,
+                                child: Icon(Icons.person,
                                     size: 36, color: AppColors.primary),
                               ),
                               const SizedBox(width: 10),
@@ -776,7 +776,7 @@ class BookingSuccessScreen extends StatelessWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text('राजेश वर्मा',
+                                    Text('राजेश वर्मा',
                                         style: TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.w800,
@@ -793,14 +793,14 @@ class BookingSuccessScreen extends StatelessWidget {
                                       child: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          const Icon(Icons.verified,
+                                          Icon(Icons.verified,
                                               size: 14,
                                               color: AppColors.primary),
                                           const SizedBox(width: 4),
                                           Text(
                                               t('वेरिफाइड मालिक',
                                                   'Verified owner'),
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                   fontSize: 11.5,
                                                   color: AppColors.text)),
                                         ],
@@ -809,13 +809,13 @@ class BookingSuccessScreen extends StatelessWidget {
                                     const SizedBox(height: 6),
                                     Row(
                                       children: [
-                                        const Icon(Icons.location_on,
+                                        Icon(Icons.location_on,
                                             size: 15,
                                             color: AppColors.primary),
                                         const SizedBox(width: 3),
                                         Expanded(
                                           child: Text(l.area,
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                   fontSize: 12.5,
                                                   color: AppColors.text)),
                                         ),
@@ -886,11 +886,11 @@ class BookingSuccessScreen extends StatelessWidget {
                         children: [
                           Row(
                             children: [
-                              const Icon(Icons.info,
+                              Icon(Icons.info,
                                   size: 22, color: AppColors.primary),
                               const SizedBox(width: 8),
                               Text(t('कुछ जरूरी बातें', 'Some important points'),
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w800,
                                       color: AppColors.text)),
@@ -937,7 +937,7 @@ class BookingSuccessScreen extends StatelessWidget {
                                           fontWeight: FontWeight.w700)),
                                   style: OutlinedButton.styleFrom(
                                     foregroundColor: AppColors.primary,
-                                    side: const BorderSide(
+                                    side: BorderSide(
                                         color: AppColors.primary),
                                     padding: EdgeInsets.zero,
                                     shape: RoundedRectangleBorder(

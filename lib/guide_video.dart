@@ -182,7 +182,7 @@ class _GuideVideoState extends State<GuideVideo> {
               children: [
                 Text(
                   t('RoomMitra गाइड', 'RoomMitra guide'),
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
                       color: AppColors.primaryDark),
@@ -190,7 +190,7 @@ class _GuideVideoState extends State<GuideVideo> {
                 const SizedBox(height: 4),
                 Text(
                   t(widget.hi, widget.en),
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 14, height: 1.35, color: AppColors.text),
                 ),
                 const SizedBox(height: 6),

@@ -106,12 +106,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             const SizedBox(height: 8),
             ListTile(
-              leading: const Icon(Icons.photo_library, color: AppColors.primary),
+              leading: Icon(Icons.photo_library, color: AppColors.primary),
               title: Text(t('गैलरी से चुनें', 'Choose from gallery')),
               onTap: () => Navigator.of(ctx).pop(ImageSource.gallery),
             ),
             ListTile(
-              leading: const Icon(Icons.photo_camera, color: AppColors.primary),
+              leading: Icon(Icons.photo_camera, color: AppColors.primary),
               title: Text(t('कैमरे से खींचें', 'Take a photo')),
               onTap: () => Navigator.of(ctx).pop(ImageSource.camera),
             ),
@@ -172,7 +172,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(t('प्रोफाइल अपडेट करें', 'Update profile'),
-                style: const TextStyle(
+                style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w800,
                     color: AppColors.text)),
@@ -305,7 +305,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _topBar(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [AppColors.primaryDark, AppColors.primary],
           begin: Alignment.topLeft,
@@ -320,7 +320,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const Spacer(),
           _langToggle(),
           const SizedBox(width: 10),
-          const Icon(Icons.settings, color: Colors.white, size: 26),
+          GestureDetector(
+            onTap: () => AppTheme.setDark(!AppTheme.isDark),
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: const BoxDecoration(
+                color: Colors.white24,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                AppTheme.isDark ? Icons.light_mode : Icons.dark_mode,
+                color: Colors.white,
+                size: 22,
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -332,7 +346,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final fallback = Container(
       width: 72,
       height: 72,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         shape: BoxShape.circle,
         gradient: LinearGradient(
           colors: [AppColors.primary, AppColors.primaryDark],
@@ -411,14 +425,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (email.isNotEmpty) {
       return Row(
         children: [
-          const Icon(Icons.email, size: _kIconSmall, color: AppColors.primary),
+          Icon(Icons.email, size: _kIconSmall, color: AppColors.primary),
           const SizedBox(width: 6),
           Flexible(
             child: Text(
               email,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontSize: 13, color: AppColors.text),
+              style: TextStyle(fontSize: 13, color: AppColors.text),
             ),
           ),
         ],
@@ -449,7 +463,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         _name.isEmpty ? t('उपयोगकर्ता', 'User') : _name,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 19,
                             fontWeight: FontWeight.w800,
                             color: AppColors.text),
@@ -458,7 +472,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const SizedBox(width: 6),
                     GestureDetector(
                       onTap: _editProfile,
-                      child: const Icon(Icons.edit,
+                      child: Icon(Icons.edit,
                           color: AppColors.primary, size: 20),
                     ),
                   ],
@@ -466,11 +480,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 6),
                 Row(
                   children: [
-                    const Icon(Icons.phone,
+                    Icon(Icons.phone,
                         size: _kIconSmall, color: AppColors.primary),
                     const SizedBox(width: 6),
                     Text(_phoneFull(),
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 13, color: AppColors.text)),
                   ],
                 ),
@@ -492,13 +506,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Icon(icon, size: 20, color: AppColors.primary),
             const SizedBox(height: 4),
             Text(k,
-                style: const TextStyle(fontSize: 11, color: AppColors.muted)),
+                style: TextStyle(fontSize: 11, color: AppColors.muted)),
             const SizedBox(height: 2),
             Text(
               v,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
+              style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
                   color: AppColors.text),
@@ -515,7 +529,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(_kRadius),
         border: Border.all(color: AppColors.border),
       ),
@@ -526,7 +540,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Expanded(
                 child: Text(
                   t('मेरी जानकारी', 'My information'),
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
                       color: AppColors.text),
@@ -556,14 +570,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
         decoration: BoxDecoration(
           border: last
               ? null
-              : const Border(bottom: BorderSide(color: AppColors.border)),
+              : Border(bottom: BorderSide(color: AppColors.border)),
         ),
         child: Row(
           children: [
             Container(
               width: _kIconBox,
               height: _kIconBox,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: AppColors.tint,
                 shape: BoxShape.circle,
               ),
@@ -576,7 +590,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   Text(
                     m.title,
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 15.5,
                         fontWeight: FontWeight.w800,
                         color: AppColors.text),
@@ -584,13 +598,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(height: 2),
                   Text(
                     m.sub,
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 12, color: AppColors.muted),
                   ),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: AppColors.text),
+            Icon(Icons.chevron_right, color: AppColors.text),
           ],
         ),
       ),
@@ -729,7 +743,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     ];
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF7FCF9),
+      backgroundColor: AppColors.bg,
       body: Column(
         children: [
           _topBar(context),
@@ -743,7 +757,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: _kGap),
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.surface,
                     borderRadius: BorderRadius.circular(_kRadius),
                     border: Border.all(color: AppColors.border),
                   ),
@@ -763,18 +777,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.favorite,
+                      Icon(Icons.favorite,
                           color: AppColors.primary, size: 22),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
                           t('RoomMitra का उपयोग करने के लिए धन्यवाद!',
                               'Thank you for using RoomMitra!'),
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontSize: 12.5, color: AppColors.text),
                         ),
                       ),
-                      const Text('v1.0.0',
+                      Text('v1.0.0',
                           style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
@@ -835,7 +849,7 @@ class _NotificationSettingsScreenState
 
   Widget _topBar() {
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [AppColors.primaryDark, AppColors.primary],
           begin: Alignment.topLeft,
@@ -872,14 +886,14 @@ class _NotificationSettingsScreenState
       decoration: BoxDecoration(
         border: last
             ? null
-            : const Border(bottom: BorderSide(color: AppColors.border)),
+            : Border(bottom: BorderSide(color: AppColors.border)),
       ),
       child: Row(
         children: [
           Container(
             width: _kIconBox,
             height: _kIconBox,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               color: AppColors.tint,
               shape: BoxShape.circle,
             ),
@@ -892,7 +906,7 @@ class _NotificationSettingsScreenState
               children: [
                 Text(
                   p.title,
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 15.5,
                       fontWeight: FontWeight.w800,
                       color: AppColors.text),
@@ -901,7 +915,7 @@ class _NotificationSettingsScreenState
                 Text(
                   p.sub,
                   style:
-                      const TextStyle(fontSize: 12, color: AppColors.muted),
+                      TextStyle(fontSize: 12, color: AppColors.muted),
                 ),
               ],
             ),
@@ -927,7 +941,7 @@ class _NotificationSettingsScreenState
     final items = _items;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF7FCF9),
+      backgroundColor: AppColors.bg,
       body: Column(
         children: [
           _topBar(),
@@ -944,7 +958,7 @@ class _NotificationSettingsScreenState
                   ),
                   child: Row(
                     children: [
-                      const CircleAvatar(
+                      CircleAvatar(
                         radius: 24,
                         backgroundColor: AppColors.primary,
                         child: Icon(Icons.tune, color: Colors.white, size: 26),
@@ -956,7 +970,7 @@ class _NotificationSettingsScreenState
                           children: [
                             Text(
                               t('नोटिफिकेशन सेटिंग', 'Notification settings'),
-                              style: const TextStyle(
+                              style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w800,
                                   color: AppColors.text),
@@ -965,7 +979,7 @@ class _NotificationSettingsScreenState
                             Text(
                               t('चुनें कि आपको किस बारे में सूचना चाहिए।',
                                   'Choose what you want to be notified about.'),
-                              style: const TextStyle(
+                              style: TextStyle(
                                   fontSize: 12.5, color: AppColors.text),
                             ),
                           ],
@@ -977,7 +991,7 @@ class _NotificationSettingsScreenState
                 const SizedBox(height: _kGap),
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.surface,
                     borderRadius: BorderRadius.circular(_kRadius),
                     border: Border.all(color: AppColors.border),
                   ),
@@ -999,7 +1013,7 @@ class _NotificationSettingsScreenState
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(Icons.info_outline,
+                      Icon(Icons.info_outline,
                           color: AppColors.primary, size: 20),
                       const SizedBox(width: 10),
                       Expanded(
@@ -1008,7 +1022,7 @@ class _NotificationSettingsScreenState
                             'यह अभी डेमो है। असली नोटिफिकेशन Supabase जुड़ने के बाद आपके फोन पर आएँगे और ये स्विच तभी असर करेंगे।',
                             'This is a demo for now. Real notifications will arrive on your phone once Supabase is connected, and only then will these switches take effect.',
                           ),
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontSize: 12.5,
                               height: 1.4,
                               color: AppColors.text),

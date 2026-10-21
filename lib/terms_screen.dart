@@ -140,7 +140,7 @@ class _TermsScreenState extends State<TermsScreen> {
 
   Widget _topBar() {
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [AppColors.primaryDark, AppColors.primary],
           begin: Alignment.topLeft,
@@ -211,7 +211,7 @@ class _TermsScreenState extends State<TermsScreen> {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: AppColors.border),
       ),
@@ -222,13 +222,13 @@ class _TermsScreenState extends State<TermsScreen> {
             width: 28,
             height: 28,
             alignment: Alignment.center,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               color: AppColors.tint,
               shape: BoxShape.circle,
             ),
             child: Text(
               '$n',
-              style: const TextStyle(
+              style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w800,
                   color: AppColors.primary),
@@ -241,7 +241,7 @@ class _TermsScreenState extends State<TermsScreen> {
               children: [
                 Text(
                   s.tTitle,
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w800,
                       color: AppColors.text),
@@ -249,7 +249,7 @@ class _TermsScreenState extends State<TermsScreen> {
                 const SizedBox(height: 6),
                 Text(
                   s.tBody,
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 13.5, height: 1.5, color: AppColors.text),
                 ),
               ],
@@ -275,7 +275,7 @@ class _TermsScreenState extends State<TermsScreen> {
             : t('आपकी जानकारी हमारे पास कैसे सुरक्षित रहती है।',
                 'How your information is kept safe with us.');
         return Scaffold(
-          backgroundColor: const Color(0xFFF7FCF9),
+          backgroundColor: AppColors.bg,
           body: Column(
             children: [
               _topBar(),
@@ -302,7 +302,7 @@ class _TermsScreenState extends State<TermsScreen> {
                     const SizedBox(height: 14),
                     Text(
                       title,
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w800,
                           color: AppColors.text),
@@ -311,13 +311,13 @@ class _TermsScreenState extends State<TermsScreen> {
                     Text(
                       sub,
                       style:
-                          const TextStyle(fontSize: 13, color: AppColors.muted),
+                          TextStyle(fontSize: 13, color: AppColors.muted),
                     ),
                     if (_tab == 0 && termsEffectiveDate.isNotEmpty) ...[
                       const SizedBox(height: 4),
                       Text(
                         '${t('लागू होने की तारीख', 'Effective date')}: $termsEffectiveDate',
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 12.5, color: AppColors.muted),
                       ),
                     ],
@@ -328,7 +328,7 @@ class _TermsScreenState extends State<TermsScreen> {
                     Center(
                       child: Text(
                         t('RoomMitra · संस्करण 1.0', 'RoomMitra · Version 1.0'),
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 12, color: AppColors.muted),
                       ),
                     ),

@@ -122,7 +122,7 @@ class _ReportScreenState extends State<ReportScreen> {
       ),
       child: Row(
         children: [
-          const Icon(Icons.verified_user, size: 28, color: AppColors.primary),
+          Icon(Icons.verified_user, size: 28, color: AppColors.primary),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
@@ -131,7 +131,7 @@ class _ReportScreenState extends State<ReportScreen> {
                 Text(
                     t('आपकी सुरक्षा, हमारी प्राथमिकता',
                         'Your safety, our priority'),
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w800,
                         color: AppColors.text)),
@@ -140,7 +140,7 @@ class _ReportScreenState extends State<ReportScreen> {
                     t('फर्जी लिस्टिंग, धोखाधड़ी या किसी भी समस्या की तुरंत रिपोर्ट करें।',
                         'Report fake listings, fraud or any problem right away.'),
                     style:
-                        const TextStyle(fontSize: 12, color: AppColors.text)),
+                        TextStyle(fontSize: 12, color: AppColors.text)),
               ],
             ),
           ),
@@ -182,13 +182,13 @@ class _ReportScreenState extends State<ReportScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(rt.tTitle,
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w800,
                           color: AppColors.text)),
                   const SizedBox(height: 2),
                   Text(rt.tSub,
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 12, height: 1.3, color: AppColors.muted)),
                 ],
               ),
@@ -211,7 +211,7 @@ class _ReportScreenState extends State<ReportScreen> {
             Container(
               width: 26,
               height: 26,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                   color: AppColors.primary, shape: BoxShape.circle),
               child: Center(
                 child: Text('$n',
@@ -224,7 +224,7 @@ class _ReportScreenState extends State<ReportScreen> {
             const SizedBox(height: 5),
             Text(label,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                     fontSize: 10.5, height: 1.25, color: AppColors.text)),
           ],
         ),
@@ -244,12 +244,12 @@ class _ReportScreenState extends State<ReportScreen> {
         children: [
           Row(
             children: [
-              const Icon(Icons.campaign, color: AppColors.primary, size: 24),
+              Icon(Icons.campaign, color: AppColors.primary, size: 24),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                     t('रिपोर्ट कैसे काम करती है?', 'How does a report work?'),
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w800,
                         color: AppColors.text)),
@@ -384,7 +384,7 @@ class _ReportScreenState extends State<ReportScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
         title: Row(
           children: [
-            const Icon(Icons.check_circle, color: AppColors.primary),
+            Icon(Icons.check_circle, color: AppColors.primary),
             const SizedBox(width: 8),
             Expanded(
               child: Text(t('रिपोर्ट दर्ज हो गई', 'Report submitted')),
@@ -414,7 +414,7 @@ class _ReportScreenState extends State<ReportScreen> {
       value: SystemUiOverlayStyle.light
           .copyWith(statusBarColor: Colors.transparent),
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.bg,
         body: Column(
           children: [
             _topBar(),
@@ -451,13 +451,13 @@ class _ReportScreenState extends State<ReportScreen> {
                                   Text(
                                       t('इस लिस्टिंग के बारे में',
                                           'About this listing'),
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                           fontSize: 11,
                                           color: AppColors.muted)),
                                   Text(l.title,
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w800,
                                           color: AppColors.text)),
@@ -470,7 +470,7 @@ class _ReportScreenState extends State<ReportScreen> {
                     ],
                     const SizedBox(height: 16),
                     Text(t('समस्या की रिपोर्ट करें', 'Report a problem'),
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.w800,
                             color: AppColors.text)),
@@ -478,7 +478,7 @@ class _ReportScreenState extends State<ReportScreen> {
                     Text(
                         t('कृपया नीचे दी गई श्रेणियों में से चुनें कि आप किस बारे में रिपोर्ट करना चाहते हैं।',
                             'Please choose from the categories below what you want to report about.'),
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 12.5, color: AppColors.muted)),
                     const SizedBox(height: 12),
                     ...List.generate(_types.length, _typeTile),
@@ -492,17 +492,17 @@ class _ReportScreenState extends State<ReportScreen> {
                           hintText: t(
                               'समस्या के बारे में थोड़ा बताएं (वैकल्पिक)',
                               'Tell us a little about the problem (optional)'),
-                          hintStyle: const TextStyle(
+                          hintStyle: TextStyle(
                               fontSize: 13.5, color: AppColors.muted),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide:
-                                const BorderSide(color: AppColors.border),
+                                BorderSide(color: AppColors.border),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide:
-                                const BorderSide(color: AppColors.primary),
+                                BorderSide(color: AppColors.primary),
                           ),
                         ),
                       ),
@@ -514,14 +514,14 @@ class _ReportScreenState extends State<ReportScreen> {
                       width: double.infinity,
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFFEDEC),
+                        color: AppTheme.isDark ? const Color(0xFF3A1D1D) : const Color(0xFFFFEDEC),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: const Color(0xFFF5C2C0)),
+                        border: Border.all(color: AppTheme.isDark ? const Color(0xFF6B2E2E) : const Color(0xFFF5C2C0)),
                       ),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(Icons.warning_amber_rounded,
+                          Icon(Icons.warning_amber_rounded,
                               color: AppColors.danger, size: 24),
                           const SizedBox(width: 8),
                           Expanded(
@@ -529,14 +529,14 @@ class _ReportScreenState extends State<ReportScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(t('ध्यान दें:', 'Note:'),
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                         fontSize: 13,
                                         fontWeight: FontWeight.w800,
                                         color: AppColors.text)),
                                 Text(
                                     t('झूठी रिपोर्ट करने पर आपके अकाउंट पर कार्रवाई की जा सकती है।',
                                         'Action may be taken on your account for false reports.'),
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                         fontSize: 12, color: AppColors.text)),
                               ],
                             ),
@@ -549,7 +549,7 @@ class _ReportScreenState extends State<ReportScreen> {
               ),
             ),
             Container(
-              color: Colors.white,
+              color: AppColors.surface,
               padding: EdgeInsets.fromLTRB(
                   14, 8, 14, 10 + MediaQuery.of(context).padding.bottom),
               child: SizedBox(

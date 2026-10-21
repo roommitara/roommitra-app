@@ -295,7 +295,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(t('नोटिफिकेशन', 'Notifications'),
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 26,
                         fontWeight: FontWeight.w800,
                         color: AppColors.text)),
@@ -304,7 +304,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     t('आपके सभी अपडेट एक ही जगह पर',
                         'All your updates in one place'),
                     style:
-                        const TextStyle(fontSize: 13, color: AppColors.muted)),
+                        TextStyle(fontSize: 13, color: AppColors.muted)),
               ],
             ),
           ),
@@ -322,14 +322,14 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.settings, size: 17, color: AppColors.primary),
+                  Icon(Icons.settings, size: 17, color: AppColors.primary),
                   const SizedBox(width: 5),
                   Text(t('सेटिंग', 'Settings'),
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 12.5,
                           fontWeight: FontWeight.w600,
                           color: AppColors.text)),
-                  const Icon(Icons.chevron_right,
+                  Icon(Icons.chevron_right,
                       size: 18, color: AppColors.text),
                 ],
               ),
@@ -410,7 +410,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: n.unread ? AppColors.tint : Colors.white,
+          color: n.unread ? AppColors.tint : AppColors.surface,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(color: AppColors.border),
         ),
@@ -454,19 +454,19 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     children: [
                       Expanded(
                         child: Text(n.tTitle,
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontSize: 15.5,
                                 fontWeight: FontWeight.w800,
                                 color: AppColors.text)),
                       ),
                       Text(n.tTime,
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontSize: 11.5, color: AppColors.muted)),
                     ],
                   ),
                   const SizedBox(height: 3),
                   Text(n.tBody,
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 13, height: 1.35, color: AppColors.muted)),
                   if (extra != null) ...[
                     const SizedBox(height: 4),
@@ -493,7 +493,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 ],
               ),
             ),
-            const Padding(
+            Padding(
               padding: EdgeInsets.only(top: 12, left: 4),
               child: Icon(Icons.chevron_right, color: AppColors.text),
             ),
@@ -511,7 +511,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       value: SystemUiOverlayStyle.light
           .copyWith(statusBarColor: Colors.transparent),
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.bg,
         body: Column(
           children: [
             _header(top),
@@ -523,7 +523,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   ? Center(
                       child: Text(
                           t('कोई नोटिफिकेशन नहीं है', 'No notifications'),
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontSize: 15, color: AppColors.muted)),
                     )
                   : ListView.separated(

@@ -87,7 +87,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             color: AppColors.tint,
             borderRadius: BorderRadius.circular(12),
           ),
-          child: const Icon(Icons.home_rounded,
+          child: Icon(Icons.home_rounded,
               color: AppColors.primary, size: 30),
         ),
         const SizedBox(width: 10),
@@ -96,7 +96,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text.rich(
-              const TextSpan(
+              TextSpan(
                 children: [
                   TextSpan(
                       text: 'Room',
@@ -109,7 +109,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               style:
                   const TextStyle(fontSize: 26, fontWeight: FontWeight.w800),
             ),
-            const Text(
+            Text(
               'कमरा ढूँढना हुआ आसान',
               style: TextStyle(fontSize: 12, color: AppColors.primary),
             ),
@@ -133,11 +133,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.surface,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: AppColors.border),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
@@ -166,7 +166,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Container(
             width: 52,
             height: 52,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               color: AppColors.tint,
               shape: BoxShape.circle,
             ),
@@ -176,7 +176,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Text(
             text,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: 11.5, height: 1.25, color: AppColors.text),
           ),
         ],
@@ -193,7 +193,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Container(
             width: 210,
             height: 210,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               color: AppColors.tintLight,
               shape: BoxShape.circle,
             ),
@@ -201,7 +201,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Container(
             width: 150,
             height: 150,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               color: AppColors.tint,
               shape: BoxShape.circle,
             ),
@@ -213,7 +213,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             child: Container(
               width: 34,
               height: 34,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: AppColors.accent,
                 shape: BoxShape.circle,
               ),
@@ -226,7 +226,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             child: Container(
               width: 22,
               height: 22,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: AppColors.primary,
                 shape: BoxShape.circle,
               ),
@@ -256,7 +256,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           const SizedBox(height: 2),
           Text(
             p.title,
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: 28,
                 height: 1.2,
                 fontWeight: FontWeight.w800,
@@ -265,7 +265,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           const SizedBox(height: 12),
           Text(
             p.body,
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: 15, height: 1.6, color: AppColors.text),
           ),
           const SizedBox(height: 14),
@@ -318,7 +318,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7FCF9),
+      backgroundColor: AppColors.bg,
       body: SafeArea(
         child: Column(
           children: [
@@ -365,7 +365,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       onPressed: widget.onFinish,
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppColors.primary,
-                        side: const BorderSide(
+                        side: BorderSide(
                             color: AppColors.primary, width: 1.2),
                         shape: const StadiumBorder(),
                         textStyle: const TextStyle(

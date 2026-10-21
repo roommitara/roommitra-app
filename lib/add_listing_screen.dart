@@ -339,7 +339,7 @@ class _AddListingScreenState extends State<AddListingScreen> {
 
   Widget _topBar() {
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [AppColors.primaryDark, AppColors.primary],
           begin: Alignment.topLeft,
@@ -375,7 +375,7 @@ class _AddListingScreenState extends State<AddListingScreen> {
     for (var i = 0; i < labels.length; i++) {
       final done = i < _step;
       final cur = i == _step;
-      const lineColor = AppColors.primary;
+      final lineColor = AppColors.primary;
       items.add(
         Expanded(
           child: Column(
@@ -436,7 +436,7 @@ class _AddListingScreenState extends State<AddListingScreen> {
       );
     }
     return Container(
-      color: Colors.white,
+      color: AppColors.surface,
       padding: const EdgeInsets.fromLTRB(8, 12, 8, 10),
       child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: items),
     );
@@ -455,7 +455,7 @@ class _AddListingScreenState extends State<AddListingScreen> {
           Container(
             width: 48,
             height: 48,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               color: AppColors.primary,
               shape: BoxShape.circle,
             ),
@@ -467,13 +467,13 @@ class _AddListingScreenState extends State<AddListingScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(title,
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w800,
                         color: AppColors.text)),
                 const SizedBox(height: 2),
                 Text(sub,
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 12.5, height: 1.3, color: AppColors.text)),
               ],
             ),
@@ -489,7 +489,7 @@ class _AddListingScreenState extends State<AddListingScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.border),
       ),
@@ -505,13 +505,13 @@ class _AddListingScreenState extends State<AddListingScreen> {
           children: [
             TextSpan(
               text: text,
-              style: const TextStyle(
+              style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
                   color: AppColors.text),
             ),
             if (required)
-              const TextSpan(
+              TextSpan(
                 text: ' *',
                 style: TextStyle(color: AppColors.danger, fontSize: 14),
               ),
@@ -528,11 +528,11 @@ class _AddListingScreenState extends State<AddListingScreen> {
         );
     return InputDecoration(
       hintText: hint,
-      hintStyle: const TextStyle(fontSize: 14, color: AppColors.muted),
+      hintStyle: TextStyle(fontSize: 14, color: AppColors.muted),
       prefixIcon:
           icon == null ? null : Icon(icon, color: AppColors.primary, size: 22),
       filled: true,
-      fillColor: Colors.white,
+      fillColor: AppColors.surface,
       isDense: true,
       contentPadding:
           const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
@@ -565,7 +565,7 @@ class _AddListingScreenState extends State<AddListingScreen> {
           inputFormatters:
               digitsOnly ? [FilteringTextInputFormatter.digitsOnly] : null,
           onChanged: (_) => setState(() {}),
-          style: const TextStyle(fontSize: 15, color: AppColors.text),
+          style: TextStyle(fontSize: 15, color: AppColors.text),
           decoration: _deco(hint, icon: icon),
         ),
         const SizedBox(height: 10),
@@ -588,7 +588,7 @@ class _AddListingScreenState extends State<AddListingScreen> {
           height: 50,
           padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surface,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: AppColors.border),
           ),
@@ -596,7 +596,7 @@ class _AddListingScreenState extends State<AddListingScreen> {
             child: DropdownButton<T>(
               value: value,
               isExpanded: true,
-              icon: const Icon(Icons.keyboard_arrow_down,
+              icon: Icon(Icons.keyboard_arrow_down,
                   color: AppColors.text),
               items: items,
               onChanged: onChanged,
@@ -645,17 +645,17 @@ class _AddListingScreenState extends State<AddListingScreen> {
                     Container(
                       width: 84,
                       height: 84,
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         color: AppColors.tint,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.add_location_alt,
+                      child: Icon(Icons.add_location_alt,
                           size: 44, color: AppColors.primary),
                     ),
                     const SizedBox(height: 14),
                     Text(
                       t('अभी पिन नहीं लगा है', 'No pin placed yet'),
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
                           color: AppColors.text),
@@ -665,7 +665,7 @@ class _AddListingScreenState extends State<AddListingScreen> {
                       t('GPS से अपनी मौजूदा जगह लें, पता खोजें या नक्शा खिसकाकर पिन लगाएँ।',
                           'Use GPS, search an address or move the map to place the pin.'),
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 13, height: 1.4, color: AppColors.muted),
                     ),
                     const SizedBox(height: 16),
@@ -693,13 +693,13 @@ class _AddListingScreenState extends State<AddListingScreen> {
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.check_circle,
+                        Icon(Icons.check_circle,
                             color: AppColors.primary, size: 26),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             t('पिन लग गया है', 'Pin placed'),
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w800,
                                 color: AppColors.text),
@@ -721,13 +721,13 @@ class _AddListingScreenState extends State<AddListingScreen> {
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Icon(Icons.location_on,
+                              Icon(Icons.location_on,
                                   size: 20, color: AppColors.primary),
                               const SizedBox(width: 6),
                               Expanded(
                                 child: Text(
                                   loc.address,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       fontSize: 13.5,
                                       height: 1.4,
                                       color: AppColors.text),
@@ -738,7 +738,7 @@ class _AddListingScreenState extends State<AddListingScreen> {
                           const SizedBox(height: 6),
                           Text(
                             '${loc.lat.toStringAsFixed(5)}, ${loc.lng.toStringAsFixed(5)}',
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontSize: 12, color: AppColors.muted),
                           ),
                         ],
@@ -754,7 +754,7 @@ class _AddListingScreenState extends State<AddListingScreen> {
                         label: Text(t('पिन बदलें', 'Change pin')),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppColors.primary,
-                          side: const BorderSide(
+                          side: BorderSide(
                               color: AppColors.primary, width: 1.2),
                           textStyle: const TextStyle(
                               fontSize: 14.5, fontWeight: FontWeight.w700),
@@ -775,7 +775,7 @@ class _AddListingScreenState extends State<AddListingScreen> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(Icons.info_outline,
+              Icon(Icons.info_outline,
                   color: AppColors.primary, size: 22),
               const SizedBox(width: 10),
               Expanded(
@@ -784,7 +784,7 @@ class _AddListingScreenState extends State<AddListingScreen> {
                     'यह पिन नज़दीकी कमरे दिखाने और किरायेदार को Google Maps में रास्ता दिखाने के काम आएगा।',
                     'This pin is used to show nearby rooms and to give tenants directions in Google Maps.',
                   ),
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 12.5, height: 1.4, color: AppColors.text),
                 ),
               ),
@@ -881,8 +881,8 @@ class _AddListingScreenState extends State<AddListingScreen> {
     return Container(
       padding: EdgeInsets.fromLTRB(
           16, 10, 16, 10 + MediaQuery.of(context).padding.bottom),
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      decoration: BoxDecoration(
+        color: AppColors.surface,
         boxShadow: [
           BoxShadow(
               color: Color(0x14000000), blurRadius: 10, offset: Offset(0, -2)),
@@ -899,7 +899,7 @@ class _AddListingScreenState extends State<AddListingScreen> {
                 label: Text(t('पिछला', 'Back')),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.primary,
-                  side: const BorderSide(color: AppColors.primary, width: 1.2),
+                  side: BorderSide(color: AppColors.primary, width: 1.2),
                   padding: const EdgeInsets.symmetric(horizontal: 18),
                   textStyle: const TextStyle(
                       fontSize: 15, fontWeight: FontWeight.w700),
@@ -953,7 +953,7 @@ class _AddListingScreenState extends State<AddListingScreen> {
       valueListenable: AppLang.notifier,
       builder: (context, lang, _) {
         return Scaffold(
-          backgroundColor: const Color(0xFFF7FCF9),
+          backgroundColor: AppColors.bg,
           body: Column(
             children: [
               _topBar(),

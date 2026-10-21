@@ -314,7 +314,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
   Widget _topBar() {
     final top = MediaQuery.of(context).padding.top;
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [AppColors.primaryDark, AppColors.primary],
           begin: Alignment.topLeft,
@@ -346,11 +346,11 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
     return Material(
       elevation: 3,
       borderRadius: BorderRadius.circular(14),
-      color: Colors.white,
+      color: AppColors.surface,
       child: Row(
         children: [
           const SizedBox(width: 12),
-          const Icon(Icons.search, color: AppColors.primary),
+          Icon(Icons.search, color: AppColors.primary),
           const SizedBox(width: 8),
           Expanded(
             child: TextField(
@@ -361,7 +361,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                 border: InputBorder.none,
                 hintText: t('पता या इलाका खोजें (जैसे Rani Tal Nahan)',
                     'Search address or area (e.g. Rani Tal Nahan)'),
-                hintStyle: const TextStyle(fontSize: 13.5, color: AppColors.muted),
+                hintStyle: TextStyle(fontSize: 13.5, color: AppColors.muted),
               ),
             ),
           ),
@@ -389,7 +389,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
       margin: const EdgeInsets.only(top: 6),
       constraints: const BoxConstraints(maxHeight: 230),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(14),
         boxShadow: const [
           BoxShadow(color: Color(0x33000000), blurRadius: 8),
@@ -400,13 +400,13 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
         padding: EdgeInsets.zero,
         itemCount: _results.length,
         separatorBuilder: (_, __) =>
-            const Divider(height: 1, color: AppColors.border),
+            Divider(height: 1, color: AppColors.border),
         itemBuilder: (context, i) {
           final p = _results[i];
           return ListTile(
             dense: true,
             leading:
-                const Icon(Icons.location_on, color: AppColors.primary),
+                Icon(Icons.location_on, color: AppColors.primary),
             title: Text(p.name,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
@@ -421,7 +421,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
   Widget _mapBtn(String tag, IconData icon, VoidCallback onTap,
       {bool active = false}) {
     return Material(
-      color: active ? AppColors.primary : Colors.white,
+      color: active ? AppColors.primary : AppColors.surface,
       elevation: 3,
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
@@ -549,7 +549,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
               _mapBtn('zout', Icons.remove, () => _zoomBy(-1)),
               const SizedBox(height: 8),
               Material(
-                color: Colors.white,
+                color: AppColors.surface,
                 elevation: 3,
                 borderRadius: BorderRadius.circular(12),
                 child: InkWell(
@@ -562,7 +562,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
                         ? const Padding(
                             padding: EdgeInsets.all(12),
                             child: CircularProgressIndicator(strokeWidth: 2))
-                        : const Icon(Icons.my_location,
+                        : Icon(Icons.my_location,
                             size: 24, color: AppColors.primary),
                   ),
                 ),
@@ -578,7 +578,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
             child: Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: const [
                   BoxShadow(color: Color(0x33000000), blurRadius: 6),
@@ -587,7 +587,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
               child: Text(
                 t('पता खोजें, GPS (दाईं तरफ का बटन) दबाएँ, या मैप को खिसकाकर पिन अपने कमरे की जगह पर रखें।',
                     'Search an address, press GPS (button on the right), or move the map to put the pin on your room.'),
-                style: const TextStyle(fontSize: 12, color: AppColors.text),
+                style: TextStyle(fontSize: 12, color: AppColors.text),
               ),
             ),
           ),
@@ -599,8 +599,8 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
     return Container(
       padding: EdgeInsets.fromLTRB(
           14, 12, 14, 12 + MediaQuery.of(context).padding.bottom),
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      decoration: BoxDecoration(
+        color: AppColors.surface,
         boxShadow: [
           BoxShadow(
               color: Color(0x22000000), blurRadius: 10, offset: Offset(0, -2)),
@@ -612,7 +612,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
         children: [
           Row(
             children: [
-              const Icon(Icons.place, size: 18, color: AppColors.primary),
+              Icon(Icons.place, size: 18, color: AppColors.primary),
               const SizedBox(width: 6),
               Text(t('पूरा पता', 'Full address'),
                   style: TextStyle(
@@ -638,14 +638,14 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
               hintText: t('जगह चुनने पर पता यहाँ अपने आप आएगा, आप बदल भी सकते हैं',
                   'The address will appear here after you choose a place; you can edit it'),
               hintStyle:
-                  const TextStyle(fontSize: 12.5, color: AppColors.muted),
+                  TextStyle(fontSize: 12.5, color: AppColors.muted),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(color: AppColors.border),
+                borderSide: BorderSide(color: AppColors.border),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(color: AppColors.primary),
+                borderSide: BorderSide(color: AppColors.primary),
               ),
             ),
           ),
@@ -653,7 +653,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
             const SizedBox(height: 6),
             Text(
               '${t('इलाका', 'Area')}: ${_locality.isEmpty ? '-' : _locality}   ${t('शहर', 'City')}: ${_city.isEmpty ? '-' : _city}',
-              style: const TextStyle(fontSize: 12, color: AppColors.muted),
+              style: TextStyle(fontSize: 12, color: AppColors.muted),
             ),
           ],
           const SizedBox(height: 10),
@@ -690,7 +690,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
       value: SystemUiOverlayStyle.light
           .copyWith(statusBarColor: Colors.transparent),
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.bg,
         body: Column(
           children: [
             _topBar(),

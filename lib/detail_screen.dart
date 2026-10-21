@@ -35,7 +35,7 @@ Widget _galleryImage(String path, {BoxFit fit = BoxFit.cover}) {
       fit: fit,
       errorBuilder: (_, __, ___) => Container(
         color: AppColors.tint,
-        child: const Center(
+        child: Center(
           child: Icon(Icons.image_not_supported_outlined,
               color: AppColors.muted, size: 32),
         ),
@@ -63,7 +63,7 @@ class _Cell {
 
 Widget _greenBar(BuildContext context, {List<Widget> actions = const []}) {
   return Container(
-    decoration: const BoxDecoration(
+    decoration: BoxDecoration(
       gradient: LinearGradient(
         colors: [AppColors.primaryDark, AppColors.primary],
         begin: Alignment.topLeft,
@@ -338,7 +338,7 @@ class _DetailScreenState extends State<DetailScreen> {
             Expanded(
               child: Text(
                 l.title,
-                style: const TextStyle(
+                style: TextStyle(
                     fontSize: 21,
                     fontWeight: FontWeight.w800,
                     color: AppColors.text),
@@ -353,7 +353,7 @@ class _DetailScreenState extends State<DetailScreen> {
               ),
               child: Text(
                 '₹${inr(l.price)}${t('/माह', '/month')}',
-                style: const TextStyle(
+                style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
                     color: AppColors.primary),
@@ -364,12 +364,12 @@ class _DetailScreenState extends State<DetailScreen> {
         const SizedBox(height: 6),
         Row(
           children: [
-            const Icon(Icons.location_on, size: 20, color: AppColors.primary),
+            Icon(Icons.location_on, size: 20, color: AppColors.primary),
             const SizedBox(width: 4),
             Expanded(
               child: Text(
                 l.area,
-                style: const TextStyle(fontSize: 15, color: AppColors.text),
+                style: TextStyle(fontSize: 15, color: AppColors.text),
               ),
             ),
           ],
@@ -402,7 +402,7 @@ class _DetailScreenState extends State<DetailScreen> {
                 cells[i].text,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontSize: 12.5, color: AppColors.text),
+                style: TextStyle(fontSize: 12.5, color: AppColors.text),
               ),
             ],
           ),
@@ -427,7 +427,7 @@ class _DetailScreenState extends State<DetailScreen> {
       children: [
         Text(
           t('विवरण', 'Description'),
-          style: const TextStyle(
+          style: TextStyle(
               fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.text),
         ),
         const SizedBox(height: 6),
@@ -437,7 +437,7 @@ class _DetailScreenState extends State<DetailScreen> {
           overflow: (_expanded || !long)
               ? TextOverflow.visible
               : TextOverflow.ellipsis,
-          style: const TextStyle(
+          style: TextStyle(
               fontSize: 14.5, height: 1.5, color: AppColors.text),
         ),
         if (long)
@@ -452,7 +452,7 @@ class _DetailScreenState extends State<DetailScreen> {
                     _expanded
                         ? t('कम पढ़ें', 'Read less')
                         : t('और पढ़ें', 'Read more'),
-                    style: const TextStyle(
+                    style: TextStyle(
                         color: AppColors.primary,
                         fontWeight: FontWeight.w700,
                         fontSize: 14),
@@ -487,7 +487,7 @@ class _DetailScreenState extends State<DetailScreen> {
         children: [
           Text(
             t('सुविधाएँ', 'Amenities'),
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w800,
                 color: AppColors.text),
@@ -508,7 +508,7 @@ class _DetailScreenState extends State<DetailScreen> {
                               Container(
                                 width: 46,
                                 height: 46,
-                                decoration: const BoxDecoration(
+                                decoration: BoxDecoration(
                                   color: AppColors.tint,
                                   shape: BoxShape.circle,
                                 ),
@@ -520,7 +520,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                 a.label,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
+                                style: TextStyle(
                                     fontSize: 12, color: AppColors.text),
                               ),
                             ],
@@ -549,12 +549,12 @@ class _DetailScreenState extends State<DetailScreen> {
           Container(
             width: 56,
             height: 56,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               color: AppColors.tint,
               shape: BoxShape.circle,
             ),
             child:
-                const Icon(Icons.person, size: 32, color: AppColors.primary),
+                Icon(Icons.person, size: 32, color: AppColors.primary),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -563,7 +563,7 @@ class _DetailScreenState extends State<DetailScreen> {
               children: [
                 Text(
                   t('मकान मालिक', 'House owner'),
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
                       color: AppColors.text),
@@ -572,7 +572,7 @@ class _DetailScreenState extends State<DetailScreen> {
                 Text(
                   t('RoomMitra पर लिस्ट किया गया',
                       'Listed on RoomMitra'),
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 12.5, color: AppColors.muted),
                 ),
               ],
@@ -599,12 +599,12 @@ class _DetailScreenState extends State<DetailScreen> {
             Container(
               width: 56,
               height: 56,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: AppColors.tint,
                 shape: BoxShape.circle,
               ),
               child:
-                  const Icon(Icons.person, size: 32, color: AppColors.primary),
+                  Icon(Icons.person, size: 32, color: AppColors.primary),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -612,11 +612,11 @@ class _DetailScreenState extends State<DetailScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(t('मकान मालिक', 'House owner'),
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 12, color: AppColors.muted)),
                   Text(
                     o.name,
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w800,
                         color: AppColors.text),
@@ -630,7 +630,7 @@ class _DetailScreenState extends State<DetailScreen> {
                         color: AppColors.tint,
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Row(
+                      child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(Icons.verified,
@@ -653,28 +653,28 @@ class _DetailScreenState extends State<DetailScreen> {
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.star, size: 16, color: AppColors.primary),
+                    Icon(Icons.star, size: 16, color: AppColors.primary),
                     const SizedBox(width: 4),
                     Text('${o.rating} ${t('(डेमो)', '(demo)')}',
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 12.5, color: AppColors.text)),
                   ],
                 ),
                 const SizedBox(height: 6),
                 Row(
                   children: [
-                    const Icon(Icons.calendar_month,
+                    Icon(Icons.calendar_month,
                         size: 16, color: AppColors.primary),
                     const SizedBox(width: 4),
                     Text(t('${o.years}+ साल', '${o.years}+ years'),
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 12.5, color: AppColors.text)),
                   ],
                 ),
               ],
             ),
             const SizedBox(width: 4),
-            const Icon(Icons.chevron_right, color: AppColors.text),
+            Icon(Icons.chevron_right, color: AppColors.text),
           ],
         ),
       ),
@@ -697,7 +697,7 @@ class _DetailScreenState extends State<DetailScreen> {
               color: AppColors.tint,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(Icons.map, size: 36, color: AppColors.primary),
+            child: Icon(Icons.map, size: 36, color: AppColors.primary),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -705,13 +705,13 @@ class _DetailScreenState extends State<DetailScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(t('लोकेशन', 'Location'),
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w800,
                         color: AppColors.text)),
                 const SizedBox(height: 2),
                 Text(l.area,
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 13, color: AppColors.muted)),
                 const SizedBox(height: 6),
                 GestureDetector(
@@ -725,7 +725,7 @@ class _DetailScreenState extends State<DetailScreen> {
                     ),
                     child: Text(
                       t('Google Maps पर देखें', 'View on Google Maps'),
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 12.5,
                           fontWeight: FontWeight.w700,
                           color: AppColors.primary),
@@ -750,14 +750,14 @@ class _DetailScreenState extends State<DetailScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.shield, color: AppColors.primary, size: 28),
+          Icon(Icons.shield, color: AppColors.primary, size: 28),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(t('सुरक्षित किराया अनुभव', 'Safe renting experience'),
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 14.5,
                         fontWeight: FontWeight.w800,
                         color: AppColors.text)),
@@ -767,7 +767,7 @@ class _DetailScreenState extends State<DetailScreen> {
                     'किराया और डिपॉजिट सीधे मालिक से तय करें। एडवांस देने से पहले कमरा ज़रूर देखें।',
                     'Fix the rent and deposit directly with the owner. Always see the room before paying any advance.',
                   ),
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 12.5, height: 1.4, color: AppColors.text),
                 ),
               ],
@@ -782,8 +782,8 @@ class _DetailScreenState extends State<DetailScreen> {
     return Container(
       padding: EdgeInsets.fromLTRB(
           16, 10, 16, 10 + MediaQuery.of(context).padding.bottom),
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      decoration: BoxDecoration(
+        color: AppColors.surface,
         boxShadow: [
           BoxShadow(
               color: Color(0x1A000000), blurRadius: 10, offset: Offset(0, -2)),
@@ -803,7 +803,7 @@ class _DetailScreenState extends State<DetailScreen> {
                     label: Text(t('WhatsApp करें', 'WhatsApp')),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.primary,
-                      side: const BorderSide(
+                      side: BorderSide(
                           color: AppColors.primary, width: 1.2),
                       textStyle: const TextStyle(
                           fontSize: 15, fontWeight: FontWeight.w700),
@@ -845,7 +845,7 @@ class _DetailScreenState extends State<DetailScreen> {
       valueListenable: AppLang.notifier,
       builder: (context, lang, _) {
         return Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.bg,
           body: Column(
             children: [
               _topBar(),
@@ -911,7 +911,7 @@ class PhotoGalleryScreen extends StatelessWidget {
 
   Widget _body(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7FCF9),
+      backgroundColor: AppColors.bg,
       body: Column(
         children: [
           _greenBar(context),
@@ -919,7 +919,7 @@ class PhotoGalleryScreen extends StatelessWidget {
             margin: const EdgeInsets.fromLTRB(16, 12, 16, 4),
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.surface,
               borderRadius: BorderRadius.circular(14),
               border: Border.all(color: AppColors.border),
             ),
@@ -943,14 +943,14 @@ class PhotoGalleryScreen extends StatelessWidget {
                         listing.title,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w800,
                             color: AppColors.text),
                       ),
                       Text(
                         '₹${inr(listing.price)}${t('/माह', '/month')}',
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 13.5,
                             fontWeight: FontWeight.w700,
                             color: AppColors.primary),
@@ -965,13 +965,13 @@ class PhotoGalleryScreen extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
             child: Row(
               children: [
-                const Icon(Icons.photo_library,
+                Icon(Icons.photo_library,
                     color: AppColors.primary, size: 22),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     t('फोटो गैलरी', 'Photo gallery'),
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w800,
                         color: AppColors.text),
@@ -986,7 +986,7 @@ class PhotoGalleryScreen extends StatelessWidget {
                   ),
                   child: Text(
                     t('${images.length} तस्वीरें', '${images.length} photos'),
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w700,
                         color: AppColors.primary),
@@ -1050,7 +1050,7 @@ class PhotoGalleryScreen extends StatelessWidget {
           Container(
             padding: EdgeInsets.fromLTRB(
                 16, 10, 16, 10 + MediaQuery.of(context).padding.bottom),
-            color: Colors.white,
+            color: AppColors.surface,
             child: SizedBox(
               width: double.infinity,
               height: 50,

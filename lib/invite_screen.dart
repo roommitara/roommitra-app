@@ -59,7 +59,7 @@ class InviteScreen extends StatelessWidget {
           Container(
             width: 44,
             height: 44,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
                 color: AppColors.tint, shape: BoxShape.circle),
             child: Icon(icon, color: AppColors.primary, size: 24),
           ),
@@ -69,12 +69,12 @@ class InviteScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(title,
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 14.5,
                         fontWeight: FontWeight.w800,
                         color: AppColors.text)),
                 Text(sub,
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 12.5, color: AppColors.muted)),
               ],
             ),
@@ -98,7 +98,7 @@ class InviteScreen extends StatelessWidget {
       value: SystemUiOverlayStyle.light
           .copyWith(statusBarColor: Colors.transparent),
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.bg,
         body: Column(
           children: [
             Container(
@@ -122,9 +122,9 @@ class InviteScreen extends StatelessWidget {
                     Container(
                       width: 96,
                       height: 96,
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                           color: AppColors.tint, shape: BoxShape.circle),
-                      child: const Icon(Icons.group_add,
+                      child: Icon(Icons.group_add,
                           size: 50, color: AppColors.primary),
                     ),
                     const SizedBox(height: 14),
@@ -155,7 +155,7 @@ class InviteScreen extends StatelessWidget {
                         children: [
                           Row(
                             children: [
-                              const Icon(Icons.chat_bubble_outline,
+                              Icon(Icons.chat_bubble_outline,
                                   size: 20, color: AppColors.primary),
                               const SizedBox(width: 8),
                               Text(t('भेजा जाने वाला मैसेज', 'Message to be sent'),
@@ -167,7 +167,7 @@ class InviteScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 10),
                           Text(inviteMessage(),
-                              style: const TextStyle(
+                              style: TextStyle(
                                   fontSize: 13.5,
                                   height: 1.45,
                                   color: AppColors.text)),
@@ -212,7 +212,7 @@ class InviteScreen extends StatelessWidget {
                                 fontSize: 15, fontWeight: FontWeight.w700)),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppColors.primary,
-                          side: const BorderSide(
+                          side: BorderSide(
                               color: AppColors.primary, width: 1.2),
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(14)),
