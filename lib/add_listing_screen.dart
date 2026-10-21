@@ -842,7 +842,16 @@ class _AddListingScreenState extends State<AddListingScreen> {
           ],
         );
       case 4:
-        return _step4();
+        return Column(
+          children: [
+            const GuideVideo(
+              asset: 'assets/guide_address.mp4',
+              hi: 'यहाँ अपने कमरे का पूरा पता लिखिए और पास की कोई जानी-पहचानी जगह बताइए, ताकि लोग आसानी से ढूँढ सकें।',
+              en: 'Write the full address of your room here and mention a nearby landmark so people can find it easily.',
+            ),
+            _step4(),
+          ],
+        );
       case 5:
         return _stepPin();
       default:
