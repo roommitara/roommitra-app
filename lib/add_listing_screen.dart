@@ -858,7 +858,17 @@ class _AddListingScreenState extends State<AddListingScreen> {
           ],
         );
       case 5:
-        return _stepPin();
+        return Column(
+          children: [
+            GuideVideo(
+              key: const ValueKey('guide_map'),
+              asset: 'assets/guide_map.mp4',
+              hi: 'अब नक्शे में पिन अपने कमरे की सही जगह पर रखिए, ताकि पास के लोगों को आपका कमरा दिख सके।',
+              en: 'Now place the pin on the map at your room\'s exact location so nearby people can see your room.',
+            ),
+            _stepPin(),
+          ],
+        );
       default:
         return _step5();
     }
