@@ -798,7 +798,16 @@ class _AddListingScreenState extends State<AddListingScreen> {
   Widget _body() {
     switch (_step) {
       case 0:
-        return _step0();
+        return Column(
+          children: [
+            const GuideVideo(
+              asset: 'assets/guide_category.mp4',
+              hi: 'यहाँ अपने कमरे का प्रकार चुनिए, फिर नाम लिखिए, इलाका बताइए और कमरों की संख्या भरिए।',
+              en: 'Choose your room type here, then enter the title, area and number of rooms.',
+            ),
+            _step0(),
+          ],
+        );
       case 1:
         return Column(
           children: [
