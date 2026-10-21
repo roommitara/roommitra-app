@@ -7,6 +7,7 @@ import 'app_shell.dart';
 import 'theme.dart';
 import 'otp_service.dart';
 import 'strings.dart';
+import 'terms_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -1025,11 +1026,13 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _link(String text) {
+  Widget _link(String hi, String en, int tab) {
     return InkWell(
-      onTap: () => _msg(t('$text जल्द जुड़ेगा', '$text coming soon')),
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute<void>(builder: (_) => TermsScreen(initialTab: tab)),
+      ),
       child: Text(
-        text,
+        t(hi, en),
         style: const TextStyle(
           fontSize: 12.5,
           color: AppColors.primary,
@@ -1058,9 +1061,9 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             style: style,
           ),
-          _link('Terms & Conditions'),
+          _link('नियम और शर्तें', 'Terms & Conditions', 0),
           Text(t(' और ', ' and '), style: style),
-          _link('Privacy Policy'),
+          _link('गोपनीयता नीति', 'Privacy Policy', 1),
           Text(t(' से सहमत होते हैं।', '.'), style: style),
         ],
       ),
