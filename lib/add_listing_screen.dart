@@ -298,9 +298,11 @@ class _AddListingScreenState extends State<AddListingScreen> {
     try {
       List<XFile> picked;
       if (src == ImageSource.gallery) {
-        picked = await _picker.pickMultiImage(imageQuality: 85);
+        picked = await _picker.pickMultiImage(
+            maxWidth: 1280, maxHeight: 1280, imageQuality: 80);
       } else {
-        final x = await _picker.pickImage(source: src, imageQuality: 85);
+        final x = await _picker.pickImage(
+            source: src, maxWidth: 1280, maxHeight: 1280, imageQuality: 80);
         picked = x == null ? <XFile>[] : <XFile>[x];
       }
       var skipped = 0;
