@@ -130,7 +130,14 @@ class _AppShellState extends State<AppShell> {
           ProfileScreen(onAdd: () => _go(2)),
         ];
         return Scaffold(
-          body: IndexedStack(index: _index, children: pages),
+          // छिपे टैब में ऐनिमेशन/वीडियो न चलें, इसलिए TickerMode से बंद रखते हैं
+          body: IndexedStack(
+            index: _index,
+            children: [
+              for (var i = 0; i < pages.length; i++)
+                TickerMode(enabled: i == _index, child: pages[i]),
+            ],
+          ),
           bottomNavigationBar: _bottomBar(context),
         );
       },
