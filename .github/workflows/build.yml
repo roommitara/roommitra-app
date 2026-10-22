@@ -19,7 +19,7 @@ jobs:
         run: flutter create --platforms=android --project-name roommitra_app --org com.roommitra out
       - name: Add Android permissions
         run: |
-          sed -i 's#<application#<uses-permission android:name="android.permission.INTERNET"/>\n    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>\n    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>\n    <application#' out/android/app/src/main/AndroidManifest.xml
+          sed -i 's#<application#<uses-permission android:name="android.permission.INTERNET"/>\n    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>\n    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>\n    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>\n    <application#' out/android/app/src/main/AndroidManifest.xml
           grep -n "uses-permission" out/android/app/src/main/AndroidManifest.xml
       - name: Add Google login deep link
         run: |
@@ -64,6 +64,51 @@ jobs:
             fi
           done
           ls -l $RES/mipmap-*/ic_launcher.png
+      - name: Add Firebase (push notifications)
+        run: |
+          if [ ! -f google-services.json ]; then echo "No google-services.json, skipping"; exit 0; fi
+          cp google-services.json out/android/app/google-services.json
+          RES=out/android/app/src/main/res
+          mkdir -p $RES/drawable $RES/values
+          # छोटा सफ़ेद घर वाला नोटिफिकेशन आइकन (Android सिर्फ सफ़ेद आकार दिखाता है)
+          convert -size 96x96 xc:none -fill white -draw "polygon 48,10 86,46 76,46 76,84 20,84 20,46 10,46" $RES/drawable/ic_stat_notify.png
+          cat > $RES/values/colors_notify.xml << 'EOF2'
+          <?xml version="1.0" encoding="utf-8"?>
+          <resources><color name="notify_color">#1B8A5A</color></resources>
+          EOF2
+          python3 - << 'PYEOF'
+          import re, os
+          man = 'out/android/app/src/main/AndroidManifest.xml'
+          s = open(man).read()
+          meta = '<meta-data android:name="com.google.firebase.messaging.default_notification_icon" android:resource="@drawable/ic_stat_notify"/><meta-data android:name="com.google.firebase.messaging.default_notification_color" android:resource="@color/notify_color"/>'
+          if 'default_notification_icon' not in s:
+              s = s.replace('</application>', meta + '</application>', 1)
+          open(man, 'w').write(s)
+          plug = '4.4.2'
+          for name in ['settings.gradle.kts', 'settings.gradle']:
+              p = 'out/android/' + name
+              if not os.path.exists(p): continue
+              t = open(p).read()
+              if 'google-services' in t: break
+              if name.endswith('.kts'):
+                  t = re.sub(r'(plugins\s*\{)', r'\1\n    id("com.google.gms.google-services") version "%s" apply false' % plug, t, count=1)
+              else:
+                  t = re.sub(r'(plugins\s*\{)', r"\1\n    id 'com.google.gms.google-services' version '%s' apply false" % plug, t, count=1)
+              open(p, 'w').write(t)
+              break
+          for name in ['build.gradle.kts', 'build.gradle']:
+              p = 'out/android/app/' + name
+              if not os.path.exists(p): continue
+              t = open(p).read()
+              if 'google-services' in t: break
+              if name.endswith('.kts'):
+                  t = re.sub(r'(plugins\s*\{)', r'\1\n    id("com.google.gms.google-services")', t, count=1)
+              else:
+                  t = re.sub(r'(plugins\s*\{)', r"\1\n    id 'com.google.gms.google-services'", t, count=1)
+              open(p, 'w').write(t)
+              break
+          PYEOF
+          grep -n "google" out/android/settings.gradle* out/android/app/build.gradle*
       - name: Copy app files
         run: |
           rm -rf out/lib

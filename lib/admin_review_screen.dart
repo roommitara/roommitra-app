@@ -1,3 +1,4 @@
+import 'push_service.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -109,6 +110,7 @@ class _AdminReviewScreenState extends State<AdminReviewScreen> {
       await _db
           .from('room_listings')
           .update({'status': status}).eq('id', listingId);
+      if (status == 'approved') PushService.notifyNewRoom(listingId);
       if (!mounted) return;
       showMsg(context, t('हो गया', 'Done'));
       listingsStore.load();

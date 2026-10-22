@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "689937871093",
+    "project_id": "roommitra-1d86a",
+    "storage_bucket": "roommitra-1d86a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:689937871093:android:00b74f05a42b66d56b15bc",
+        "android_client_info": {
+          "package_name": "com.roommitra.roommitra_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAWJ1PA34OcgvlZakPVjhZblAPfPg8b7Vs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -5,6 +5,7 @@ import 'detail_screen.dart';
 import 'location_service.dart';
 import 'nearby_rooms.dart';
 import 'notification_service.dart';
+import 'push_service.dart';
 import 'notifications_screen.dart';
 import 'strings.dart';
 import 'theme.dart';
@@ -127,6 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     appState.loadFavorites();
     NotificationService.instance.start();
+    PushService.instance.start();
     if (!listingsStore.loaded) {
       listingsStore.load();
     }
