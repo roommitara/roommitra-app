@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'data.dart';
 import 'home_screen.dart' show RoomMitraLogo;
-import 'booking_screen.dart';
 import 'owner_contact.dart';
 import 'owner_profile_screen.dart';
 import 'report_screen.dart';

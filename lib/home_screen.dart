@@ -4,6 +4,8 @@ import 'data.dart';
 import 'detail_screen.dart';
 import 'location_service.dart';
 import 'nearby_rooms.dart';
+import 'notification_service.dart';
+import 'notifications_screen.dart';
 import 'strings.dart';
 import 'theme.dart';
 
@@ -124,6 +126,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     appState.loadFavorites();
+    NotificationService.instance.start();
     if (!listingsStore.loaded) {
       listingsStore.load();
     }
@@ -146,6 +149,62 @@ class _HomeScreenState extends State<HomeScreen> {
         'assets/city_shimla.jpg'),
   ];
 
+  Widget _bell() {
+    return ListenableBuilder(
+      listenable: NotificationService.instance,
+      builder: (context, _) {
+        final n = NotificationService.instance.unread;
+        return GestureDetector(
+          onTap: () async {
+            await Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                  builder: (_) => const NotificationsScreen()),
+            );
+          },
+          child: SizedBox(
+            width: 46,
+            height: 46,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Container(
+                  width: 46,
+                  height: 46,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: AppColors.primaryDark, width: 2),
+                  ),
+                  child: Icon(Icons.notifications_none,
+                      color: AppColors.primaryDark, size: 25),
+                ),
+                if (n > 0)
+                  Positioned(
+                    right: -2,
+                    top: -2,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE53935),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        n > 9 ? '9+' : '$n',
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Widget _header(double top) {
     return Container(
       width: double.infinity,
@@ -153,35 +212,39 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: EdgeInsets.fromLTRB(16, top + 12, 16, 12),
       child: Row(
         children: [
-          const Flexible(child: RoomMitraLogo(dark: true)),
-          const SizedBox(width: 8),
-          const Spacer(),
-          GestureDetector(
-            onTap: AppLang.toggle,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              decoration: BoxDecoration(
-                color: AppColors.tint,
-                borderRadius: BorderRadius.circular(22),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.language,
-                      size: 20, color: AppColors.primaryDark),
-                  const SizedBox(width: 6),
-                  Text(
-                    AppLang.isHindi ? 'English' : 'हिंदी',
-                    style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.primaryDark),
-                  ),
-                ],
+          const Expanded(
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: RoomMitraLogo(dark: true),
               ),
             ),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 8),
+          GestureDetector(
+            onTap: AppLang.toggle,
+            child: Container(
+              width: 46,
+              height: 46,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: AppColors.tint,
+                shape: BoxShape.circle,
+              ),
+              child: Text(
+                AppLang.isHindi ? 'EN' : 'हिं',
+                style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w900,
+                    color: AppColors.primaryDark),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          _bell(),
+          const SizedBox(width: 8),
           PopupMenuButton<String>(
             tooltip: t('शहर चुनें', 'Choose city'),
             onSelected: appState.setCity,
@@ -204,14 +267,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     )))
                 .toList(),
             child: Container(
-              width: 50,
-              height: 50,
+              width: 46,
+              height: 46,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(color: AppColors.primaryDark, width: 2),
               ),
               child: Icon(Icons.location_on,
-                  color: AppColors.primaryDark, size: 28),
+                  color: AppColors.primaryDark, size: 26),
             ),
           ),
         ],

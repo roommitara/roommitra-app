@@ -1,132 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+
 import 'data.dart';
-import 'home_screen.dart' show RoomMitraLogo;
+import 'notification_service.dart';
 import 'strings.dart';
 import 'theme.dart';
 
-enum NotifKind { message, room, booking, safety, read, offer, views, update }
-
-class NotifItem {
-  final NotifKind kind;
-  final String title;
-  final String? titleEn;
-  final String body;
-  final String? bodyEn;
-  final String? extra;
-  final String? extraEn;
-  final IconData? extraIcon;
-  final String time;
-  final String? timeEn;
-  bool unread;
-
-  NotifItem({
-    required this.kind,
-    required this.title,
-    this.titleEn,
-    required this.body,
-    this.bodyEn,
-    this.extra,
-    this.extraEn,
-    this.extraIcon,
-    required this.time,
-    this.timeEn,
-    this.unread = false,
-  });
-
-  String get tTitle => t(title, titleEn ?? title);
-  String get tBody => t(body, bodyEn ?? body);
-  String? get tExtra => extra == null ? null : t(extra!, extraEn ?? extra!);
-  String get tTime => t(time, timeEn ?? time);
-}
-
-final List<NotifItem> demoNotifications = [
-  NotifItem(
-    kind: NotifKind.message,
-    title: 'नया संदेश',
-    titleEn: 'New message',
-    body: 'राहुल शर्मा ने आपको संदेश भेजा है: "क्या यह कमरा अभी भी खाली है?"',
-    bodyEn: 'Rahul Sharma sent you a message: "Is this room still vacant?"',
-    time: '10:24 AM',
-    unread: true,
-  ),
-  NotifItem(
-    kind: NotifKind.room,
-    title: 'नई लिस्टिंग',
-    titleEn: 'New listing',
-    body: '2BHK फ्लैट (सेमी फर्निश्ड) का नया लिस्टिंग पोस्ट किया गया है।',
-    bodyEn: 'A new listing for a 2BHK flat (semi furnished) has been posted.',
-    extra: 'चौगान, नाहन',
-    extraEn: 'Chaugan, Nahan',
-    extraIcon: Icons.location_on,
-    time: '09:12 AM',
-    unread: true,
-  ),
-  NotifItem(
-    kind: NotifKind.booking,
-    title: 'बुकिंग अनुरोध',
-    titleEn: 'Booking request',
-    body: 'अमित यादव ने आपके कमरे को देखने के लिए अनुरोध भेजा है।',
-    bodyEn: 'Amit Yadav has sent a request to view your room.',
-    extra: '16 अक्टूबर 2026, 11:00 AM',
-    extraEn: '16 October 2026, 11:00 AM',
-    extraIcon: Icons.event,
-    time: '08:45 AM',
-    unread: true,
-  ),
-  NotifItem(
-    kind: NotifKind.read,
-    title: 'संदेश पढ़ा गया',
-    titleEn: 'Message read',
-    body: 'सीमा पवार ने आपका संदेश पढ़ लिया है।\n"जी हाँ, यह कमरा अभी उपलब्ध है।"',
-    bodyEn:
-        'Seema Pawar has read your message.\n"Yes, this room is available."',
-    time: '07:30 AM',
-  ),
-  NotifItem(
-    kind: NotifKind.safety,
-    title: 'सुरक्षा अलर्ट',
-    titleEn: 'Safety alert',
-    body:
-        'कृपया ध्यान दें: हाल ही में एक फर्जी लिस्टिंग की रिपोर्ट की गई है। हम इसकी जाँच कर रहे हैं।',
-    bodyEn:
-        'Please note: a fake listing was recently reported. We are looking into it.',
-    time: 'कल 07:15 PM',
-    timeEn: 'Yesterday 07:15 PM',
-  ),
-  NotifItem(
-    kind: NotifKind.offer,
-    title: 'स्पेशल ऑफर',
-    titleEn: 'Special offer',
-    body: 'आज के लिए खास! अपने कमरे की लिस्टिंग करें और जल्दी किरायेदार पाएं।',
-    bodyEn: 'Special for today! List your room and find a tenant quickly.',
-    time: 'कल 12:20 PM',
-    timeEn: 'Yesterday 12:20 PM',
-  ),
-  NotifItem(
-    kind: NotifKind.views,
-    title: 'आपका कमरा देखा गया',
-    titleEn: 'Your room was viewed',
-    body: 'आपकी लिस्टिंग 1RK फ्लैट को आज 12 बार देखा गया है।',
-    bodyEn: 'Your listing 1RK flat has been viewed 12 times today.',
-    extra: 'व्यू डिटेल देखें',
-    extraEn: 'View details',
-    time: 'कल 10:05 AM',
-    timeEn: 'Yesterday 10:05 AM',
-  ),
-  NotifItem(
-    kind: NotifKind.update,
-    title: 'ऐप अपडेट',
-    titleEn: 'App update',
-    body:
-        'RoomMitra का नया वर्ज़न अब उपलब्ध है। बेहतर अनुभव के लिए अभी अपडेट करें।',
-    bodyEn:
-        'A new version of RoomMitra is now available. Update now for a better experience.',
-    time: '12 अक्टूबर 2026',
-    timeEn: '12 October 2026',
-  ),
-];
-
+/// असली नोटिफिकेशन: कमरा मंज़ूर/रिजेक्ट/छिपा, और एडमिन के लिए नया कमरा व रिपोर्ट।
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
 
@@ -135,368 +14,163 @@ class NotificationsScreen extends StatefulWidget {
 }
 
 class _NotificationsScreenState extends State<NotificationsScreen> {
-  int _tab = 0;
+  NotificationService get _svc => NotificationService.instance;
 
-  List<String> get _tabs => [
-        t('सभी', 'All'),
-        t('मैसेज', 'Messages'),
-        t('नए कमरे', 'New rooms'),
-        t('बुकिंग', 'Bookings'),
-        t('सुरक्षा', 'Safety'),
-      ];
+  @override
+  void initState() {
+    super.initState();
+    _svc.start();
+  }
 
-  static const _tabIcons = [
-    Icons.notifications,
-    Icons.chat_bubble_outline,
-    Icons.home,
-    Icons.event,
-    Icons.shield,
-  ];
-
-  bool _inTab(NotifItem n, int tab) {
-    switch (tab) {
-      case 1:
-        return n.kind == NotifKind.message || n.kind == NotifKind.read;
-      case 2:
-        return n.kind == NotifKind.room;
-      case 3:
-        return n.kind == NotifKind.booking;
-      case 4:
-        return n.kind == NotifKind.safety;
+  IconData _icon(String kind) {
+    switch (kind) {
+      case 'approved':
+        return Icons.check_circle;
+      case 'rejected':
+        return Icons.cancel;
+      case 'hidden':
+        return Icons.visibility_off;
+      case 'review':
+        return Icons.fact_check;
+      case 'report':
+        return Icons.flag;
       default:
-        return true;
+        return Icons.notifications;
     }
   }
 
-  int _unread(int tab) =>
-      demoNotifications.where((n) => n.unread && _inTab(n, tab)).length;
-
-  IconData _icon(NotifKind k) {
-    switch (k) {
-      case NotifKind.message:
-        return Icons.chat_bubble;
-      case NotifKind.room:
-        return Icons.home;
-      case NotifKind.booking:
-        return Icons.event;
-      case NotifKind.read:
-        return Icons.mail;
-      case NotifKind.safety:
-        return Icons.shield;
-      case NotifKind.offer:
-        return Icons.percent;
-      case NotifKind.views:
-        return Icons.visibility;
-      case NotifKind.update:
-        return Icons.campaign;
-    }
-  }
-
-  Color _iconBg(NotifKind k) {
-    switch (k) {
-      case NotifKind.read:
-        return const Color(0xFF2F6FE4);
-      case NotifKind.safety:
-        return const Color(0xFFF2A81D);
-      case NotifKind.update:
-        return AppColors.tint;
-      default:
+  Color _color(String kind) {
+    switch (kind) {
+      case 'approved':
         return AppColors.primary;
+      case 'rejected':
+      case 'report':
+        return AppColors.danger;
+      case 'hidden':
+        return const Color(0xFFF2A81D);
+      default:
+        return AppColors.primaryDark;
     }
   }
 
-  Color _iconFg(NotifKind k) =>
-      k == NotifKind.update ? AppColors.primary : Colors.white;
-
-  void _markAllRead() {
-    setState(() {
-      for (final n in demoNotifications) {
-        n.unread = false;
-      }
-    });
-    showMsg(
-        context,
-        t('सभी नोटिफिकेशन पढ़े हुए हो गए',
-            'All notifications marked as read'));
+  String _ago(DateTime d) {
+    final diff = DateTime.now().difference(d);
+    if (diff.inMinutes < 1) return t('अभी', 'Just now');
+    if (diff.inMinutes < 60) {
+      return t('${diff.inMinutes} मिनट पहले', '${diff.inMinutes} min ago');
+    }
+    if (diff.inHours < 24) {
+      return t('${diff.inHours} घंटे पहले', '${diff.inHours} h ago');
+    }
+    return t('${diff.inDays} दिन पहले', '${diff.inDays} days ago');
   }
 
-  Widget _header(double top) {
-    final total = _unread(0);
-    return Container(
-      color: AppColors.primary,
-      padding: EdgeInsets.fromLTRB(4, top + 8, 8, 12),
-      child: Row(
-        children: [
-          IconButton(
-            onPressed: () => Navigator.of(context).pop(),
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
-          ),
-          const RoomMitraLogo(),
-          const Spacer(),
-          Stack(
-            clipBehavior: Clip.none,
-            children: [
-              IconButton(
-                onPressed: _markAllRead,
-                icon: const Icon(Icons.notifications_none,
-                    color: Colors.white, size: 28),
-              ),
-              if (total > 0)
-                Positioned(
-                  right: 6,
-                  top: 6,
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFE53935),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Text('$total',
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700)),
-                  ),
-                ),
-            ],
-          ),
-          PopupMenuButton<int>(
-            icon: const Icon(Icons.more_vert, color: Colors.white),
-            onSelected: (v) {
-              if (v == 0) {
-                _markAllRead();
-              } else {
-                setState(() => demoNotifications.clear());
-              }
-            },
-            itemBuilder: (_) => [
-              PopupMenuItem(
-                  value: 0,
-                  child: Text(t('सभी को पढ़ा हुआ करें', 'Mark all as read'))),
-              PopupMenuItem(
-                  value: 1,
-                  child: Text(
-                      t('सभी नोटिफिकेशन हटाएं', 'Delete all notifications'))),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _titleRow() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(t('नोटिफिकेशन', 'Notifications'),
-                    style: TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.text)),
-                const SizedBox(height: 2),
-                Text(
-                    t('आपके सभी अपडेट एक ही जगह पर',
-                        'All your updates in one place'),
-                    style:
-                        TextStyle(fontSize: 13, color: AppColors.muted)),
-              ],
-            ),
-          ),
-          GestureDetector(
-            onTap: () => showMsg(
-                context,
-                t('नोटिफिकेशन सेटिंग जल्द जुड़ेगी',
-                    'Notification settings coming soon')),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
-              decoration: BoxDecoration(
-                color: AppColors.tint,
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.settings, size: 17, color: AppColors.primary),
-                  const SizedBox(width: 5),
-                  Text(t('सेटिंग', 'Settings'),
-                      style: TextStyle(
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.text)),
-                  Icon(Icons.chevron_right,
-                      size: 18, color: AppColors.text),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _tabRow() {
-    final tabs = _tabs;
-    return SizedBox(
-      height: 46,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        itemCount: tabs.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
-        itemBuilder: (context, i) {
-          final sel = _tab == i;
-          final cnt = i == 2 || i == 3 || i == 4 ? 0 : _unread(i);
-          return GestureDetector(
-            onTap: () => setState(() => _tab = i),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                color: sel ? AppColors.primaryDark : AppColors.tint,
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(
-                    color: sel ? AppColors.primaryDark : AppColors.border),
-              ),
-              child: Row(
-                children: [
-                  Icon(_tabIcons[i],
-                      size: 19,
-                      color: sel ? Colors.white : AppColors.primary),
-                  const SizedBox(width: 7),
-                  Text(tabs[i],
-                      style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                          color: sel ? Colors.white : AppColors.text)),
-                  if (cnt > 0) ...[
-                    const SizedBox(width: 7),
-                    Container(
-                      padding: const EdgeInsets.all(5),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFE53935),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Text('$cnt',
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700)),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _card(NotifItem n) {
-    final extra = n.tExtra;
-    return GestureDetector(
-      onTap: () {
-        setState(() => n.unread = false);
-        showMsg(
-            context,
-            t('${n.tTitle} — डिटेल अगले चरण में जुड़ेगी',
-                '${n.tTitle} — details will be added in the next step'));
-      },
-      child: Container(
-        padding: const EdgeInsets.all(12),
+  Widget _tile(AppNotification n) {
+    final c = _color(n.kind);
+    return Dismissible(
+      key: ValueKey(n.id),
+      direction: DismissDirection.endToStart,
+      background: Container(
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.only(right: 20),
+        margin: const EdgeInsets.only(bottom: 10),
         decoration: BoxDecoration(
-          color: n.unread ? AppColors.tint : AppColors.surface,
+          color: AppColors.danger,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.border),
         ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Container(
-                  width: 46,
-                  height: 46,
-                  decoration: BoxDecoration(
-                    color: _iconBg(n.kind),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(_icon(n.kind), color: _iconFg(n.kind), size: 24),
+        child: const Icon(Icons.delete, color: Colors.white),
+      ),
+      onDismissed: (_) => _svc.delete(n),
+      child: GestureDetector(
+        onTap: () => _svc.markRead(n),
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 10),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: n.isRead ? AppColors.surface : AppColors.tint,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: AppColors.border),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: c.withOpacity(0.15),
+                  shape: BoxShape.circle,
                 ),
-                if (n.unread)
-                  Positioned(
-                    right: -2,
-                    top: -2,
-                    child: Container(
-                      width: 12,
-                      height: 12,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFE53935),
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 1.5),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(n.tTitle,
-                            style: TextStyle(
-                                fontSize: 15.5,
-                                fontWeight: FontWeight.w800,
-                                color: AppColors.text)),
-                      ),
-                      Text(n.tTime,
-                          style: TextStyle(
-                              fontSize: 11.5, color: AppColors.muted)),
-                    ],
-                  ),
-                  const SizedBox(height: 3),
-                  Text(n.tBody,
-                      style: TextStyle(
-                          fontSize: 13, height: 1.35, color: AppColors.muted)),
-                  if (extra != null) ...[
-                    const SizedBox(height: 4),
+                child: Icon(_icon(n.kind), color: c, size: 24),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     Row(
                       children: [
-                        if (n.extraIcon != null) ...[
-                          Icon(n.extraIcon, size: 14, color: AppColors.primary),
-                          const SizedBox(width: 4),
-                        ],
-                        Flexible(
-                          child: Text(extra,
-                              style: TextStyle(
-                                  fontSize: 12.5,
-                                  color: n.extraIcon == null
-                                      ? AppColors.primary
-                                      : AppColors.muted,
-                                  fontWeight: n.extraIcon == null
-                                      ? FontWeight.w700
-                                      : FontWeight.w400)),
+                        Expanded(
+                          child: Text(
+                            t(n.titleHi, n.titleEn),
+                            style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.text),
+                          ),
                         ),
+                        if (!n.isRead)
+                          Container(
+                            width: 10,
+                            height: 10,
+                            decoration: BoxDecoration(
+                                color: AppColors.primary,
+                                shape: BoxShape.circle),
+                          ),
                       ],
                     ),
+                    if (n.bodyHi.isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        t(n.bodyHi, n.bodyEn),
+                        style: TextStyle(
+                            fontSize: 13, height: 1.35, color: AppColors.text),
+                      ),
+                    ],
+                    const SizedBox(height: 6),
+                    Text(
+                      _ago(n.createdAt),
+                      style:
+                          TextStyle(fontSize: 11.5, color: AppColors.muted),
+                    ),
                   ],
-                ],
+                ),
               ),
-            ),
-            Padding(
-              padding: EdgeInsets.only(top: 12, left: 4),
-              child: Icon(Icons.chevron_right, color: AppColors.text),
-            ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _empty(String text, {bool retry = false}) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(28),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.notifications_none, size: 64, color: AppColors.muted),
+            const SizedBox(height: 12),
+            Text(text,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontSize: 15, height: 1.4, color: AppColors.muted)),
+            if (retry) ...[
+              const SizedBox(height: 12),
+              ElevatedButton(
+                  onPressed: _svc.load, child: Text(t('फिर कोशिश करें', 'Retry'))),
+            ],
           ],
         ),
       ),
@@ -505,36 +179,52 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final top = MediaQuery.of(context).padding.top;
-    final items = demoNotifications.where((n) => _inTab(n, _tab)).toList();
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light
-          .copyWith(statusBarColor: Colors.transparent),
-      child: Scaffold(
-        backgroundColor: AppColors.bg,
-        body: Column(
-          children: [
-            _header(top),
-            _titleRow(),
-            _tabRow(),
-            const SizedBox(height: 10),
-            Expanded(
-              child: items.isEmpty
-                  ? Center(
-                      child: Text(
-                          t('कोई नोटिफिकेशन नहीं है', 'No notifications'),
-                          style: TextStyle(
-                              fontSize: 15, color: AppColors.muted)),
-                    )
-                  : ListView.separated(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                      itemCount: items.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 10),
-                      itemBuilder: (_, i) => _card(items[i]),
-                    ),
+    return ValueListenableBuilder<String>(
+      valueListenable: AppLang.notifier,
+      builder: (context, _, __) => ListenableBuilder(
+        listenable: _svc,
+        builder: (context, _) {
+          final items = _svc.items;
+          Widget body;
+          if (!_svc.loaded && _svc.error == null) {
+            body = const Center(child: CircularProgressIndicator());
+          } else if (!_svc.loaded && _svc.error != null) {
+            body = _empty(
+                t('नोटिफिकेशन लोड नहीं हो सके। इंटरनेट जाँचकर फिर कोशिश करें।',
+                    'Could not load notifications. Check your internet and retry.'),
+                retry: true);
+          } else if (items.isEmpty) {
+            body = _empty(t('अभी कोई नोटिफिकेशन नहीं है',
+                'No notifications yet'));
+          } else {
+            body = RefreshIndicator(
+              onRefresh: _svc.load,
+              child: ListView.builder(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(14),
+                itemCount: items.length,
+                itemBuilder: (c, i) => _tile(items[i]),
+              ),
+            );
+          }
+          return Scaffold(
+            backgroundColor: AppColors.bg,
+            appBar: AppBar(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              title: Text(t('नोटिफिकेशन', 'Notifications')),
+              actions: [
+                if (_svc.unread > 0)
+                  TextButton(
+                    onPressed: _svc.markAllRead,
+                    child: Text(t('सब पढ़ा', 'Mark all read'),
+                        style: const TextStyle(color: Colors.white)),
+                  ),
+              ],
             ),
-          ],
-        ),
+            body: body,
+          );
+        },
       ),
     );
   }

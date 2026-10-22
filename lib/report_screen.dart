@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'data.dart';
 import 'home_screen.dart' show RoomMitraLogo;
-import 'notifications_screen.dart';
 import 'strings.dart';
 import 'theme.dart';
 
@@ -365,18 +364,6 @@ class _ReportScreenState extends State<ReportScreen> {
 
     if (!mounted) return;
     setState(() => _sending = false);
-    demoNotifications.insert(
-      0,
-      NotifItem(
-        kind: NotifKind.safety,
-        title: t('रिपोर्ट दर्ज हुई', 'Report submitted'),
-        body: t(
-            '"${rt.title}" की आपकी रिपोर्ट मिल गई है। हमारी टीम जाँच कर रही है।',
-            'We have received your report for "${rt.titleEn}". Our team is reviewing it.'),
-        time: t('अभी', 'Just now'),
-        unread: true,
-      ),
-    );
     showDialog<void>(
       context: context,
       barrierDismissible: false,
