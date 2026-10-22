@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 
+import 'data.dart';
+
 enum NearbyStatus {
   idle,
   loading,
@@ -60,6 +62,7 @@ class NearbyService extends ChangeNotifier {
         if (last != null) {
           lat = last.latitude;
           lng = last.longitude;
+          appState.autoCityFrom(last.latitude, last.longitude);
           _set(NearbyStatus.ready);
         }
       } catch (_) {}
@@ -72,6 +75,7 @@ class NearbyService extends ChangeNotifier {
       );
       lat = pos.latitude;
       lng = pos.longitude;
+      appState.autoCityFrom(pos.latitude, pos.longitude);
       _set(NearbyStatus.ready);
     } on TimeoutException {
       _set(hasPosition ? NearbyStatus.ready : NearbyStatus.error);

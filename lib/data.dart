@@ -1,4 +1,7 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'strings.dart';
@@ -570,6 +573,14 @@ class Filters {
   }
 }
 
+/// हर शहर का लगभग केंद्र (अक्षांश, देशांतर), फोन की जगह से शहर पहचानने के लिए
+const Map<String, List<double>> cityCenters = {
+  'Nahan': [30.5593, 77.2947],
+  'Paonta Sahib': [30.4367, 77.6240],
+  'Solan': [30.9045, 77.0967],
+  'Shimla': [31.1048, 77.1734],
+};
+
 /// होम से किसी श्रेणी पर दबाने पर खोज स्क्रीन में यही फ़िल्टर लग जाता है
 final ValueNotifier<Filters?> searchPreset = ValueNotifier<Filters?>(null);
 
@@ -578,9 +589,54 @@ class AppState extends ChangeNotifier {
   String city = 'Nahan';
   final Set<String> favorites = <String>{};
 
+  /// जगह के हिसाब से शहर अपने आप बदलने की सेटिंग (डिफ़ॉल्ट: चालू)
+  bool autoCity = true;
+
+  /// यूज़र ने इस बार खुद शहर चुन लिया हो तो अपने आप न बदलें
+  bool _manualCity = false;
+
+  /// यूज़र के चुनने पर
   void setCity(String c) {
     city = c;
+    _manualCity = true;
     notifyListeners();
+  }
+
+  Future<void> loadPrefs() async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      autoCity = p.getBool('auto_city') ?? true;
+    } catch (_) {}
+  }
+
+  Future<void> setAutoCity(bool v) async {
+    autoCity = v;
+    if (v) _manualCity = false;
+    notifyListeners();
+    try {
+      final p = await SharedPreferences.getInstance();
+      await p.setBool('auto_city', v);
+    } catch (_) {}
+  }
+
+  /// फोन की जगह आने पर सबसे पास का शहर चुन लो (60 km के अंदर हो तभी)
+  void autoCityFrom(double lat, double lng) {
+    if (!autoCity || _manualCity) return;
+    String? best;
+    var bestKm = 1e9;
+    cityCenters.forEach((name, c) {
+      final dLat = (c[0] - lat) * 111.0;
+      final dLng = (c[1] - lng) * 111.0 * math.cos(lat * math.pi / 180);
+      final km = math.sqrt(dLat * dLat + dLng * dLng);
+      if (km < bestKm) {
+        bestKm = km;
+        best = name;
+      }
+    });
+    if (best != null && bestKm <= 60 && best != city) {
+      city = best!;
+      notifyListeners();
+    }
   }
 
   bool isFav(String id) => favorites.contains(id);

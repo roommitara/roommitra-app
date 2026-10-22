@@ -6,6 +6,7 @@ import 'data.dart';
 import 'help_screen.dart';
 import 'home_screen.dart' show RoomMitraLogo;
 import 'invite_screen.dart';
+import 'location_service.dart';
 import 'login_screen.dart';
 import 'messages_screen.dart';
 import 'my_listings_screen.dart';
@@ -694,6 +695,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
         t('प्रोफाइल अपडेट करें', 'Update profile'),
         t('अपना नाम बदलें, फोटो बदलने के लिए फोटो दबाएँ', 'Change your name; tap the photo to change it'),
         _editProfile,
+      ),
+      _MenuItem(
+        Icons.my_location,
+        t('जगह अपने आप चुनें', 'Auto-detect my city'),
+        appState.autoCity
+            ? t('चालू: फोन की जगह से शहर अपने आप बदलेगा',
+                'On: city changes automatically from your location')
+            : t('बंद: शहर आप खुद चुनेंगे', 'Off: you choose the city'),
+        () {
+          final on = !appState.autoCity;
+          appState.setAutoCity(on);
+          if (on) NearbyService.instance.refresh(ask: true);
+          setState(() {});
+          showMsg(
+              context,
+              on
+                  ? t('अब शहर जगह से अपने आप चुना जाएगा',
+                      'City will now be picked from your location')
+                  : t('अब शहर आप खुद चुनेंगे', 'You will now choose the city'));
+        },
       ),
       _MenuItem(
         Icons.group_add,

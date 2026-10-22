@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:video_player/video_player.dart';
 import 'app_shell.dart';
+import 'data.dart';
 import 'login_screen.dart';
 import 'onboarding_screen.dart';
 import 'otp_service.dart';
@@ -14,6 +15,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await AppLang.load();
   await AppTheme.load();
+  await appState.loadPrefs();
 
   String? startupError;
   try {
