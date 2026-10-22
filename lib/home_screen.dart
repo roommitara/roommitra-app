@@ -128,16 +128,17 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     appState.loadFavorites();
     NotificationService.instance.start();
-    PushService.instance.start();
     if (!listingsStore.loaded) {
       listingsStore.load();
     }
     // ऐप खुलते ही लोकेशन की इजाज़त माँगो (सिर्फ पहली बार) और नज़दीकी कमरे निकालो
-    if (NearbyService.instance.status == NearbyStatus.idle) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        NearbyService.instance.refresh(ask: true);
-      });
-    }
+    // पहले लोकेशन की इजाज़त, उसके बाद नोटिफिकेशन की (दोनों एक साथ माँगने पर Android एक छोड़ देता है)
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (NearbyService.instance.status == NearbyStatus.idle) {
+        await NearbyService.instance.refresh(ask: true).timeout(const Duration(seconds: 30), onTimeout: () {});
+      }
+      PushService.instance.start();
+    });
   }
 
   static const List<_City> _cities = [
