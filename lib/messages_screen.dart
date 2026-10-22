@@ -623,7 +623,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style:
-                      const TextStyle(fontSize: 12, color: Color(0xFFD9F2E3)),
+                      const TextStyle(fontSize: 12, color: Color(0xFFD9EEF7)),
                 ),
               ],
             ),

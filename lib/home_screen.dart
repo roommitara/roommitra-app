@@ -142,11 +142,11 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   static const List<_City> _cities = [
-    _City('Nahan', Icons.location_city, Color(0xFF7FB0DC), Color(0xFF9CC6A0),
+    _City('Nahan', Icons.location_city, Color(0xFF7FB0DC), Color(0xFF8FC3D9),
         'assets/city_nahan.jpg'),
     _City('Paonta Sahib', Icons.account_balance, Color(0xFFC9A57C),
         Color(0xFF8FB7D9), 'assets/city_paonta.jpg'),
-    _City('Solan', Icons.landscape, Color(0xFF9CC6A0), Color(0xFF5E9B78),
+    _City('Solan', Icons.landscape, Color(0xFF8FC3D9), Color(0xFF5B9DB8),
         'assets/city_solan.jpg'),
     _City('Shimla', Icons.terrain, Color(0xFF8FB7D9), Color(0xFF5B8DB8),
         'assets/city_shimla.jpg'),
@@ -421,7 +421,7 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         Row(
           children: [
-            _tile(Icons.single_bed, const Color(0xFFE3F3EA),
+            _tile(Icons.single_bed, const Color(0xFFE3F3F9),
                 const Color(0xFF1B7A43), t('सिंगल\nरूम', 'Single\nRoom'),
                 'single_room'),
             const SizedBox(width: 8),
@@ -441,7 +441,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 const Color(0xFFD6336C), t('दुकान', 'Shop'),
                 'shop'),
             const SizedBox(width: 8),
-            _tile(Icons.people, const Color(0xFFE0F5F3),
+            _tile(Icons.people, const Color(0xFFDDF1F8),
                 const Color(0xFF1E8E86), t('शेयरिंग', 'Sharing'),
                 'sharing'),
           ],
@@ -509,7 +509,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  static const Color _lime = Color(0xFF7BF03A);
+  static const Color _lime = Color(0xFF35C6F4);
 
   Widget _feature(IconData icon, String text) {
     return Expanded(

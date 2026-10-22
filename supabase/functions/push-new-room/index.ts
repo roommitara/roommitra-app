@@ -93,7 +93,7 @@ Deno.serve(async (req) => {
             token: tk.token,
             notification: { title, body },
             data: { kind: "new_room", listing_id: String(l.id) },
-            android: { priority: "HIGH", notification: { color: "#1B8A5A" } },
+            android: { priority: "HIGH", notification: { color: "#007BA7" } },
           },
         }),
       });

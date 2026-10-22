@@ -74,7 +74,7 @@ jobs:
           convert -size 96x96 xc:none -fill white -draw "polygon 48,10 86,46 76,46 76,84 20,84 20,46 10,46" $RES/drawable/ic_stat_notify.png
           cat > $RES/values/colors_notify.xml << 'EOF2'
           <?xml version="1.0" encoding="utf-8"?>
-          <resources><color name="notify_color">#1B8A5A</color></resources>
+          <resources><color name="notify_color">#007BA7</color></resources>
           EOF2
           python3 - << 'PYEOF'
           import re, os

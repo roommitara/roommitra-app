@@ -375,7 +375,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       TextSpan(
                         text: 'Mitra',
-                        style: TextStyle(color: Color(0xFF3FAE5A)),
+                        style: TextStyle(color: Color(0xFF35A9D6)),
                       ),
                     ],
                   ),
@@ -435,7 +435,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   width: 46,
                   height: 3,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF3FAE5A),
+                    color: const Color(0xFF35A9D6),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),

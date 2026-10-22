@@ -29,31 +29,32 @@ class AppTheme {
 class AppColors {
   static bool get _d => AppTheme.isDark;
 
+  // जेट ब्लैक #0A0A0A + सेरुलियन ब्लू #007BA7
   static Color get primary =>
-      _d ? const Color(0xFF1FA067) : const Color(0xFF0B5D3B);
+      _d ? const Color(0xFF1596C4) : const Color(0xFF007BA7);
   static Color get primaryDark =>
-      _d ? const Color(0xFF2DB87C) : const Color(0xFF07442B);
-  static Color get accent => const Color(0xFF6FE23C);
+      _d ? const Color(0xFF0A4A63) : const Color(0xFF005A7A);
+  static Color get accent => const Color(0xFF35C6F4);
   static Color get tint =>
-      _d ? const Color(0xFF1C3A2C) : const Color(0xFFE6F4EC);
+      _d ? const Color(0xFF0F2A36) : const Color(0xFFE3F3F9);
   static Color get tintLight =>
-      _d ? const Color(0xFF16241D) : const Color(0xFFF3FAF6);
+      _d ? const Color(0xFF111B21) : const Color(0xFFF2FAFD);
   static Color get text =>
-      _d ? const Color(0xFFE8F2EC) : const Color(0xFF10261C);
+      _d ? const Color(0xFFEAF4F8) : const Color(0xFF0A0A0A);
   static Color get muted =>
-      _d ? const Color(0xFF9DB0A6) : const Color(0xFF6B7C74);
+      _d ? const Color(0xFF98A7AE) : const Color(0xFF5F6F77);
   static Color get border =>
-      _d ? const Color(0xFF2C4136) : const Color(0xFFD9E8DF);
+      _d ? const Color(0xFF26353D) : const Color(0xFFD5E5EC);
   static Color get danger =>
       _d ? const Color(0xFFFF6B6B) : const Color(0xFFD64545);
 
   /// पूरे स्क्रीन का बैकग्राउंड
   static Color get bg =>
-      _d ? const Color(0xFF0E1511) : const Color(0xFFFFFFFF);
+      _d ? const Color(0xFF0A0A0A) : const Color(0xFFFFFFFF);
 
   /// कार्ड, डिब्बे, डायलॉग की सतह
   static Color get surface =>
-      _d ? const Color(0xFF17211B) : const Color(0xFFFFFFFF);
+      _d ? const Color(0xFF15191C) : const Color(0xFFFFFFFF);
 }
 
 ThemeData buildAppTheme() {
@@ -62,7 +63,7 @@ ThemeData buildAppTheme() {
     useMaterial3: true,
     brightness: d ? Brightness.dark : Brightness.light,
     colorScheme: ColorScheme.fromSeed(
-      seedColor: const Color(0xFF0B5D3B),
+      seedColor: const Color(0xFF007BA7),
       brightness: d ? Brightness.dark : Brightness.light,
       primary: AppColors.primary,
       surface: AppColors.surface,
