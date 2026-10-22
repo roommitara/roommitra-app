@@ -58,7 +58,7 @@ Deno.serve(async (req) => {
 
     const db = createClient(url, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
     const { data: l } = await db.from("room_listings")
-      .select("id, owner_id, title, city, locality, rent, status")
+      .select("id, owner_id, title, city, locality, monthly_rent, status")
       .eq("id", listing_id).maybeSingle();
     if (!l || l.status !== "approved") return json({ skipped: "not approved" });
 
@@ -76,7 +76,7 @@ Deno.serve(async (req) => {
     const at = await accessToken(sa);
 
     const where = l.locality ? `${l.locality}, ${l.city}` : l.city;
-    const rent = l.rent ? `₹${l.rent}` : "";
+    const rent = l.monthly_rent ? `₹${l.monthly_rent}` : "";
     const rows: Record<string, unknown>[] = [];
     let sent = 0;
     const dead: string[] = [];
