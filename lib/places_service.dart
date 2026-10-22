@@ -76,6 +76,9 @@ class PlacesService {
 
   static final Map<String, List<AreaItem>> _areaCache = {};
 
+  /// आख़िरी गड़बड़ी का संदेश (लिस्ट खाली रहे तो स्क्रीन पर दिखाने के लिए)
+  static String lastError = '';
+
   /// शहर के इलाकों की लिस्ट: पहले सर्वर की सेव की हुई, खाली हो तो Google से एक बार मँगवाकर
   static Future<List<AreaItem>> areas(String city) async {
     final c = _areaCache[city];
@@ -95,13 +98,22 @@ class PlacesService {
     try {
       var list = await read();
       if (list.isEmpty) {
-        await _call({'action': 'areas', 'city': city});
+        lastError = '';
+        final d = await _call({'action': 'areas', 'city': city});
+        if (d == null) {
+          lastError = 'places-proxy call failed';
+        } else if (d['error'] != null) {
+          lastError = '${d['error']}';
+        } else if (d['errors'] is List && (d['errors'] as List).isNotEmpty) {
+          lastError = (d['errors'] as List).join(' | ');
+        }
         list = await read();
       }
       if (list.isNotEmpty) _areaCache[city] = list;
       return list;
     } catch (e) {
       debugPrint('areas failed: $e');
+      lastError = '$e';
       return const [];
     }
   }

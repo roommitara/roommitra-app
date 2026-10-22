@@ -118,6 +118,13 @@ class _AreaSheetState extends State<_AreaSheet> {
                                         'No area with this name.'),
                                 style: TextStyle(color: AppColors.muted)),
                           ),
+                        if (all.isEmpty && PlacesService.lastError.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: Text('Error: ${PlacesService.lastError}',
+                                style: TextStyle(
+                                    fontSize: 12, color: AppColors.danger)),
+                          ),
                         if (q.length >= 2)
                           ListTile(
                             leading: Icon(Icons.edit, color: AppColors.accent),

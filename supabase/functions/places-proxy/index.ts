@@ -107,6 +107,7 @@ Deno.serve(async (req) => {
         [`chowk in ${city}`, false], [`market in ${city}`, false],
         [`${city} bus stand railway station`, false], [`temple lake park in ${city}`, false],
       ];
+      const errs: string[] = [];
       const seen = new Map<string, { city: string; name: string; lat: number; lng: number }>();
       const okTypes = ["sublocality", "sublocality_level_1", "sublocality_level_2", "neighborhood", "political"];
       await Promise.all(queries.map(async ([q, strict]) => {
@@ -114,6 +115,7 @@ Deno.serve(async (req) => {
           textQuery: q, languageCode: "en", pageSize: 20,
           locationBias: { circle: { center: { latitude: center[0], longitude: center[1] }, radius: 12000 } },
         }, "places.displayName,places.location,places.types");
+        if (j.error) errs.push(String(j.error.message ?? j.error.status ?? "google error").slice(0, 200));
         for (const p of j.places ?? []) {
           const name = String(p.displayName?.text ?? "").trim();
           if (!name || !p.location) continue;
@@ -127,7 +129,7 @@ Deno.serve(async (req) => {
       }));
       const rows = [...seen.values()];
       if (rows.length) await db.from("city_areas").upsert(rows, { onConflict: "city,name" });
-      return json({ cached: false, count: rows.length });
+      return json({ cached: false, count: rows.length, errors: [...new Set(errs)] });
     }
 
     return json({ error: "unknown action" }, 400);
