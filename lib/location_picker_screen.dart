@@ -1,14 +1,12 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:http/http.dart' as http;
-import 'package:latlong2/latlong.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'data.dart';
+import 'places_service.dart';
 import 'strings.dart';
 import 'theme.dart';
 
@@ -28,24 +26,6 @@ class LocationResult {
   });
 }
 
-class _Place {
-  final String name;
-  final LatLng point;
-  const _Place(this.name, this.point);
-}
-
-class _Rev {
-  final String address;
-  final String city;
-  final String locality;
-  const _Rev(this.address, this.city, this.locality);
-}
-
-const Map<String, String> _headers = {
-  'User-Agent': 'RoomMitraApp/1.0',
-  'Accept-Language': 'hi,en',
-};
-
 class LocationPickerScreen extends StatefulWidget {
   /// एडिट करते समय पुरानी लोकेशन यहाँ आती है
   final LocationResult? initial;
@@ -58,9 +38,17 @@ class LocationPickerScreen extends StatefulWidget {
 class _LocationPickerScreenState extends State<LocationPickerScreen> {
   // नक्शा खुलते समय सिर्फ देखने की शुरुआती जगह (नाहन के आसपास)।
   // यह सेव नहीं होती, मालिक को पिन खुद तय करना होगा।
-  static const LatLng _defaultView = LatLng(30.5593, 77.2959);
+  LatLng get _defaultView {
+    final c = cityCenters[appState.city] ?? const [30.5593, 77.2959];
+    return LatLng(c[0], c[1]);
+  }
 
-  final MapController _map = MapController();
+  GoogleMapController? _map;
+  bool _programmatic = false; // कोड से कैमरा हिला रहे हों तो पिन न बदलें
+  Timer? _progTimer;
+  Timer? _searchTimer;
+  final String _session =
+      DateTime.now().microsecondsSinceEpoch.toRadixString(36);
   final TextEditingController _search = TextEditingController();
   final TextEditingController _address = TextEditingController();
 
@@ -72,7 +60,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
   bool _revBusy = false;
   bool _saving = false;
   bool _satellite = false; // सैटेलाइट नक्शा
-  List<_Place> _results = [];
+  List<PlaceHit> _results = [];
   String _city = '';
   String _locality = '';
   Timer? _revTimer;
@@ -96,9 +84,11 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
   @override
   void dispose() {
     _revTimer?.cancel();
+    _progTimer?.cancel();
+    _searchTimer?.cancel();
     _search.dispose();
     _address.dispose();
-    _map.dispose();
+    _map?.dispose();
     super.dispose();
   }
 
@@ -107,62 +97,63 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
     showMsg(context, t);
   }
 
-  // ----------------------------- पता खोजना -----------------------------
-  Future<void> _doSearch() async {
-    final q = _search.text.trim();
-    if (q.length < 3) {
-      _msg(t('कम से कम 3 अक्षर लिखें',
-          'Type at least 3 letters'));
+  // ----------------------------- पता खोजना (Google Places) -----------------------------
+  void _onSearchChanged(String v) {
+    _searchTimer?.cancel();
+    if (v.trim().length < 2) {
+      setState(() => _results = []);
       return;
     }
-    FocusScope.of(context).unfocus();
+    _searchTimer = Timer(const Duration(milliseconds: 450), _doSearch);
+  }
+
+  Future<void> _doSearch() async {
+    final q = _search.text.trim();
+    if (q.length < 2) {
+      _msg(t('कम से कम 2 अक्षर लिखें', 'Type at least 2 letters'));
+      return;
+    }
+    setState(() => _searching = true);
+    final out = await PlacesService.autocomplete(q, appState.city, _session);
+    if (!mounted) return;
     setState(() {
-      _searching = true;
-      _results = [];
+      _searching = false;
+      _results = out;
     });
-    try {
-      final uri = Uri.https('nominatim.openstreetmap.org', '/search', {
-        'q': q,
-        'format': 'jsonv2',
-        'limit': '6',
-        'countrycodes': 'in',
-      });
-      final r =
-          await http.get(uri, headers: _headers).timeout(const Duration(seconds: 12));
-      if (r.statusCode != 200) {
-        _msg(t('खोज अभी काम नहीं कर रही, थोड़ी देर बाद कोशिश करें',
-          'Search is not working right now, try again later'));
-      } else {
-        final list = jsonDecode(r.body) as List<dynamic>;
-        final out = <_Place>[];
-        for (final e in list) {
-          final m = e as Map<String, dynamic>;
-          final lat = double.tryParse('${m['lat']}');
-          final lon = double.tryParse('${m['lon']}');
-          if (lat == null || lon == null) continue;
-          out.add(_Place('${m['display_name']}', LatLng(lat, lon)));
-        }
-        if (mounted) setState(() => _results = out);
-        if (out.isEmpty) _msg(t('कोई जगह नहीं मिली। दूसरा नाम लिखकर देखें',
-          'No place found. Try another name'));
-      }
-    } catch (_) {
-      _msg(t('इंटरनेट या खोज में दिक्कत है, फिर कोशिश करें',
-          'Internet or search problem, please try again'));
-    } finally {
-      if (mounted) setState(() => _searching = false);
+    if (out.isEmpty) {
+      _msg(t('कोई जगह नहीं मिली। दूसरा नाम लिखकर देखें', 'No place found. Try another name'));
     }
   }
 
-  void _pickPlace(_Place p) {
+  Future<void> _pickPlace(PlaceHit h) async {
+    FocusScope.of(context).unfocus();
     setState(() {
       _results = [];
-      _pin = p.point;
-      _chosen = true;
-      if (!_addrEdited) _address.text = p.name;
+      _searching = true;
     });
-    _map.move(p.point, 17);
+    final info = await PlacesService.details(h.id, _session);
+    if (!mounted) return;
+    setState(() => _searching = false);
+    if (info == null) {
+      _msg(t('इस जगह की जानकारी नहीं मिली', 'Could not get details of this place'));
+      return;
+    }
+    final p = LatLng(info.lat, info.lng);
+    setState(() {
+      _pin = p;
+      _chosen = true;
+      _search.text = h.text;
+      if (!_addrEdited && info.address.isNotEmpty) _address.text = info.address;
+    });
+    _moveTo(p, 17);
     _scheduleReverse();
+  }
+
+  void _moveTo(LatLng p, double zoom) {
+    _programmatic = true;
+    _progTimer?.cancel();
+    _progTimer = Timer(const Duration(milliseconds: 1800), () => _programmatic = false);
+    _map?.animateCamera(CameraUpdate.newLatLngZoom(p, zoom));
   }
 
   // ----------------------------- GPS -----------------------------
@@ -204,7 +195,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
         _chosen = true;
         _results = [];
       });
-      _map.move(p, 18);
+      _moveTo(p, 18);
       _scheduleReverse();
     } on TimeoutException {
       _msg(t('GPS से जगह नहीं मिली। खुली जगह में जाकर फिर कोशिश करें',
@@ -223,36 +214,8 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
     _revTimer = Timer(const Duration(milliseconds: 900), _reverse);
   }
 
-  Future<_Rev?> _fetchReverse(LatLng p) async {
-    try {
-      final uri = Uri.https('nominatim.openstreetmap.org', '/reverse', {
-        'lat': '${p.latitude}',
-        'lon': '${p.longitude}',
-        'format': 'jsonv2',
-        'addressdetails': '1',
-        'zoom': '18',
-      });
-      final r =
-          await http.get(uri, headers: _headers).timeout(const Duration(seconds: 12));
-      if (r.statusCode != 200) return null;
-      final m = jsonDecode(r.body) as Map<String, dynamic>;
-      final a = (m['address'] as Map<String, dynamic>?) ?? {};
-      String pick(List<String> keys) {
-        for (final k in keys) {
-          final v = a[k];
-          if (v is String && v.trim().isNotEmpty) return v.trim();
-        }
-        return '';
-      }
-
-      final city = pick(['city', 'town', 'village', 'municipality', 'county']);
-      final locality = pick(
-          ['suburb', 'neighbourhood', 'quarter', 'hamlet', 'village', 'road']);
-      return _Rev('${m['display_name'] ?? ''}', city, locality);
-    } catch (_) {
-      return null;
-    }
-  }
+  Future<ReverseInfo?> _fetchReverse(LatLng p) =>
+      PlacesService.reverse(p.latitude, p.longitude);
 
   Future<void> _reverse() async {
     if (!_chosen || !mounted) return;
@@ -356,11 +319,12 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
             child: TextField(
               controller: _search,
               textInputAction: TextInputAction.search,
+              onChanged: _onSearchChanged,
               onSubmitted: (_) => _doSearch(),
               decoration: InputDecoration(
                 border: InputBorder.none,
-                hintText: t('पता या इलाका खोजें (जैसे Rani Tal Nahan)',
-                    'Search address or area (e.g. Rani Tal Nahan)'),
+                hintText: t('इलाका, चौक या जगह खोजें (जैसे Rani Tal)',
+                    'Search area, chowk or place (e.g. Rani Tal)'),
                 hintStyle: TextStyle(fontSize: 13.5, color: AppColors.muted),
               ),
             ),
@@ -407,7 +371,7 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
             dense: true,
             leading:
                 Icon(Icons.location_on, color: AppColors.primary),
-            title: Text(p.name,
+            title: Text(p.text,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(fontSize: 13)),
@@ -438,55 +402,42 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
   }
 
   void _zoomBy(double d) {
-    final cam = _map.camera;
-    final z = (cam.zoom + d).clamp(4.0, 19.0).toDouble();
-    _map.move(cam.center, z);
+    _programmatic = true;
+    _progTimer?.cancel();
+    _progTimer = Timer(const Duration(milliseconds: 900), () => _programmatic = false);
+    _map?.animateCamera(d > 0 ? CameraUpdate.zoomIn() : CameraUpdate.zoomOut());
   }
 
   Widget _mapArea() {
     return Stack(
       children: [
-        FlutterMap(
-          mapController: _map,
-          options: MapOptions(
-            initialCenter: _pin,
-            initialZoom: _chosen ? 17 : 13,
-            minZoom: 4,
-            maxZoom: 19,
-            onPositionChanged: (camera, hasGesture) {
-              if (hasGesture) {
-                setState(() {
-                  _pin = camera.center;
-                  _chosen = true;
-                  _results = [];
-                });
-                _scheduleReverse();
-              }
-            },
-          ),
-          children: [
-            if (_satellite)
-              TileLayer(
-                urlTemplate:
-                    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-                userAgentPackageName: 'com.roommitra.roommitra_app',
-                maxNativeZoom: 19,
-              )
-            else
-              TileLayer(
-                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                retinaMode: RetinaMode.isHighDensity(context),
-                userAgentPackageName: 'com.roommitra.roommitra_app',
-                maxNativeZoom: 19,
-              ),
-            RichAttributionWidget(
-              attributions: [
-                TextSourceAttribution(_satellite
-                    ? 'Imagery © Esri, Maxar, Earthstar Geographics'
-                    : '© OpenStreetMap contributors'),
-              ],
-            ),
-          ],
+        GoogleMap(
+          initialCameraPosition:
+              CameraPosition(target: _pin, zoom: _chosen ? 17 : 14),
+          mapType: _satellite ? MapType.hybrid : MapType.normal,
+          minMaxZoomPreference: const MinMaxZoomPreference(4, 21),
+          zoomControlsEnabled: false,
+          myLocationButtonEnabled: false,
+          mapToolbarEnabled: false,
+          compassEnabled: true,
+          onMapCreated: (c) => _map = c,
+          onCameraMove: (pos) {
+            if (_programmatic) return;
+            _pin = pos.target;
+            if (!_chosen || _results.isNotEmpty) {
+              setState(() {
+                _chosen = true;
+                _results = [];
+              });
+            }
+          },
+          onCameraIdle: () {
+            if (_programmatic) {
+              _programmatic = false;
+              return;
+            }
+            if (_chosen) _scheduleReverse();
+          },
         ),
         // बीच में टिका हुआ पिन। नीचे की नोक मैप के ठीक बीच पर रहती है।
         IgnorePointer(

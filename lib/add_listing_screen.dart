@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'area_picker.dart';
 import 'data.dart';
 import 'guide_video.dart';
 import 'home_screen.dart' show RoomMitraLogo;

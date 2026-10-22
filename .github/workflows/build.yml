@@ -109,6 +109,21 @@ jobs:
               break
           PYEOF
           grep -n "google" out/android/settings.gradle* out/android/app/build.gradle*
+      - name: Add Google Maps key
+        env:
+          MAPS_KEY: ${{ secrets.MAPS_API_KEY }}
+        run: |
+          if [ -z "$MAPS_KEY" ]; then echo "No MAPS_API_KEY secret: map will be blank"; exit 0; fi
+          python3 - << 'PYEOF'
+          import os
+          p = 'out/android/app/src/main/AndroidManifest.xml'
+          s = open(p).read()
+          m = '<meta-data android:name="com.google.android.geo.API_KEY" android:value="%s"/>' % os.environ['MAPS_KEY']
+          if 'geo.API_KEY' not in s:
+              s = s.replace('</application>', m + '</application>', 1)
+          open(p, 'w').write(s)
+          PYEOF
+          grep -c "geo.API_KEY" out/android/app/src/main/AndroidManifest.xml
       - name: Copy app files
         run: |
           rm -rf out/lib

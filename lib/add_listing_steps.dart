@@ -133,15 +133,29 @@ extension _AddListingSteps on _AddListingScreenState {
                         value: c, child: Text(cityName(c))))
                     .toList(),
                 (v) {
-                  if (v != null) _set(() => _city = v);
+                  if (v != null && v != _city) {
+                    _set(() {
+                      _city = v;
+                      _area.clear();
+                    });
+                  }
                 },
                 required: true,
               ),
-              _field(t('इलाका/एरिया', 'Area/Locality'), _area,
-                  hint: t('जैसे - Rani Tal', 'e.g. Rani Tal'),
-                  required: true,
-                  icon: Icons.location_city,
-                  maxLength: 40),
+              _label(t('इलाका/एरिया', 'Area/Locality'), required: true),
+              TextField(
+                controller: _area,
+                readOnly: true,
+                onTap: () async {
+                  final a = await showAreaPicker(context, _city);
+                  if (a != null) _set(() => _area.text = a);
+                },
+                style: TextStyle(fontSize: 15, color: AppColors.text),
+                decoration: _deco(
+                    t('इलाका चुनने के लिए दबाएँ', 'Tap to choose area'),
+                    icon: Icons.location_city),
+              ),
+              const SizedBox(height: 10),
               _dropdown<int>(
                 t('कमरों की संख्या', 'Number of rooms'),
                 _rooms,
